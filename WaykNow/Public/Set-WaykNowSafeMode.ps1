@@ -1,7 +1,6 @@
 
-. .\Common\Invoke-Process.ps1
-
-function Restart-WaykNowComputer
+. "$PSScriptRoot/../Private/Invoke-Process.ps1"
+function Set-WaykNowSafeMode
 {
 	# copy default boot entry
 	$bcdedit_copy = $(Invoke-Process -FilePath 'bcdedit' -ArgumentList "/copy `{default`} /d `"Safe Mode with Wayk Now`"")
@@ -22,4 +21,3 @@ function Restart-WaykNowComputer
 	$safeboot_network_reg = "HKLM:SYSTEM\CurrentControlSet\Control\SafeBoot\Network"
 	New-Item -Path $safeboot_network_reg -Name 'WaykNowService' -Value 'Service' -Force
 }
-

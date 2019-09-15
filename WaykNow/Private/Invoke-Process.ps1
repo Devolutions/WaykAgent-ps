@@ -77,4 +77,3 @@ function Invoke-Process {
         Remove-Item -Path $stdOutTempFile, $stdErrTempFile -Force -ErrorAction Ignore
     }
 }
-
