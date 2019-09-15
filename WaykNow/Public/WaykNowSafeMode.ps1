@@ -90,3 +90,5 @@ function Reset-WaykNowSafeMode
 
 	Remove-Item -Path "$safeboot_reg\WaykNowService" -Force -Recurse
 }
+
+Export-ModuleMember -Function Set-WaykNowSafeMode, Reset-WaykNowSafeMode
