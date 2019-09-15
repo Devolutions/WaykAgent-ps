@@ -16,5 +16,3 @@ function Get-WaykNowUpdate
 	Write-Host $download_url_mac
 	Write-Host $download_url_deb
 }
-
-Get-WaykNowUpdate
