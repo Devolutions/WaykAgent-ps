@@ -15,3 +15,4 @@ Foreach ($Import in @($Public + $Private))
 
 # Export Module Member
 Export-ModuleMember -Function $Public.BaseName -Alias *
+Export-ModuleMember -Function 'Reset-WaykNowSafeMode'
