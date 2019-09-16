@@ -1,18 +1,15 @@
 
 . "$PSScriptRoot/../Private/Invoke-Process.ps1"
-function Get-HostEnvironment
-{
-	if ($null -Eq $Global:IsWindows) {
-		if ($PSEdition -Eq 'Desktop') {
-			$Global:IsWindows = $true
-		}
-	}
-}
+. "$PSScriptRoot/../Private/PlatformHelpers.ps1"
 
 function Get-WaykNowVersion
 {
 	if ($IsWindows) {
-
+		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Now'
+		if ($uninstall_reg) {
+			$version = $uninstall_reg.DisplayVersion
+			return $version
+		}
 	} elseif ($IsMacOS) {
 		$info_plist_path = "/Applications/WaykNow.app/Contents/Info.plist"
 		$cf_bundle_version_xpath = "//dict/key[. ='CFBundleVersion']/following-sibling::string[1]"
@@ -65,19 +62,21 @@ function Install-WaykNow
 {
 	$download_url = Get-WaykNowPackage
 	$download_file = Split-Path -Path $download_url -Leaf
-	Write-Host $download_url
 
-	(New-Object System.Net.WebClient).DownloadFile($download_url, $download_file)
-
-	$install_log_file = "WaykNow_Install.log"
+	Write-Host "Downloading $download_url"
+	$web_client = [System.Net.WebClient]::new()
+	$web_client.DownloadFile($download_url, $download_file)
+	$web_client.Dispose()
 
 	if ($IsWindows) {
+		$install_log_file = "WaykNow_Install.log"
 		$msi_args = @(
 			'/i', $download_file,
 			'/quiet', '/norestart',
 			'/log', $install_log_file
 		)
 		Start-Process "msiexec.exe" -ArgumentList $msi_args -Wait -NoNewWindow
+		Remove-Item -Path $install_log_file -Force -ErrorAction SilentlyContinue
 	} elseif ($IsMacOS) {
 		$volumes_wayk_now = "/Volumes/WaykNow"
 		if (Test-Path -Path $volumes_wayk_now -PathType 'Container') {
@@ -105,7 +104,6 @@ function Install-WaykNow
 	}
 
 	Remove-Item -Path $download_file -Force
-	Remove-Item -Path $install_log_file -Force -ErrorAction SilentlyContinue
 }
 
 function Uninstall-WaykNow
@@ -114,22 +112,15 @@ function Uninstall-WaykNow
 	
 	if ($IsWindows) {
 		# https://stackoverflow.com/a/25546511
-		$display_name = 'Wayk Now'
-		if ([System.Environment]::Is64BitOperatingSystem) {
-			$uninstall_string = Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" `
-				| ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $display_name } `
-				| Select-Object UninstallString
-		} else {
-			$uninstall_string = Get-ChildItem "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall" `
-				| ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $display_name } `
-				| Select-Object UninstallString
+		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Now'
+		if ($uninstall_reg) {
+			$uninstall_string = $($uninstall_reg.UninstallString `
+				-Replace "msiexec.exe", "" -Replace "/I", "" -Replace "/X", "").Trim()
+			$msi_args = @(
+				'/X', $uninstall_string, '/qb'
+			)
+			Start-Process "msiexec.exe" -ArgumentList $msi_args -Wait
 		}
-		$uninstall_string = $($uninstall_string.UninstallString `
-			-Replace "msiexec.exe", "" -Replace "/I", "" -Replace "/X", "").Trim()
-		$msi_args = @(
-			'/X', $uninstall_string, '/qb'
-		)
-		Start-Process "msiexec.exe" -ArgumentList $msi_args -Wait
 	} elseif ($IsMacOS) {
 		$wayk_now_app = "/Applications/WaykNow.app"
 		if (Test-Path -Path $wayk_now_app -PathType 'Container') {
