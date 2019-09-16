@@ -75,14 +75,22 @@ function Uninstall-WaykNow
 {
 	if ($IsWindows) {
 		# https://stackoverflow.com/a/25546511
-
 		$display_name = 'Wayk Now'
-		$uninstall_string = Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" `
-			| ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $display_name } `
-			| Select-Object UninstallString
+		if ([System.Environment]::Is64BitOperatingSystem) {
+			$uninstall_string = Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" `
+				| ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $display_name } `
+				| Select-Object UninstallString
+		} else {
+			$uninstall_string = Get-ChildItem "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall" `
+				| ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $display_name } `
+				| Select-Object UninstallString
+		}
 		$uninstall_string = $($uninstall_string.UninstallString `
 			-Replace "msiexec.exe", "" -Replace "/I", "" -Replace "/X", "").Trim()
-		Start-Process "msiexec.exe" -ArgumentList "/X $uninstall_string /qb" -Wait
+		$msi_args = @(
+			'/X', $uninstall_string, '/qb'
+		)
+		Start-Process "msiexec.exe" -ArgumentList $msi_args -Wait
 	} elseif ($IsMacOS) {
 
 	} elseif ($IsLinux) {
