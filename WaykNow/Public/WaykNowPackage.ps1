@@ -7,6 +7,25 @@ function Get-HostEnvironment
 		}
 	}
 }
+
+function Get-WaykNowVersion
+{
+	if ($IsWindows) {
+
+	} elseif ($IsMacOS) {
+		$info_plist_path = "/Applications/WaykNow.app/Contents/Info.plist"
+		$cf_bundle_version_xpath = "//dict/key[. ='CFBundleVersion']/following-sibling::string[1]"
+		if (Test-Path -Path $info_plist_path) {
+			$version = $(Select-Xml -Path $info_plist_path -XPath $cf_bundle_version_xpath `
+				| Foreach-Object {$_.Node.InnerXML }).Trim()
+			return $version
+		}
+	} elseif ($IsLinux) {
+
+	}
+
+	return $null
+}
 function Get-WaykNowPackage
 {
 	$products_url = "https://devolutions.net/products.htm"
@@ -127,4 +146,4 @@ function Uninstall-WaykNow
 	}
 }
 
-Export-ModuleMember -Function Get-WaykNowPackage, Install-WaykNow, Uninstall-WaykNow
+Export-ModuleMember -Function Get-WaykNowVersion, Get-WaykNowPackage, Install-WaykNow, Uninstall-WaykNow
