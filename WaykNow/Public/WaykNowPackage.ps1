@@ -73,6 +73,8 @@ function Install-WaykNow
 
 function Uninstall-WaykNow
 {
+	Stop-WaykNow
+	
 	if ($IsWindows) {
 		# https://stackoverflow.com/a/25546511
 		$display_name = 'Wayk Now'
