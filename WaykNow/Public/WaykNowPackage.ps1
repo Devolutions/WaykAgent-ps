@@ -56,24 +56,46 @@ function Install-WaykNow
 	} elseif ($IsMacOS) {
 
 	} elseif ($IsLinux) {
-
+		$dpkg_args = @(
+			'-i', $download_file
+		)
+		if ((id -u) -eq 0) {
+			Start-Process 'dpkg' -ArgumentList $dpkg_args -Wait
+		} else {
+			$dpkg_args = @('dpkg') + $dpkg_args
+			Start-Process 'sudo' -ArgumentList $dpkg_args -Wait
+		}
 	}
 
 	Remove-Item -Path $download_file -Force
-	Remove-Item -Path $install_log_file -Force
+	Remove-Item -Path $install_log_file -Force -ErrorAction SilentlyContinue
 }
 
 function Uninstall-WaykNow
 {
-	# https://stackoverflow.com/a/25546511
-	
-	$display_name = 'Wayk Now'
-	$uninstall_string = Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" `
-		| ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $display_name } `
-		| Select-Object UninstallString
-	$uninstall_string = $($uninstall_string.UninstallString `
-		-Replace "msiexec.exe", "" -Replace "/I", "" -Replace "/X", "").Trim()
-	Start-Process "msiexec.exe" -ArgumentList "/X $uninstall_string /qb" -Wait
+	if ($IsWindows) {
+		# https://stackoverflow.com/a/25546511
+
+		$display_name = 'Wayk Now'
+		$uninstall_string = Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" `
+			| ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $display_name } `
+			| Select-Object UninstallString
+		$uninstall_string = $($uninstall_string.UninstallString `
+			-Replace "msiexec.exe", "" -Replace "/I", "" -Replace "/X", "").Trim()
+		Start-Process "msiexec.exe" -ArgumentList "/X $uninstall_string /qb" -Wait
+	} elseif ($IsMacOS) {
+
+	} elseif ($IsLinux) {
+		$apt_args = @(
+			'-y', 'remove', 'wayk-now'
+		)
+		if ((id -u) -eq 0) {
+			Start-Process 'apt-get' -ArgumentList $apt_args -Wait
+		} else {
+			$apt_args = @('apt-get') + $apt_args
+			Start-Process 'sudo' -ArgumentList $apt_args -Wait
+		}
+	}
 }
 
 Export-ModuleMember -Function Get-WaykNowPackage, Install-WaykNow, Uninstall-WaykNow
