@@ -54,7 +54,19 @@ function Install-WaykNow
 		)
 		Start-Process "msiexec.exe" -ArgumentList $msi_args -Wait -NoNewWindow
 	} elseif ($IsMacOS) {
-
+		$volumes_wayk_now = "/Volumes/WaykNow"
+		if (Test-Path -Path $volumes_wayk_now -PathType 'Container') {
+			Start-Process 'hdiutil' -ArgumentList @('unmount', $volumes_wayk_now) -Wait
+		}
+		Start-Process 'hdiutil' -ArgumentList @('mount', "./$download_file") `
+			-Wait -RedirectStandardOutput '/dev/null'
+		Wait-Process $(Start-Process 'sudo' -ArgumentList @('cp', '-R', `
+			"${volumes_wayk_now}/WaykNow.app", "/Applications") -PassThru).Id
+		Start-Process 'hdiutil' -ArgumentList @('unmount', $volumes_wayk_now) `
+			-Wait -RedirectStandardOutput '/dev/null'
+		Wait-Process $(Start-Process 'sudo' -ArgumentList @('ln', '-sfn', `
+			"/Applications/WaykNow.app/Contents/MacOS/WaykNow",
+			"/usr/local/bin/wayk-now") -PassThru).Id
 	} elseif ($IsLinux) {
 		$dpkg_args = @(
 			'-i', $download_file
@@ -94,7 +106,14 @@ function Uninstall-WaykNow
 		)
 		Start-Process "msiexec.exe" -ArgumentList $msi_args -Wait
 	} elseif ($IsMacOS) {
-
+		$wayk_now_app = "/Applications/WaykNow.app"
+		if (Test-Path -Path $wayk_now_app -PathType 'Container') {
+			Start-Process 'sudo' -ArgumentList @('rm', '-rf', $wayk_now_app) -Wait
+		}
+		$wayk_now_symlink = "/usr/local/bin/wayk-now"
+		if (Test-Path -Path $wayk_now_symlink) {
+			Start-Process 'sudo' -ArgumentList @('rm', $wayk_now_symlink) -Wait
+		}
 	} elseif ($IsLinux) {
 		$apt_args = @(
 			'-y', 'remove', 'wayk-now'
