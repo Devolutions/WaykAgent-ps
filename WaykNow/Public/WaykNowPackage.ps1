@@ -4,7 +4,7 @@
 
 function Get-WaykNowVersion
 {
-	if ($IsWindows) {
+	if (Get-IsWindows) {
 		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Now'
 		if ($uninstall_reg) {
 			$version = $uninstall_reg.DisplayVersion
@@ -47,10 +47,9 @@ function Get-WaykNowPackage
 	$version_patch = $version_matches.Groups[3].Value
 	$version_triple = "${version_major}.${version_minor}.${version_patch}"
 
-	Get-HostEnvironment
 	$download_url = $null
 
-	if ($IsWindows) {
+	if (Get-IsWindows) {
 		if ([System.Environment]::Is64BitOperatingSystem) {
 			$download_url = $download_url_x64
 		} else {
@@ -91,7 +90,7 @@ function Install-WaykNow(
 	$web_client.DownloadFile($download_url, $download_file)
 	$web_client.Dispose()
 
-	if ($IsWindows) {
+	if (Get-IsWindows) {
 		$install_log_file = "WaykNow_Install.log"
 		$msi_args = @(
 			'/i', $download_file,
@@ -133,7 +132,7 @@ function Uninstall-WaykNow
 {
 	Stop-WaykNow
 	
-	if ($IsWindows) {
+	if (Get-IsWindows) {
 		# https://stackoverflow.com/a/25546511
 		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Now'
 		if ($uninstall_reg) {

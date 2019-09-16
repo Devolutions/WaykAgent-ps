@@ -1,7 +1,7 @@
 
 function Start-WaykNow
 {
-	if ($IsWindows) {
+	if (Get-IsWindows) {
         if ($PSEdition -Eq 'Desktop') {
             $wayk_now_service = $(Get-Service | Where-Object -Property 'Name' -Like 'WaykNowService')
 
@@ -33,7 +33,7 @@ function Start-WaykNow
 
 function Stop-WaykNow
 {
-	if ($IsWindows) {
+	if (Get-IsWindows) {
         $wayk_now_process = $(Get-Process | Where-Object -Property ProcessName -Like 'WaykNow')
 
         if ($wayk_now_process) {

@@ -1,12 +1,14 @@
 
-function Get-HostEnvironment
+
+function Get-IsWindows
 {
-	if ($null -Eq $Global:IsWindows) {
-		if ($PSEdition -Eq 'Desktop') {
-			$Global:IsWindows = $true
-		}
-	}
+    if (-Not (Test-Path 'variable:global:IsWindows')) {
+        return $true # Windows PowerShell 5.1 or earlier
+    } else {
+        return $IsWindows
+    }
 }
+
 function Get-UninstallRegistryKey(
 	[string] $display_name = 'Wayk Now'
 ){
