@@ -1,4 +1,5 @@
 
+. "$PSScriptRoot/../Private/Invoke-Process.ps1"
 function Get-HostEnvironment
 {
 	if ($null -Eq $Global:IsWindows) {
@@ -21,7 +22,12 @@ function Get-WaykNowVersion
 			return $version
 		}
 	} elseif ($IsLinux) {
-
+		$dpkg_status = $(Invoke-Process -FilePath 'dpkg' -ArgumentList "-s wayk-now")
+		$matches = $($dpkg_status | Select-String -AllMatches -Pattern 'version: (\S+)').Matches
+		if ($matches) {
+			$version = $matches.Groups[1].Value
+			return $version
+		}
 	}
 
 	return $null
