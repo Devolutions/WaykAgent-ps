@@ -19,7 +19,7 @@ function Get-WaykNowVersion
 			return $version
 		}
 	} elseif ($IsLinux) {
-		$dpkg_status = $(Invoke-Process -FilePath 'dpkg' -ArgumentList "-s wayk-now")
+		$dpkg_status = $(Invoke-Process -FilePath 'dpkg' -ArgumentList "-s wayk-now" -IgnoreExitCode)
 		$matches = $($dpkg_status | Select-String -AllMatches -Pattern 'version: (\S+)').Matches
 		if ($matches) {
 			$version = $matches.Groups[1].Value
@@ -34,12 +34,18 @@ function Get-WaykNowPackage
 	$products_url = "https://devolutions.net/products.htm"
 	$products_htm = Invoke-RestMethod -Uri $products_url -Method 'GET' -ContentType 'text/plain'
 	$matches = $($products_htm | Select-String -AllMatches -Pattern "Wayk.Version=(\S+)").Matches
-	$version = $matches.Groups[1].Value
+	$version_quad = $matches.Groups[1].Value
 	$download_base = "https://cdn.devolutions.net/download"
-	$download_url_x64 = "$download_base/Wayk/$version/WaykNow-x64-$version.msi"
-	$download_url_x86 = "$download_base/Wayk/$version/WaykNow-x86-$version.msi"
-	$download_url_mac = "$download_base/Mac/Wayk/$version/Wayk.Mac.$version.dmg"
-	$download_url_deb = "$download_base/Linux/Wayk/$version/wayk-now_${version}_amd64.deb"
+	$download_url_x64 = "$download_base/Wayk/$version_quad/WaykNow-x64-$version_quad.msi"
+	$download_url_x86 = "$download_base/Wayk/$version_quad/WaykNow-x86-$version_quad.msi"
+	$download_url_mac = "$download_base/Mac/Wayk/$version_quad/Wayk.Mac.$version_quad.dmg"
+	$download_url_deb = "$download_base/Linux/Wayk/$version_quad/wayk-now_${version_quad}_amd64.deb"
+
+	$version_matches = $($version_quad | Select-String -AllMatches -Pattern "(\d+)`.(\d+)`.(\d+)`.(\d+)").Matches
+	$version_major = $version_matches.Groups[1].Value
+	$version_minor = $version_matches.Groups[2].Value
+	$version_patch = $version_matches.Groups[3].Value
+	$version_triple = "${version_major}.${version_minor}.${version_patch}"
 
 	Get-HostEnvironment
 	$download_url = $null
@@ -56,11 +62,28 @@ function Get-WaykNowPackage
 		$download_url = $download_url_deb
 	}
  
-	return $download_url
+    $result = [PSCustomObject]@{
+        Url = $download_url
+        Version = $version_triple
+    }
+
+	return $result
 }
-function Install-WaykNow
-{
-	$download_url = Get-WaykNowPackage
+function Install-WaykNow(
+	[switch] $Force
+){
+	$package = Get-WaykNowPackage
+	$latest_version = $package.Version
+	$current_version = Get-WaykNowVersion
+
+	if (([version]$latest_version -gt [version]$current_version) -Or $Force) {
+		Write-Host "Installing Wayk Now ${latest_version}"
+	} else {
+		Write-Host "Wayk Now is already up to date"
+		return
+	}
+
+	$download_url = $package.url
 	$download_file = Split-Path -Path $download_url -Leaf
 
 	Write-Host "Downloading $download_url"
@@ -131,14 +154,16 @@ function Uninstall-WaykNow
 			Start-Process 'sudo' -ArgumentList @('rm', $wayk_now_symlink) -Wait
 		}
 	} elseif ($IsLinux) {
-		$apt_args = @(
-			'-y', 'remove', 'wayk-now'
-		)
-		if ((id -u) -eq 0) {
-			Start-Process 'apt-get' -ArgumentList $apt_args -Wait
-		} else {
-			$apt_args = @('apt-get') + $apt_args
-			Start-Process 'sudo' -ArgumentList $apt_args -Wait
+		if (Get-WaykNowVersion) {
+			$apt_args = @(
+				'-y', 'remove', 'wayk-now', '--purge'
+			)
+			if ((id -u) -eq 0) {
+				Start-Process 'apt-get' -ArgumentList $apt_args -Wait
+			} else {
+				$apt_args = @('apt-get') + $apt_args
+				Start-Process 'sudo' -ArgumentList $apt_args -Wait
+			}
 		}
 	}
 }

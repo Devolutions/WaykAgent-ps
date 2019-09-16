@@ -36,7 +36,10 @@ function Invoke-Process {
 
         [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [string]$ArgumentList
+        [string]$ArgumentList,
+
+        [Parameter()]
+        [switch]$IgnoreExitCode
     )
 
     $ErrorActionPreference = 'Stop'
@@ -58,7 +61,7 @@ function Invoke-Process {
             $cmd = Start-Process @startProcessParams
             $cmdOutput = Get-Content -Path $stdOutTempFile -Raw
             $cmdError = Get-Content -Path $stdErrTempFile -Raw
-            if ($cmd.ExitCode -ne 0) {
+            if (($cmd.ExitCode -Ne 0) -And (-Not $IgnoreExitCode)) {
                 if ($cmdError) {
                     throw $cmdError.Trim()
                 }
