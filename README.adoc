@@ -1,0 +1,98 @@
+:toc:
+:toclevels: 4
+
+= Wayk Now PowerShell Cmdlet
+
+== Installation
+
+On Windows, the regular PowerShell can be used. On macOS and Linux, you need PowerShell Core 6.0:
+
+PowerShell Core 6.0::
+https://github.com/PowerShell/PowerShell#get-powershell
+
+To launch a PowerShell Core terminal, use the `pwsh` command.
+
+=== Installation from PSGallery
+
+The Wayk Den PowerShell module is https://www.powershellgallery.com/packages/WaykNow[available on PSGallery].
+
+[source,sh]
+----
+Install-Module -Name WaykNow
+Import-Module WaykNow
+----
+
+If you encounter issues with the `Install-Module` command, you may have to https://docs.microsoft.com/en-ca/powershell/gallery/installing-psget[install or update PowerShellGet].
+
+You can then list all commands exported from the `WaykNow` module:
+
+[source,sh]
+----
+Get-Command -Module WaykNow
+----
+
+=== Installation from Source
+
+From PowerShell, clone the https://github.com/Devolutions/WaykNow-ps[WaykNow-ps] git repository, then import the module from the "WaykNow" directory.
+
+[source,sh]
+----
+git clone https://github.com/Devolutions/WaykNow-ps
+Import-Module "./WaykNow-ps/WaykNow" -Force
+----
+
+== Usage
+
+=== Install/Uninstall
+
+The `Install-WaykNow` and `Uninstall-WaykNow` commands can be used to install, update and uninstall Wayk Now on all platforms. On Windows, the PowerShell console must have elevated rights to perform the installation. On macOS and Linux, sudo will be called to elevate permissions when necessary.
+
+Here is a sample installation, update check and uninstall for macOS:
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Install-WaykNow
+Installing Wayk Now 3.3.2
+Downloading https://cdn.devolutions.net/download/Mac/Wayk/3.3.2.0/Wayk.Mac.3.3.2.0.dmg
+Password:
+PS ~/WaykNow-ps> Install-WaykNow
+Wayk Now is already up to date
+PS ~/WaykNow-ps> Uninstall-WaykNow
+----
+
+By default, the `Install-WaykNow` skips the installation if the local Wayk Now version is the same as the latest one available, unless the `-Force` parameter is used.
+
+=== Version/Package
+
+The `Get-WaykNowVersion` command detects the current Wayk Now installation version number.
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Get-WaykNowVersion
+3.3.2
+----
+
+The `Get-WaykNowPackage` command discovers the latest Wayk Now version available and the corresponding download URL.
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Get-WaykNowPackage
+
+Url                                                                        Version
+---                                                                        -------
+https://cdn.devolutions.net/download/Mac/Wayk/3.3.2.0/Wayk.Mac.3.3.2.0.dmg 3.3.2
+----
+
+=== Start/Stop/Restart
+
+The `Start-WaykNow`, `Stop-WaykNow` and `Restart-WaykNow` commands can be used to start, stop and restart all Wayk Now executables and services correctly. This can be particularly useful with the Windows system service.
+
+=== Reboot in Safe Mode
+
+This is an experimental feature for Windows that has been prototyped as part of this PowerShell cmdlet. It will likely be rewritten and integrated directly in the main Wayk Now software at some point in the future.
+
+Starting from a regular Windows boot environment (not safe mode), open an administrative PowerShell console and use the `Set-WaykNowSafeMode` command. This will create a copy of the current boot entry, rename it to "Wayk Now Safe Mode", and set it as the default. A copy of the original boot entry name is saved in the registry to allow reverting to the original state.
+
+You can not reboot the system (`Restart-Computer` or `shutdown /r`), and it will automatically select the "Wayk Now Safe Mode" boot entry. Once the system is booted, you should be able to connect to it with Wayk Now.
+
+To revert to the original state, open a PowerShell console again, but use the `Reset-WaykNowSafeMode` command. This will set the original boot entry as the default, and delete the special "Wayk Now Safe Mode". You can now restart the computer again and it will boot in its regular state.
