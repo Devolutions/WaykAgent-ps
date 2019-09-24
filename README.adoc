@@ -96,3 +96,340 @@ Starting from a regular Windows boot environment (not safe mode), open an admini
 You can not reboot the system (`Restart-Computer` or `shutdown /r`), and it will automatically select the "Wayk Now Safe Mode" boot entry. Once the system is booted, you should be able to connect to it with Wayk Now.
 
 To revert to the original state, open a PowerShell console again, but use the `Reset-WaykNowSafeMode` command. This will set the original boot entry as the default, and delete the special "Wayk Now Safe Mode". You can now restart the computer again and it will boot in its regular state.
+
+== Configuration
+The `Set-WaykNowConfig` command, is used for modfy multiple settings from WaykNow.
+Here is a list of properties that you can modify:
+
+==== Windows settings
+With Windows you can set the global settings or the local settings, by default the local setting is used, if you want to use the global settings in you command add this parameter :
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -Global $true
+----
+
+=== General Properties
+==== -FriendlyName
+The Friendly Name is used for Prompt For Permission (PFP) authentication. It should be easily recognized by your peers.
+
+*Type:* string +
+*DefaultValue:* Username of the local user +
+*Example:*
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -FriendlyName david
+----
+
+==== -Language
+Specifies the language of the application, "en" for English, "fr" for French, "de" German, "zh-CN" for Chinese Simplified, "zh-TW" for Chinese Traditional.
+
+*Type:* string +
+*DefaultValue:* Language of the system +
+*Accepted values:* "en", "fr", "de", "zh-CN", "zh-TW" +
+*Example:*
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -Language en
+----
+
+==== -ControlMode
+Specifies the Remote Control Mode of WaykNow, AllRemoteControlMode: Both sides are displayed, TakeRemoteControlClientOnly: Only the client side is displayed and AllowRemoteControlSeverOnly: Only the server side is displayed.
+
+*Type:* ControlMode +
+*DefaultValue:* AllRemoteControlMode +
+*Accepted values:* AllRemoteControlMode, TakeRemoteControlClientOnly, AllowRemoteControlSeverOnly +
+*Example:*
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -ControlMode AllRemoteControlMode
+----
+
+==== -AutoLaunchOnUserLogon
+Select this option if you wish to launch Wayk Now when you log on.
+
+*Type:* boolean +
+*DefaultValue:* false +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -AutoLaunchOnUserLogon $false
+----
+
+==== -ShowMainWindowOnLaunch
+this option is to prevent the main application window from showing when Wayk Now starts. It can be quite useful when the application is automatically launched.
+
+*Type:* boolean +
+*DefaultValue:* true +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -ShowMainWindowOnLaunch $true
+----
+
+==== -MinimizeToNotificationArea
+This option is to hide Wayk Now from the taskbar when minimized.
+
+*Type:* boolean +
+*DefaultValue:* false +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -MinimizeToNotificationArea $false
+----
+
+==== -ElevationPrompt
+This option is to disable the prompt to elevate program permissions, and run Wayk Now without elevated program permissions.
+
+*Type:* boolean +
+*DefaultValue:* false +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -ElevationPrompt $false
+----
+
+=== Security Properties
+==== -AllowPersonalPassword
+etting to enabled/disabled SRP: When Secure Remote Password is disabled, the password options are disabled as well.
+
+*Type:* boolean +
+*DefaultValue:* true +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -AllowPersonalPassword $true
+----
+
+==== -AllowSystemAuth
+Setting to enabled/disabled SRD: Secure Remote Delegation is the method used for system authentication in the case of unattended remote access. On Windows, remote access is restricted to members of the built-in Administrators or Remote Desktop Users groups.
+
+*Type:* boolean +
+*DefaultValue:* true +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -AllowSystemAuth $true
+----
+
+==== -AllowNoPassword
+Setting to enabled/disabled PFP: Prompt for Permission authentication requests explicit consent from the remote user without the need for a password.
+
+*Type:* boolean +
+*DefaultValue:* true +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -AllowNoPassword $true
+----
+
+==== -PersonalPasswordType
+Setting to select your password type: +
+
+- Generated Password +
+Generate a strong, random password with our password generator which can be configured with the -GeneratedPasswordLength and -GeneratedPasswordCharSet section. +
+- Custom Password +
+Create a custom password of your own choosing.
+
+*Type:* PersonalPasswordType +
+*Accepted values:* Generated, Custom +
+*DefaultValue:* Generated +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -PersonalPasswordType Generated
+----
+
+==== -PersonalPassword
+Create a custom password of your own choosing.
+
+*Type:* string +
+*Example:*
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -PersonalPassword password
+----
+
+==== -GeneratedPasswordLength
+The generated password length
+
+*Type:* int +
+*Accepted values:* Between 3 and 9 +
+*DefaultValue:* 6 +
+*Example:*
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -GeneratedPasswordLength 6
+----
+
+==== -GeneratedPasswordCharSet
+The parameter used by the password generator:
+The alphanumeric character set contains numbers and letters, excluding 0, O, 1, I for a total of 32 characters. This choice was made to avoid any possible confusion when communicating the password to the other user.
+
+*Type:* GeneratedPasswordCharSet +
+*Accepted values:* Numeric, Alphanumeric +
+*DefaultValue:* Alphanumeric +
+*Example:*
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -GeneratedPasswordCharSet Alphanumeric
+----
+
+=== Connectivity Properties
+==== -DenEnabled
+Connect to Wayk Den to enable simplified peer-to-peer connectivity with a 6-digit ID.
+
+*Type:* boolean +
+*DefaultValue:* true +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -DenEnabled $true
+----
+
+==== -DenUrl
+Connect to the Wayk Den server with the URL
+
+*Type:* string +
+*DefaultValue:* "wss://den.wayk.net" +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -DenUrl wss://den.wayk.net
+----
+
+=== Advanced Properties
+==== -QualityMode
+The quality mode allow to adjust the quality of the render to optimize performance.
+
+*Type:* QualityMode +
+*Accepted values:* Low, Medium, High +
+*DefaultValue:* Medium +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -QualityMode Medium
+----
+
+==== -LoggingLevel
+This Logging level option affects the verbosity of the logging messages.
+
+*Type:* LoggingLevel +
+*Accepted values:* Trace, Debug, Info, Warn, Error, Fatal, Off +
+*DefaultValue:* Off +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -LoggingLevel Off
+----
+
+==== -LoggingFilter
+This Logging filter option filters the types of messages that are logged.
+Do not use unless instructed.
+
+*Type:* string +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -LoggingFilter filter
+----
+
+=== Access Control Properties
+The Access Control section allows you to restrict access to certain resources shared by the server. In other words, access control defines what can be done to your machine when someone else is connected. You can set each feature independently.
+
+- *Allow*: The feature is enabled.
+
+- *Confirm*: The feature is disabled, but can be enabled after user confirmation during the session.
+
+- *Disable*: The feature is disabled. For security reasons or to enforce company policies, you may want to disable specific features.
+
+==== -AccessControlViewing
+The viewing access control
+
+*Type:* AccessControl +
+*Accepted values:* Allow, Confirm, Disable +
+*DefaultValue:* Allow +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -AccessControlViewing Allow
+----
+
+==== -AccessControlInteract
+The interaction access control
+
+*Type:* AccessControl +
+*Accepted values:* Allow, Confirm, Disable +
+*DefaultValue:* Allow +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -AccessControlInteract Allow
+----
+
+==== -AccessControlClipboard
+The clipboard access control
+
+*Type:* AccessControl +
+*Accepted values:* Allow, Confirm, Disable +
+*DefaultValue:* Allow +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -AccessControlClipboard Allow
+----
+
+==== -AccessControlFileTransfer
+The file transfer access control
+
+*Type:* AccessControl +
+*Accepted values:* Allow, Confirm, Disable +
+*DefaultValue:* Allow +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -AccessControlFileTransfer Allow
+----
+
+==== -AccessControlExec
+The execution access control
+
+*Type:* AccessControl +
+*Accepted values:* Allow, Confirm, Disable +
+*DefaultValue:* Allow +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -AccessControlExec Allow
+----
+
+==== -AccessControlChat
+The chat access control
+
+*Type:* AccessControl +
+*Accepted values:* Allow, Confirm, Disable +
+*DefaultValue:* Allow +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -AccessControlChat Allow
+----
