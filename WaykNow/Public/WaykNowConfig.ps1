@@ -94,111 +94,116 @@ function Set-WaykNowConfig
 	} 
     elseif ($IsLinux) {
 		$config_file_path = '/usr/bin/wayk-now'
-	}
+    }
+    
+    $globalOption = '';
+    if($Global -ne $null) {
+        $globalOption =  '--global';
+    }
 
     # General
     if($FriendlyName) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<str>', 'FriendlyName', $FriendlyName) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<str>', 'FriendlyName', $FriendlyName) -Wait
     }
 
     if($Language) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<str>', 'Language', $Language) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<str>', 'Language', $Language) -Wait
     }
 
     if($null -ne $ControlMode) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<int>', 'ControlMode', [int]$ControlMode) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<int>', 'ControlMode', [int]$ControlMode) -Wait
     }
 
     if($AutoLaunchOnUserLogon -ne $null) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<bool>', 'AutoLaunchOnUserLogon', $AutoLaunchOnUserLogon) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<bool>', 'AutoLaunchOnUserLogon', $AutoLaunchOnUserLogon) -Wait
     }
 
     if($ShowMainWindowOnLaunch -ne $null) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<bool>', 'ShowMainWindowOnLaunch', $ShowMainWindowOnLaunch) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<bool>', 'ShowMainWindowOnLaunch', $ShowMainWindowOnLaunch) -Wait
     }
 
     if($MinimizeToNotificationArea -ne $null) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<bool>', 'MinimizeToNotificationArea', $MinimizeToNotificationArea) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<bool>', 'MinimizeToNotificationArea', $MinimizeToNotificationArea) -Wait
     }
 
     if($ElevationPrompt -ne $null) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<bool>', 'ElevationPrompt', $ElevationPrompt) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<bool>', 'ElevationPrompt', $ElevationPrompt) -Wait
     }
 
     # Security
     if($AllowPersonalPassword -ne $null) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<bool>', 'AllowPersonalPassword', $AllowPersonalPassword) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<bool>', 'AllowPersonalPassword', $AllowPersonalPassword) -Wait
     }
 
     if($AllowSystemAuth -ne $null) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<bool>', 'AllowSystemAuth', $AllowSystemAuth) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<bool>', 'AllowSystemAuth', $AllowSystemAuth) -Wait
     }
 
     if($AllowNoPassword -ne $null) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<bool>', 'AllowNoPassword', $AllowNoPassword) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<bool>', 'AllowNoPassword', $AllowNoPassword) -Wait
     }
 
     if($null -ne $PersonalPasswordType) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<int>', 'PersonalPasswordType', [int]$PersonalPasswordType) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<int>', 'PersonalPasswordType', [int]$PersonalPasswordType) -Wait
     }
 
     if($PersonalPassword) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<str>', 'PersonalPassword', $PersonalPassword) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<str>', 'PersonalPassword', $PersonalPassword) -Wait
     }
 
     if($GeneratedPasswordLength) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<int>', 'GeneratedPasswordLength', $GeneratedPasswordLength) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<int>', 'GeneratedPasswordLength', $GeneratedPasswordLength) -Wait
     }
 
     if($null -ne $GeneratedPasswordCharSet) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<int>', 'GeneratedPasswordCharSet', [int]$GeneratedPasswordCharSet) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<int>', 'GeneratedPasswordCharSet', [int]$GeneratedPasswordCharSet) -Wait
     }
 
     # Connectivity
     if($DenEnabled -ne $null) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<bool>', 'DenEnabled', $DenEnabled) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<bool>', 'DenEnabled', $DenEnabled) -Wait
     }
 
     if($DenUrl) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<str>', 'DenUrl', $DenUrl) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<str>', 'DenUrl', $DenUrl) -Wait
     }
 
     #Advanced
     if($null -ne $QualityMode) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<int>', 'QualityMode', [int]$QualityMode) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<int>', 'QualityMode', [int]$QualityMode) -Wait
     }
 
     if($null -ne $LoggingLevel) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<int>', 'LoggingLevel', [int]$LoggingLevel) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<int>', 'LoggingLevel', [int]$LoggingLevel) -Wait
     }
 
     if($LoggingFilter) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<str>', 'LoggingFilter', $LoggingFilter) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<str>', 'LoggingFilter', $LoggingFilter) -Wait
     }
 
     #Access Control
     if($null -ne $AccessControlViewing) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<int>', 'AccessControl.Viewing', [int]$AccessControlViewing) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<int>', 'AccessControl.Viewing', [int]$AccessControlViewing) -Wait
     }
 
     if($null -ne $AccessControlInteract) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<int>', 'AccessControl.Interact', [int]$AccessControlInteract) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<int>', 'AccessControl.Interact', [int]$AccessControlInteract) -Wait
     }
 
     if($null -ne $AccessControlClipboard) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<int>', 'AccessControl.Clipboard', [int]$AccessControlClipboard) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<int>', 'AccessControl.Clipboard', [int]$AccessControlClipboard) -Wait
     }
 
     if($null -ne $AccessControlFileTransfer) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<int>', 'AccessControl.FileTransfer', [int]$AccessControlFileTransfer) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<int>', 'AccessControl.FileTransfer', [int]$AccessControlFileTransfer) -Wait
     }
 
     if($null -ne $AccessControlExec) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<int>', 'AccessControl.Exec', [int]$AccessControlExec) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<int>', 'AccessControl.Exec', [int]$AccessControlExec) -Wait
     }
 
     if($null -ne $AccessControlChat) {
-        Start-Process $config_file_path -ArgumentList @('config', '--type<int>', 'AccessControl.Chat', [int]$AccessControlChat) -Wait
+        Start-Process $config_file_path -ArgumentList @('config', $globalOption, '--type<int>', 'AccessControl.Chat', [int]$AccessControlChat) -Wait
     }
 }
 
