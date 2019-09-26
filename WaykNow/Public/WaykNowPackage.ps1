@@ -167,4 +167,81 @@ function Uninstall-WaykNow
 	}
 }
 
-Export-ModuleMember -Function Get-WaykNowVersion, Get-WaykNowPackage, Install-WaykNow, Uninstall-WaykNow
+class WaykNowInfo
+{
+	[string] $DataPath
+	[string] $GlobalDataPath
+	[string] $ConfigFile
+	[string] $LogPath
+	[string] $CertificateFile
+	[string] $PrivateKeyFile
+	[string] $PasswordVault
+	[string] $KnownHostsFile
+	[string] $BookmarksFile
+}
+
+function Get-WaykNowInfo()
+{
+	$DataPath = '';
+	$GlobalDataPath = '';
+	$resolvedGlobalPath = '';
+	if (Get-IsWindows)	 {
+
+		Add-PathIfNotExist "$Env:APPDATA\Wayk" $true
+		$DataPath = $Env:APPDATA + '\Wayk';
+		if (Get-Service "WaykNowService" -ErrorAction SilentlyContinue)
+		{
+			if(Get-IsRunAsAdministrator)
+			{
+				Add-PathIfNotExist "$Env:ALLUSERSPROFILE\Wayk" $true
+				Add-PathIfNotExist "$Env:ALLUSERSPROFILE\Wayk\WaykNow.cfg" $false
+			}
+
+			$GlobalDataPath = $Env:ALLUSERSPROFILE + '\Wayk\WaykNow.cfg'
+			$resolvedGlobalPath = Resolve-Path -Path $GlobalDataPath
+		}
+	} elseif ($IsMacOS) {
+		Add-PathIfNotExist "~/Library/Application Support/Wayk" $true
+		$DataPath = '~/Library/Application Support/Wayk'
+	} elseif ($IsLinux) {
+		Add-PathIfNotExist "~/.config/Wayk" $true
+		$DataPath = '~/.config/Wayk'
+	}
+
+	$resolvedPath = Resolve-Path -Path $DataPath
+
+	$WaykNowInfoObject = [WaykNowInfo]::New()
+	$WaykNowInfoObject.DataPath = $resolvedPath
+	$WaykNowInfoObject.GlobalDataPath = $resolvedGlobalPath
+
+	Add-PathIfNotExist "$resolvedPath/WaykNow.cfg" $false
+	$WaykNowInfoObject.ConfigFile = "$resolvedPath/WaykNow.cfg"
+
+	$WaykNowInfoObject.LogPath = "$resolvedPath/logs"
+	$WaykNowInfoObject.CertificateFile = "$resolvedPath/WaykNow.crt"
+	$WaykNowInfoObject.PrivateKeyFile = "$resolvedPath/WaykNow.key"
+	$WaykNowInfoObject.PasswordVault = "$resolvedPath/WaykNow.vault"
+	$WaykNowInfoObject.KnownHostsFile = "$resolvedPath/known_hosts"
+	$WaykNowInfoObject.BookmarksFile = "$resolvedPath/bookmarks"
+
+	return $WaykNowInfoObject 
+}
+
+function Add-PathIfNotExist(
+	[string] $path,
+	[bool] $isFolder
+)
+{
+	if($isFolder) {
+		if (!(Test-Path $path)) {
+		   New-Item -path $path -ItemType Directory -Force
+		}
+	}
+	else {
+		if (!(Test-Path $path))	{
+		   New-Item -path $path -ItemType File -Force
+		}
+	}
+}
+
+Export-ModuleMember -Function Get-WaykNowVersion, Get-WaykNowPackage, Install-WaykNow, Uninstall-WaykNow, Get-WaykNowInfo
