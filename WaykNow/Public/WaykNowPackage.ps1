@@ -206,23 +206,26 @@ function Get-WaykNowInfo()
 	}
 
 	$resolvedPath = Resolve-Path -Path $DataPath
-	$resolvedPath = $resolvedPath -replace "\\", "/"
-	$resolvedGlobalPath = $resolvedGlobalPath -replace "\\", "/"
 
 	Add-PathIfNotExist "$resolvedPath/WaykNow.cfg" $false
 	Add-PathIfNotExist "$resolvedPath/logs" $true
 	Add-PathIfNotExist "$resolvedPath/bookmarks" $true
 
+	Add-PathIfNotExist "$resolvedPath/WaykNow.crt" $false
+	Add-PathIfNotExist "$resolvedPath/WaykNow.key" $false
+	Add-PathIfNotExist "$resolvedPath/WaykNow.vault" $false
+	Add-PathIfNotExist "$resolvedPath/known_hosts" $false
+
 	$WaykNowInfoObject = [WaykNowInfo]::New()
 	$WaykNowInfoObject.DataPath = $resolvedPath
 	$WaykNowInfoObject.GlobalDataPath = $resolvedGlobalPath
-	$WaykNowInfoObject.ConfigFile = "$resolvedPath/WaykNow.cfg"
-	$WaykNowInfoObject.LogPath = "$resolvedPath/logs"
-	$WaykNowInfoObject.CertificateFile = "$resolvedPath/WaykNow.crt"
-	$WaykNowInfoObject.PrivateKeyFile = "$resolvedPath/WaykNow.key"
-	$WaykNowInfoObject.PasswordVault = "$resolvedPath/WaykNow.vault"
-	$WaykNowInfoObject.KnownHostsFile = "$resolvedPath/known_hosts"
-	$WaykNowInfoObject.BookmarksFile = "$resolvedPath/bookmarks"
+	$WaykNowInfoObject.ConfigFile =  Resolve-Path -Path "$resolvedPath/WaykNow.cfg" 
+	$WaykNowInfoObject.LogPath =  Resolve-Path -Path "$resolvedPath/logs" 
+	$WaykNowInfoObject.CertificateFile =  Resolve-Path -Path "$resolvedPath/WaykNow.crt" 
+	$WaykNowInfoObject.PrivateKeyFile =   Resolve-Path -Path "$resolvedPath/WaykNow.key" 
+	$WaykNowInfoObject.PasswordVault =  Resolve-Path -Path "$resolvedPath/WaykNow.vault" 
+	$WaykNowInfoObject.KnownHostsFile =  Resolve-Path -Path "$resolvedPath/known_hosts" 
+	$WaykNowInfoObject.BookmarksFile = Resolve-Path -Path "$resolvedPath/bookmarks"
 
 	return $WaykNowInfoObject 
 }

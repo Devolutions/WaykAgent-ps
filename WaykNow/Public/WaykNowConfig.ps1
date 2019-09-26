@@ -421,8 +421,6 @@ function Get-WaykNowConfig()
     $WaykNowConfigObject.AccessControlExec = Get-NowOptionInt 'AccessControl.Exec' $GlobalServiceAvailable $true ([int]([AccessControl]::Allow)) $LocalJson $GlobalJson
     $WaykNowConfigObject.AccessControlChat = Get-NowOptionInt 'AccessControl.Chat' $GlobalServiceAvailable $true ([int]([AccessControl]::Allow)) $LocalJson $GlobalJson
 
-    Write-Host (Get-NowOptionBool 'DenEnabled' $GlobalServiceAvailable $false $true $LocalJson $GlobalJson)
-    Write-Host $WaykNowConfigObject.DenEnabled
     return $WaykNowConfigObject
 }
 
