@@ -21,3 +21,9 @@ function Get-UninstallRegistryKey(
     return Get-ChildItem $uninstall_base_reg `
         | ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $display_name };
 }
+
+# Work only with windows, use the check Get-IsWindows before call this one
+function Get-IsRunAsAdministrator  
+{
+    return ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')
+}

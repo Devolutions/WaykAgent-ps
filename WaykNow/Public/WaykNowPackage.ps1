@@ -167,4 +167,84 @@ function Uninstall-WaykNow
 	}
 }
 
-Export-ModuleMember -Function Get-WaykNowVersion, Get-WaykNowPackage, Install-WaykNow, Uninstall-WaykNow
+class WaykNowInfo
+{
+	[string] $DataPath
+	[string] $GlobalDataPath
+	[string] $ConfigFile
+	[string] $LogPath
+	[string] $CertificateFile
+	[string] $PrivateKeyFile
+	[string] $PasswordVault
+	[string] $KnownHostsFile
+	[string] $BookmarksFile
+}
+
+function Get-WaykNowInfo()
+{
+	$DataPath = '';
+	$GlobalDataPath = '';
+	$resolvedGlobalPath = '';
+	if (Get-IsWindows)	{
+		Add-PathIfNotExist "$Env:APPDATA\Wayk" $true
+		$DataPath = $Env:APPDATA + '\Wayk';
+		if (Get-Service "WaykNowService" -ErrorAction SilentlyContinue)	{
+			if(Get-IsRunAsAdministrator)	{
+				Add-PathIfNotExist "$Env:ALLUSERSPROFILE\Wayk" $true
+				Add-PathIfNotExist "$Env:ALLUSERSPROFILE\Wayk\WaykNow.cfg" $false
+			}
+
+			$GlobalDataPath = $Env:ALLUSERSPROFILE + '\Wayk\WaykNow.cfg'
+			$resolvedGlobalPath = Resolve-Path -Path $GlobalDataPath
+		}
+	} elseif ($IsMacOS) {
+		Add-PathIfNotExist "~/Library/Application Support/Wayk" $true
+		$DataPath = '~/Library/Application Support/Wayk'
+	} elseif ($IsLinux) {
+		Add-PathIfNotExist "~/.config/Wayk" $true
+		$DataPath = '~/.config/Wayk'
+	}
+
+	$resolvedPath = Resolve-Path -Path $DataPath
+
+	Add-PathIfNotExist "$resolvedPath/WaykNow.cfg" $false
+	Add-PathIfNotExist "$resolvedPath/logs" $true
+	Add-PathIfNotExist "$resolvedPath/bookmarks" $true
+
+	Add-PathIfNotExist "$resolvedPath/WaykNow.crt" $false
+	Add-PathIfNotExist "$resolvedPath/WaykNow.key" $false
+	Add-PathIfNotExist "$resolvedPath/WaykNow.vault" $false
+	Add-PathIfNotExist "$resolvedPath/known_hosts" $false
+
+	$WaykNowInfoObject = [WaykNowInfo]::New()
+	$WaykNowInfoObject.DataPath = $resolvedPath
+	$WaykNowInfoObject.GlobalDataPath = $resolvedGlobalPath
+	$WaykNowInfoObject.ConfigFile =  Resolve-Path -Path "$resolvedPath/WaykNow.cfg" 
+	$WaykNowInfoObject.LogPath =  Resolve-Path -Path "$resolvedPath/logs" 
+	$WaykNowInfoObject.CertificateFile =  Resolve-Path -Path "$resolvedPath/WaykNow.crt" 
+	$WaykNowInfoObject.PrivateKeyFile =   Resolve-Path -Path "$resolvedPath/WaykNow.key" 
+	$WaykNowInfoObject.PasswordVault =  Resolve-Path -Path "$resolvedPath/WaykNow.vault" 
+	$WaykNowInfoObject.KnownHostsFile =  Resolve-Path -Path "$resolvedPath/known_hosts" 
+	$WaykNowInfoObject.BookmarksFile = Resolve-Path -Path "$resolvedPath/bookmarks"
+
+	return $WaykNowInfoObject 
+}
+
+function Add-PathIfNotExist(
+	[string] $path,
+	[bool] $isFolder
+)
+{
+	if($isFolder) {
+		if (!(Test-Path $path)) {
+		   New-Item -path $path -ItemType Directory -Force
+		}
+	}
+	else {
+		if (!(Test-Path $path))	{
+		   New-Item -path $path -ItemType File -Force
+		}
+	}
+}
+
+Export-ModuleMember -Function Get-WaykNowVersion, Get-WaykNowPackage, Install-WaykNow, Uninstall-WaykNow, Get-WaykNowInfo
