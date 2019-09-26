@@ -185,14 +185,11 @@ function Get-WaykNowInfo()
 	$DataPath = '';
 	$GlobalDataPath = '';
 	$resolvedGlobalPath = '';
-	if (Get-IsWindows)	 {
-
+	if (Get-IsWindows)	{
 		Add-PathIfNotExist "$Env:APPDATA\Wayk" $true
 		$DataPath = $Env:APPDATA + '\Wayk';
-		if (Get-Service "WaykNowService" -ErrorAction SilentlyContinue)
-		{
-			if(Get-IsRunAsAdministrator)
-			{
+		if (Get-Service "WaykNowService" -ErrorAction SilentlyContinue)	{
+			if(Get-IsRunAsAdministrator)	{
 				Add-PathIfNotExist "$Env:ALLUSERSPROFILE\Wayk" $true
 				Add-PathIfNotExist "$Env:ALLUSERSPROFILE\Wayk\WaykNow.cfg" $false
 			}
@@ -209,14 +206,17 @@ function Get-WaykNowInfo()
 	}
 
 	$resolvedPath = Resolve-Path -Path $DataPath
+	$resolvedPath = $resolvedPath -replace "\\", "/"
+	$resolvedGlobalPath = $resolvedGlobalPath -replace "\\", "/"
+
+	Add-PathIfNotExist "$resolvedPath/WaykNow.cfg" $false
+	Add-PathIfNotExist "$resolvedPath/logs" $true
+	Add-PathIfNotExist "$resolvedPath/bookmarks" $true
 
 	$WaykNowInfoObject = [WaykNowInfo]::New()
 	$WaykNowInfoObject.DataPath = $resolvedPath
 	$WaykNowInfoObject.GlobalDataPath = $resolvedGlobalPath
-
-	Add-PathIfNotExist "$resolvedPath/WaykNow.cfg" $false
 	$WaykNowInfoObject.ConfigFile = "$resolvedPath/WaykNow.cfg"
-
 	$WaykNowInfoObject.LogPath = "$resolvedPath/logs"
 	$WaykNowInfoObject.CertificateFile = "$resolvedPath/WaykNow.crt"
 	$WaykNowInfoObject.PrivateKeyFile = "$resolvedPath/WaykNow.key"

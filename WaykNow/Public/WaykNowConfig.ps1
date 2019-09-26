@@ -95,6 +95,7 @@ function Set-WaykNowConfig
     [string] $FriendlyName,
 
     # Specifies the language of the application, "en" for English, "fr" for French, "de" German, "zh-CN" for Chinese Simplified, "zh-TW" for Chinese Traditional.
+    [ValidateSet("en", "fr", "de", "zh-CN", "zh-TW")]
     [string] $Language,
 
     # Specifies the Remote Control Mode of WaykNow, AllRemoteControlMode: Both sides are displayed, TakeRemoteControlClientOnly: Only the client side is displayed and AllowRemoteControlSeverOnly: Only the server side is displayed.    [ControlMode] $ControlMode,

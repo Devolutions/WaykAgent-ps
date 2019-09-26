@@ -107,22 +107,22 @@ PS ~/WaykNow-ps> Get-WaykNowInfo
 
 [source,sh]
 ----
-DataPath        : C:\Users\jdufaud\AppData\Roaming\Wayk
-GlobalDataPath  : C:\ProgramData\Wayk\WaykNow.cfg
-ConfigFile      : C:\Users\jdufaud\AppData\Roaming\Wayk/WaykNow.cfg
-LogPath         : C:\Users\jdufaud\AppData\Roaming\Wayk/logs
-CertificateFile : C:\Users\jdufaud\AppData\Roaming\Wayk/WaykNow.crt
-PrivateKeyFile  : C:\Users\jdufaud\AppData\Roaming\Wayk/WaykNow.key
-PasswordVault   : C:\Users\jdufaud\AppData\Roaming\Wayk/WaykNow.vault
-KnownHostsFile  : C:\Users\jdufaud\AppData\Roaming\Wayk/known_hosts
-BookmarksFile   : C:\Users\jdufaud\AppData\Roaming\Wayk/bookmarks
+DataPath        : C:/Users/User/AppData/Roaming/Wayk
+GlobalDataPath  : C:/ProgramData/Wayk/WaykNow.cfg
+ConfigFile      : C:/Users/User/AppData/Roaming/Wayk/WaykNow.cfg
+LogPath         : C:/Users/User/AppData/Roaming/Wayk/logs
+CertificateFile : C:/Users/User/AppData/Roaming/Wayk/WaykNow.crt
+PrivateKeyFile  : C:/Users/User/AppData/Roaming/Wayk/WaykNow.key
+PasswordVault   : C:/Users/User/AppData/Roaming/Wayk/WaykNow.vault
+KnownHostsFile  : C:/Users/User/AppData/Roaming/Wayk/known_hosts
+BookmarksFile   : C:/Users/User/AppData/Roaming/Wayk/bookmarks
 ----
 
 == Configuration
 The `Set-WaykNowConfig` command, is used for modfy multiple settings from WaykNow.
 Here is a list of properties that you can modify:
 
-With Windows you can set the global settings or the local settings, by default the local setting is used, if you want to use the global settings in you command add this parameter:
+With Windows you can set the global settings or the local settings, by default the local setting is used, if you want to use the global settings in you command add this flag:
 
 [source,sh]
 ----
@@ -167,7 +167,7 @@ AccessControlChat          : Allow
 ----
 
 === General Properties
-==== -FriendlyName
+==== FriendlyName
 The Friendly Name is used for Prompt For Permission (PFP) authentication. It should be easily recognized by your peers.
 
 *Type:* string +
