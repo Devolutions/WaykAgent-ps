@@ -201,8 +201,7 @@ function Set-WaykNowConfig
         }
 
         if(!(Get-IsRunAsAdministrator)) {
-            Write-Host "You need to run as admin when you use global"
-            return;
+            throw "You need to run as administrator when you use global"
         }
 
         $json = Get-Content -Raw -Path $WaykInfo.GlobalDataPath | ConvertFrom-Json
