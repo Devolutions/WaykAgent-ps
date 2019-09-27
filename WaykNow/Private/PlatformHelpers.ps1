@@ -27,3 +27,10 @@ function Get-IsRunAsAdministrator
 {
     return ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')
 }
+
+function New-TemporaryDirectory()
+{
+	$parent = [System.IO.Path]::GetTempPath()
+	$name = [System.IO.Path]::GetRandomFileName()
+	return New-Item -ItemType Directory -Path (Join-Path $parent $name)
+}

@@ -1,4 +1,5 @@
 . "$PSScriptRoot/../Private/Invoke-Process.ps1"
+. "$PSScriptRoot/../Private/Exceptions.ps1"
 
 enum ControlMode 
 {
@@ -201,8 +202,7 @@ function Set-WaykNowConfig
         }
 
         if(!(Get-IsRunAsAdministrator)) {
-            Write-Host "You need to run as admin when you use global"
-            return;
+			throw (New-Object RunAsAdministratorException)
         }
 
         $json = Get-Content -Raw -Path $WaykInfo.GlobalDataPath | ConvertFrom-Json

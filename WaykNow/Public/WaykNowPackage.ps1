@@ -1,6 +1,7 @@
 
 . "$PSScriptRoot/../Private/Invoke-Process.ps1"
 . "$PSScriptRoot/../Private/PlatformHelpers.ps1"
+. "$PSScriptRoot/../Private/Exceptions.ps1"
 
 function Get-WaykNowVersion
 {
@@ -29,12 +30,22 @@ function Get-WaykNowVersion
 
 	return $null
 }
-function Get-WaykNowPackage
+function Get-WaykNowPackage(
+	[string] $Version
+)
 {
+	$version_quad = '';
 	$products_url = "https://devolutions.net/products.htm"
 	$products_htm = Invoke-RestMethod -Uri $products_url -Method 'GET' -ContentType 'text/plain'
 	$matches = $($products_htm | Select-String -AllMatches -Pattern "Wayk.Version=(\S+)").Matches
-	$version_quad = $matches.Groups[1].Value
+	if($version)
+	{
+		$version_quad = $version
+	}
+	else
+	{
+		$version_quad = $matches.Groups[1].Value
+	}
 	$download_base = "https://cdn.devolutions.net/download"
 	$download_url_x64 = "$download_base/Wayk/$version_quad/WaykNow-x64-$version_quad.msi"
 	$download_url_x86 = "$download_base/Wayk/$version_quad/WaykNow-x86-$version_quad.msi"
@@ -69,9 +80,17 @@ function Get-WaykNowPackage
 	return $result
 }
 function Install-WaykNow(
-	[switch] $Force
+	[switch] $Force,
+	[string] $Version
 ){
-	$package = Get-WaykNowPackage
+	if(Get-IsWindows){
+        if(!(Get-IsRunAsAdministrator)) {
+			throw (New-Object RunAsAdministratorException)
+		}
+	}
+
+	$tempDirectory = New-TemporaryDirectory
+	$package = Get-WaykNowPackage $Version
 	$latest_version = $package.Version
 	$current_version = Get-WaykNowVersion
 
@@ -82,29 +101,38 @@ function Install-WaykNow(
 		return
 	}
 
+	if(([version]$current_version -gt [version]$latest_version) -And $Force)
+	{
+		Uninstall-WaykNow
+	}
+
 	$download_url = $package.url
 	$download_file = Split-Path -Path $download_url -Leaf
-
+	$download_file_path = "$tempDirectory/$download_file"
 	Write-Host "Downloading $download_url"
+
 	$web_client = [System.Net.WebClient]::new()
-	$web_client.DownloadFile($download_url, $download_file)
+	$web_client.DownloadFile($download_url, $download_file_path)
 	$web_client.Dispose()
+	
+	$download_file_path = Resolve-Path $download_file_path
 
 	if (Get-IsWindows) {
-		$install_log_file = "WaykNow_Install.log"
+		$install_log_file = "$tempDirectory/WaykNow_Install.log"
 		$msi_args = @(
-			'/i', $download_file,
+			'/i', $download_file_path,
 			'/quiet', '/norestart',
 			'/log', $install_log_file
 		)
 		Start-Process "msiexec.exe" -ArgumentList $msi_args -Wait -NoNewWindow
+
 		Remove-Item -Path $install_log_file -Force -ErrorAction SilentlyContinue
 	} elseif ($IsMacOS) {
 		$volumes_wayk_now = "/Volumes/WaykNow"
 		if (Test-Path -Path $volumes_wayk_now -PathType 'Container') {
 			Start-Process 'hdiutil' -ArgumentList @('unmount', $volumes_wayk_now) -Wait
 		}
-		Start-Process 'hdiutil' -ArgumentList @('mount', "./$download_file") `
+		Start-Process 'hdiutil' -ArgumentList @('mount', "$download_file_path") `
 			-Wait -RedirectStandardOutput '/dev/null'
 		Wait-Process $(Start-Process 'sudo' -ArgumentList @('cp', '-R', `
 			"${volumes_wayk_now}/WaykNow.app", "/Applications") -PassThru).Id
@@ -115,7 +143,7 @@ function Install-WaykNow(
 			"/usr/local/bin/wayk-now") -PassThru).Id
 	} elseif ($IsLinux) {
 		$dpkg_args = @(
-			'-i', $download_file
+			'-i', $download_file_path
 		)
 		if ((id -u) -eq 0) {
 			Start-Process 'dpkg' -ArgumentList $dpkg_args -Wait
@@ -125,7 +153,7 @@ function Install-WaykNow(
 		}
 	}
 
-	Remove-Item -Path $download_file -Force
+	Remove-Item -Path $tempDirectory -Force -Recurse
 }
 
 function Uninstall-WaykNow
