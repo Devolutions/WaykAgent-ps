@@ -62,7 +62,7 @@ PS ~/WaykNow-ps> Uninstall-WaykNow
 
 By default, the `Install-WaykNow` skips the installation if the local Wayk Now version is the same as the latest one available, unless the `-Force` parameter is used.
 
-An optionnal parameter `-Version` is available if you want to select your version of Wayk now, if the selected version is smaller than the current version, you need to set the flag `-Force` to override the current version.
+The `-Version` optional parameter can be used to force using a specific version of Wayk Now instead of the latest one.
 
 === Version/Package
 
@@ -76,7 +76,7 @@ PS ~/WaykNow-ps> Get-WaykNowVersion
 
 The `Get-WaykNowPackage` command discovers the latest Wayk Now version available and the corresponding download URL.
 
-An optionnal parameter `-Version` is available if you want to see an older version of Wayk now
+An optional parameter `-Version` is available if you want to see an older version of Wayk Now.
 
 [source,sh]
 ----

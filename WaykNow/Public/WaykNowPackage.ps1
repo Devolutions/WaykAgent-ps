@@ -1,6 +1,7 @@
 
 . "$PSScriptRoot/../Private/Invoke-Process.ps1"
 . "$PSScriptRoot/../Private/PlatformHelpers.ps1"
+. "$PSScriptRoot/../Private/Exceptions.ps1"
 
 function Get-WaykNowVersion
 {
@@ -84,7 +85,7 @@ function Install-WaykNow(
 ){
 	if(Get-IsWindows){
         if(!(Get-IsRunAsAdministrator)) {
-			throw 'You need to run as administrator to do this action'
+			throw (New-Object RunAsAdministratorException)
 		}
 	}
 
@@ -272,14 +273,6 @@ function Add-PathIfNotExist(
 		   New-Item -path $path -ItemType File -Force
 		}
 	}
-}
-
-function New-TemporaryDirectory()
-{
-	$parent = [System.IO.Path]::GetTempPath()
-	$name = [System.IO.Path]::GetRandomFileName()
-	$name = "Wayk.$name"
-	return New-Item -ItemType Directory -Path (Join-Path $parent $name)
 }
 
 Export-ModuleMember -Function Get-WaykNowVersion, Get-WaykNowPackage, Install-WaykNow, Uninstall-WaykNow, Get-WaykNowInfo
