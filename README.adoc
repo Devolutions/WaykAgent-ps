@@ -3,6 +3,8 @@
 
 = Wayk Now PowerShell Cmdlet
 
+WaykNow-ps is a PowerShell cmdlet for https://wayk.devolutions.net[Devolutions Wayk Now]. For assistance or feature requests, please use the https://forum.devolutions.net/#WaykNow[Wayk Now forums] or open a ticket on this github project.
+
 == Installation
 
 On Windows, the regular PowerShell can be used. On macOS and Linux, you need PowerShell Core 6.0:
