@@ -538,7 +538,6 @@ PS ~/WaykNow-ps> Set-WaykNowBranding -Sample
 The `Reset-WaykNowBranding` command remove the `branding.7z` from the `%APPDATA%\Wayk` and the `%PROGRAMDATA%\Wayk` paths.
 
 == Wayk Now License
-=== License Management
 ==== Set Wayk Now License
 The `Set-WaykNowLicense` command with the parameter `License`, set your Wayk Now license.
 
