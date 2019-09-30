@@ -539,7 +539,7 @@ The `Reset-WaykNowBranding` command remove the `branding.7z` from the `%APPDATA%
 
 == Wayk Now License
 ==== Set Wayk Now License
-The `Set-WaykNowLicense` command with the parameter `License`, set your Wayk Now license.
+The `Set-WaykNowLicense` command with the parameter `License`, sets your Wayk Now license.
 
 [source,sh]
 ----
