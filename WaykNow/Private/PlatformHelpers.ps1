@@ -1,5 +1,3 @@
-
-
 function Get-IsWindows
 {
     if (-Not (Test-Path 'variable:global:IsWindows')) {

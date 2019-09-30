@@ -4,3 +4,31 @@ class RunAsAdministratorException : System.ApplicationException
     {
     }
 }
+
+class IncorrectPath : System.ApplicationException
+{
+    IncorrectPath():base("The path does not exist")
+    {
+    }
+}
+
+class UnsuportedPlatformException : System.ApplicationException
+{
+    UnsuportedPlatformException([string] $supportedPlatform):base("This feature is only supported on $supportedPlatform")
+    {
+    }
+}
+
+class SoftwareRequired : System.ApplicationException
+{
+    SoftwareRequired([string] $softwareRequired, [string] $downloadUrl):base("This software is required $softwareRequired, you can download at $downloadUrl")
+    {
+    }
+}
+
+class IncorrectFormat : System.ApplicationException
+{
+    IncorrectFormat([string] $actualFormat, $requiredFormat):base("The format $actualFormat is incompatible, the required format is $requiredFormat")
+    {
+    }
+}
