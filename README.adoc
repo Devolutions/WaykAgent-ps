@@ -103,7 +103,7 @@ You can not reboot the system (`Restart-Computer` or `shutdown /r`), and it will
 To revert to the original state, open a PowerShell console again, but use the `Reset-WaykNowSafeMode` command. This will set the original boot entry as the default, and delete the special "Wayk Now Safe Mode". You can now restart the computer again and it will boot in its regular state.
 
 === Wayk Now Information
-The `Get-WaykNowInfo` command return information about the differents WaykNow paths
+The `Get-WaykNowInfo` command returns information about the differents WaykNow paths
 
 [source,sh]
 ----
@@ -135,7 +135,7 @@ PS ~/WaykNow-ps> Set-WaykNowConfig -Global
 ----
 
 === Get Configuration
-The `Get-WaykNowConfig` command return the list of configurations from WaykNow
+The `Get-WaykNowConfig` command returns the list of configurations from WaykNow
 
 [source,sh]
 ----
@@ -547,7 +547,7 @@ PS ~/WaykNow-ps> Set-WaykNowLicense -License XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
 ----
 
 ==== Get Wayk Now License
-The `Get-WaykNowLicense` command return your license from Wayk Now.
+The `Get-WaykNowLicense` command returns your license from Wayk Now.
 
 [source,sh]
 ----
