@@ -562,3 +562,13 @@ The `Reset-WaykNowLicense` command remove your license from Wayk Now.
 ----
 PS ~/WaykNow-ps> Reset-WaykNowLicense 
 ----
+
+== Wayk Now Unique ID
+==== Get Wayk Now Unique ID
+The `Get-WaykNowUniqueID` command return the unique ID of Wayk Now
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Get-WaykNowUniqueID
+xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+----
