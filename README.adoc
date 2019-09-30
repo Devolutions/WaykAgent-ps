@@ -546,7 +546,7 @@ The `Set-WaykNowLicense` command with the parameter `License`, set your Wayk Now
 PS ~/WaykNow-ps> Set-WaykNowLicense -License XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
 ----
 
-==== Get Wayk NoW License
+==== Get Wayk Now License
 The `Get-WaykNowLicense` command return your license from Wayk Now.
 
 [source,sh]
