@@ -556,11 +556,12 @@ XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
 ----
 
 ==== Reset Wayk Now license
-The `Reset-WaykNowLicense` command remove your license from Wayk Now.
+The `Reset-WaykNowLicense` command removes your license from Wayk Now.
 
 [source,sh]
 ----
 PS ~/WaykNow-ps> Reset-WaykNowLicense 
+
 ----
 
 == Wayk Now Unique ID
