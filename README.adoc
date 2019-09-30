@@ -517,6 +517,7 @@ PS ~/WaykNow-ps> Test-WaykNowBranding -BrandingPath C:\Devolutions\BrandingFolde
 
 ==== Set Wayk Now Branding
 The `Set-WaykNowBranding` command with the parameter `BrandingPath` will copy your archive `branding.7z` to the correct path of WaykNow, you can use an url, or a local path.
+The `Sample` flag downloads and installs a sample branding.7z file for a fictional company that you can use as a reference or starting point.
 
 [source,sh]
 ----
@@ -526,6 +527,11 @@ PS ~/WaykNow-ps> Set-WaykNowBranding -BrandingPath https://cdn.devolutions.net/d
 [source,sh]
 ----
 PS ~/WaykNow-ps> Set-WaykNowBranding -BrandingPath C:\Devolutions\BrandingFolder\branding.7z
+----
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowBranding -Sample
 ----
 
 ==== Reset Wayk Now Branding

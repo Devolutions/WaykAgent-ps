@@ -2,23 +2,30 @@
 . "$PSScriptRoot/../Private/Invoke-Process.ps1"
 
 function Set-WaykNowBranding(
-    [Parameter(Mandatory = $true, HelpMessage= "brancing.7z file path")]
-    [string] $BrandingPath
+    [string] $BrandingPath,
+    [switch] $Sample
 ){
     if((Get-IsWindows) -or ($IsMacOS)){
         [WaykNowInfo]$WaykNowInfo = Get-WaykNowInfo
         $dataPath = $WaykNowInfo.DataPath;
         $tempDirectory = New-TemporaryDirectory
         $fileLocation = "$tempDirectory/branding.7z"
+        $path = ''
+        if($Sample){
+            $path = 'https://cdn.devolutions.net/download/Documents/help-content/branding.7z'
+        }
+        else{
+            $path = $BrandingPath
+        }
 
         try{
             $web_client = [System.Net.WebClient]::new()
-            $web_client.DownloadFile($brandingPath, $fileLocation)
+            $web_client.DownloadFile($path, $fileLocation)
             $web_client.Dispose()
         }
         catch{
-            if(Test-Path -Path $brandingPath){
-                $fileLocation = $brandingPath
+            if(Test-Path -Path $path){
+                $fileLocation = $path
             }
             else{
                 throw (New-Object IncorrectPath)
@@ -64,7 +71,7 @@ function Reset-WaykNowBranding(){
 }
 
 function Test-WaykNowBranding(
-    [Parameter(Mandatory = $true, HelpMessage= "brancing.7z file path")]
+    [Parameter(Mandatory = $true, HelpMessage= "branding.7z file path")]
     [string] $BrandingPath
 ){
     if((Get-IsWindows)){
