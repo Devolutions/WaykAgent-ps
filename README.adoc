@@ -565,7 +565,7 @@ PS ~/WaykNow-ps> Reset-WaykNowLicense
 
 == Wayk Now Unique ID
 ==== Get Wayk Now Unique ID
-The `Get-WaykNowUniqueID` command return the unique ID of Wayk Now
+The `Get-WaykNowUniqueID` command returns the unique ID of Wayk Now
 
 [source,sh]
 ----
