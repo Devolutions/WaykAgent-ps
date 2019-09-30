@@ -198,6 +198,7 @@ function Uninstall-WaykNow
 class WaykNowInfo
 {
 	[string] $DataPath
+	[string] $GlobalPath
 	[string] $GlobalDataPath
 	[string] $ConfigFile
 	[string] $LogPath
@@ -212,6 +213,7 @@ function Get-WaykNowInfo()
 {
 	$DataPath = '';
 	$GlobalDataPath = '';
+	$GlobalPath = '';
 	$resolvedGlobalPath = '';
 	if (Get-IsWindows)	{
 		Add-PathIfNotExist "$Env:APPDATA\Wayk" $true
@@ -224,6 +226,7 @@ function Get-WaykNowInfo()
 
 			$GlobalDataPath = $Env:ALLUSERSPROFILE + '\Wayk\WaykNow.cfg'
 			$resolvedGlobalPath = Resolve-Path -Path $GlobalDataPath
+			$GlobalPath = Resolve-Path -Path ($Env:ALLUSERSPROFILE + '\Wayk')
 		}
 	} elseif ($IsMacOS) {
 		Add-PathIfNotExist "~/Library/Application Support/Wayk" $true
@@ -246,6 +249,7 @@ function Get-WaykNowInfo()
 
 	$WaykNowInfoObject = [WaykNowInfo]::New()
 	$WaykNowInfoObject.DataPath = $resolvedPath
+	$WaykNowInfoObject.GlobalPath = $GlobalPath
 	$WaykNowInfoObject.GlobalDataPath = $resolvedGlobalPath
 	$WaykNowInfoObject.ConfigFile =  Resolve-Path -Path "$resolvedPath/WaykNow.cfg" 
 	$WaykNowInfoObject.LogPath =  Resolve-Path -Path "$resolvedPath/logs" 

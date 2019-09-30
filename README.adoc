@@ -2,7 +2,6 @@
 :toclevels: 4
 
 = Wayk Now PowerShell Cmdlet
-
 WaykNow-ps is a PowerShell cmdlet for https://wayk.devolutions.net[Devolutions Wayk Now]. For assistance or feature requests, please use the https://forum.devolutions.net/#WaykNow[Wayk Now forums] or open a ticket on this github project.
 
 == Installation
@@ -496,3 +495,44 @@ The chat access control
 ----
 PS ~/WaykNow-ps> Set-WaykNowConfig -AccessControlChat Allow
 ----
+
+== White Labeling
+For more information about White Labeling: +
+https://helpwayk.devolutions.net/index.html?advanced_whitelabelbranding.htm
+
+=== Branding Management
+==== Test Wayk Now Branding
+
+The `Test-WaykNowBranding` command with the parameter `BrandingPath` will inform you if the `branding.7z` is in a correct format, if the json file is correct, and if the encoding of the json file is correct.
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Test-WaykNowBranding -BrandingPath https://cdn.devolutions.net/download/Documents/help-content/branding.7z
+----
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Test-WaykNowBranding -BrandingPath C:\Devolutions\BrandingFolder\branding.7z
+----
+
+==== Set Wayk Now Branding
+The `Set-WaykNowBranding` command with the parameter `BrandingPath` will copy your archive `branding.7z` to the correct path of WaykNow, you can use an url, or a local path.
+The `Sample` flag downloads and installs a sample branding.7z file for a fictional company that you can use as a reference or starting point.
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowBranding -BrandingPath https://cdn.devolutions.net/download/Documents/help-content/branding.7z
+----
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowBranding -BrandingPath C:\Devolutions\BrandingFolder\branding.7z
+----
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowBranding -Sample
+----
+
+==== Reset Wayk Now Branding
+The `Reset-WaykNowBranding` command remove the `branding.7z` from the `%APPDATA%\Wayk` and the `%PROGRAMDATA%\Wayk` paths.
