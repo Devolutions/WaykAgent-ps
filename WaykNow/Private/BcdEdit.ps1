@@ -45,3 +45,20 @@ function Get-BcdNameById(
 
 	return $null
 }
+
+function Get-BcdSafeBootByName(
+	[string] $name,
+	[string[]] $entries
+){
+	Foreach ($entry in $entries) {
+		if ($entry -Match "\s.+${name}`r`n") {
+			$result = $entry | Select-String -AllMatches -Pattern "safeboot+\s+(.+)`r`n"
+			if($result){
+				$name = $result.Matches.Groups[1]
+				return $name
+			}
+		}
+	}
+
+	return $null
+}
