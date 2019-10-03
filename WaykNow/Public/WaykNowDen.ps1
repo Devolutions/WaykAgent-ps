@@ -24,6 +24,11 @@ function Get-WaykNowDen(
     $WaykNowObject.Realm = $Realm
     $WaykNowObject.DenID = $denJson.denId
     $WaykNowObject.DenUrl = $settingJson.DenUrl
+
+    # TODO Remove this one when the Den Url will be alwways set in the settings file .cfg
+    if(!($WaykNowObject.DenUrl)){
+        $WaykNowObject.DenUrl = "wss://den.wayk.net"
+    }
     $WaykNowObject.DenPath = "$DenLocalPath/$Realm"
 
     return $WaykNowObject
@@ -82,14 +87,15 @@ function Connect-WaykNowDen(
             }
             Write-Host "`"$name`" is already connected, you can use -Force to force reconnect"
         }
-        catch [System.Net.WebException]{
+        catch {
             Write-Host "Unknow error $_"
+            Write-Host "Try to use -Force"
         }
     }
     else{
         # if force, disconnect the current sessions
         if($Force){
-            Disconnect-WaykNowDen
+            $_ = Disconnect-WaykNowDen
         }
 
         $device_authorization = (Invoke-RestMethod -Uri "$lucidUrl/auth/device-authorization" -Method 'POST' -ContentType 'application/x-www-form-urlencoded' -Body $Form)
@@ -102,11 +108,11 @@ function Connect-WaykNowDen(
             grant_type = "urn:ietf:params:oauth:grant-type:device_code"
         }
     
-        Start-Process $verificationUri
+        Start-Process $verificationUri -ErrorAction SilentlyContinue
     
         $pokeCode = '400'
         while($pokeCode -eq '400'){
-            Start-Sleep -Seconds $device_authorization.interval
+            Start-Sleep -Seconds $device_authorization.interval -ErrorAction SilentlyContinue
     
             try{
                 $result = Invoke-RestMethod -Uri "$lucidUrl/auth/token" -Method 'POST' -ContentType 'application/x-www-form-urlencoded' -Body $FormPoke
@@ -130,7 +136,7 @@ function Connect-WaykNowDen(
             Write-Host "`"$name`" is now connected"
 
             }
-            catch [System.Net.WebException]{
+            catch [Microsoft.PowerShell.Commands.HttpResponseException]{
                 $pokeCode = $_.Exception.Response.StatusCode.Value__
                 if(!($pokeCode -eq '400')){
                     throw $_
@@ -164,7 +170,12 @@ function Disconnect-WaykNowDen(
     }
     if($oauthJson.device_code){
         $deviceCode = $oauthJson.device_code
-        $_ = Invoke-RestMethod -Uri "$lucidUrl/auth/device-logout?code=$deviceCode" -Method 'POST' -ContentType 'application/x-www-form-urlencoded'
+        try{
+            $_ = Invoke-RestMethod -Uri "$lucidUrl/auth/device-logout?code=$deviceCode" -Method 'POST' -ContentType 'application/x-www-form-urlencoded'
+        }
+        catch{
+            #Just hide error from here, you can try to disconnect with an device code who not work at all so // miam
+        }
 
         $oauthJson = Set-JsonValue $oauthJson "device_code" $null
         $fileValue = $oauthJson | ConvertTo-Json
