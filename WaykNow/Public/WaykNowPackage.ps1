@@ -201,6 +201,7 @@ class WaykNowInfo
 	[string] $GlobalPath
 	[string] $GlobalDataPath
 	[string] $ConfigFile
+	[string] $DenPath
 	[string] $LogPath
 	[string] $CertificateFile
 	[string] $PrivateKeyFile
@@ -241,6 +242,7 @@ function Get-WaykNowInfo()
 	Add-PathIfNotExist "$resolvedPath/WaykNow.cfg" $false
 	Add-PathIfNotExist "$resolvedPath/logs" $true
 	Add-PathIfNotExist "$resolvedPath/bookmarks" $true
+	Add-PathIfNotExist "$resolvedPath/den" $true
 
 	Add-PathIfNotExist "$resolvedPath/WaykNow.crt" $false
 	Add-PathIfNotExist "$resolvedPath/WaykNow.key" $false
@@ -252,6 +254,7 @@ function Get-WaykNowInfo()
 	$WaykNowInfoObject.GlobalPath = $GlobalPath
 	$WaykNowInfoObject.GlobalDataPath = $resolvedGlobalPath
 	$WaykNowInfoObject.ConfigFile =  Resolve-Path -Path "$resolvedPath/WaykNow.cfg" 
+	$WaykNowInfoObject.DenPath = "$resolvedPath/den"
 	$WaykNowInfoObject.LogPath =  Resolve-Path -Path "$resolvedPath/logs" 
 	$WaykNowInfoObject.CertificateFile =  Resolve-Path -Path "$resolvedPath/WaykNow.crt" 
 	$WaykNowInfoObject.PrivateKeyFile =   Resolve-Path -Path "$resolvedPath/WaykNow.key" 
@@ -260,23 +263,6 @@ function Get-WaykNowInfo()
 	$WaykNowInfoObject.BookmarksFile = Resolve-Path -Path "$resolvedPath/bookmarks"
 
 	return $WaykNowInfoObject 
-}
-
-function Add-PathIfNotExist(
-	[string] $path,
-	[bool] $isFolder
-)
-{
-	if($isFolder) {
-		if (!(Test-Path $path)) {
-		   New-Item -path $path -ItemType Directory -Force
-		}
-	}
-	else {
-		if (!(Test-Path $path))	{
-		   New-Item -path $path -ItemType File -Force
-		}
-	}
 }
 
 Export-ModuleMember -Function Get-WaykNowVersion, Get-WaykNowPackage, Install-WaykNow, Uninstall-WaykNow, Get-WaykNowInfo

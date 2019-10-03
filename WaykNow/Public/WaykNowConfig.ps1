@@ -1,5 +1,6 @@
 . "$PSScriptRoot/../Private/Invoke-Process.ps1"
 . "$PSScriptRoot/../Private/Exceptions.ps1"
+. "$PSScriptRoot/../Private/JsonHelper.ps1"
 
 enum ControlMode 
 {
@@ -422,30 +423,6 @@ function Get-WaykNowConfig()
     $WaykNowConfigObject.AccessControlChat = Get-NowOptionInt 'AccessControl.Chat' $GlobalServiceAvailable $true ([int]([AccessControl]::Allow)) $LocalJson $GlobalJson
 
     return $WaykNowConfigObject
-}
-
-function Set-JsonValue(
-    [PSCustomObject] $json,
-    [string] $name,
-    [PSCustomObject] $value
-)
-{
-    if($json.$name)
-    {
-        $json.$name = $value;
-    }
-    else
-    {
-        # If the json is empty
-        if(!$json){
-            $json = '{}'
-            $json = ConvertFrom-Json $json
-        }
-          
-        $json |  Add-Member -Type NoteProperty -Name $name -Value $value -Force
-    }
-
-    return $json
 }
 
 function Get-NowOptionInt(
