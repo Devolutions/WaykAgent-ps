@@ -21,3 +21,18 @@ function Set-JsonValue(
 
     return $json
 }
+
+function Get-WaykNowDenOauthJson(
+    [string]$WaykDenPath
+){
+    $oauthPath = "$WaykDenPath/oauth.cfg"
+    $oauthJson = ''
+    if(Test-Path $oauthPath){
+        $oauthJson = Get-Content -Raw -Path $oauthPath | ConvertFrom-Json
+    }else{
+        Add-PathIfNotExist $oauthPath $false
+        $oauthJson = Get-Content -Raw -Path $oauthPath | ConvertFrom-Json
+    }
+
+    return $oauthJson
+}

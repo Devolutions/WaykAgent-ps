@@ -32,3 +32,10 @@ class IncorrectFormat : System.ApplicationException
     {
     }
 }
+
+class NotConnectedException : System.ApplicationException
+{
+    NotConnectedException():base("You are not connected yet, use Connect-WaykNowDen")
+    {
+    }
+}
