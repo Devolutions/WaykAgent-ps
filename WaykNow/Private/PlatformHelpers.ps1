@@ -33,7 +33,6 @@ function New-TemporaryDirectory()
 	return New-Item -ItemType Directory -Path (Join-Path $parent $name)
 }
 
-
 function Get-FileEncoding(
     [Parameter(Mandatory = $True, ValueFromPipelineByPropertyName = $True)]
     [string]$Path
@@ -56,4 +55,21 @@ function Get-FileEncoding(
     else{
         Write-Output 'UTF8-NOBOM'
     }
+}
+
+function Add-PathIfNotExist(
+	[string] $path,
+	[bool] $isFolder
+)
+{
+	if($isFolder) {
+		if (!(Test-Path $path)) {
+		    $_ = New-Item -path $path -ItemType Directory -Force
+		}
+	}
+	else {
+		if (!(Test-Path $path))	{
+            $_ = New-Item -path $path -ItemType File -Force
+		}
+	}
 }

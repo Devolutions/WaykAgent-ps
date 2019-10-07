@@ -573,3 +573,48 @@ The `Get-WaykNowUniqueID` command returns the unique ID of Wayk Now
 PS ~/WaykNow-ps> Get-WaykNowUniqueID
 xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ----
+
+== Connection with Wayk Den
+==== Connect WaykNowDen
+The command `Connect-WaykNowDen` will start a connection to the WaykDen set on WaykNow, you can use the parameter -Force to force reconnect the actual session.
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Connect-WaykNowDen 
+"name" is now connected
+----
+
+==== Disconnect WaykNowDen
+The command `Disconnect-WaykNowDen` will logout your connection with WaykDen.
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Disconnect-WaykNowDen 
+
+----
+
+==== Get WaykNowDen
+The command `Get-WaykNowDen` show the WaykDen set on WaykNow
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Get-WaykNowDen 
+DenUrl             Realm    DenID  DenPath
+------             -----    -----  -------
+wss://den.wayk.net wayk.net XXXXXX C:\Users\user\AppData\Roaming\Wayk\den\wayk.net
+----
+
+==== Get WaykNowDenMachine
+The command `Get-WaykNowDenMachine` show the registered machine on your WaykDen.
+You need to be logged with WaykDen before use this command, you can refer to "Connect WaykNowDen"
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Get-WaykNowDenMachine 
+
+MachineName     DenID  State   UserAgent
+-----------     -----  -----   ---------
+DEVOLUTIONS146W 616529 ONLINE  WaykNow/3.3.2 (Windows; Windows 10 Pro 1809)
+DEVOLUTIONS147W 619181 OFFLINE WaykNow/3.3.2 (Windows; Windows 10 Pro 1809)
+
+----
