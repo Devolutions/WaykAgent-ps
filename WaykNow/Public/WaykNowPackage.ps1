@@ -202,6 +202,7 @@ class WaykNowInfo
 	[string] $GlobalDataPath
 	[string] $ConfigFile
 	[string] $DenPath
+	[string] $DenGlobalPath
 	[string] $LogPath
 	[string] $CertificateFile
 	[string] $PrivateKeyFile
@@ -218,6 +219,8 @@ function Get-WaykNowInfo()
 	$resolvedGlobalPath = '';
 	if (Get-IsWindows)	{
 		Add-PathIfNotExist "$Env:APPDATA\Wayk" $true
+		Add-PathIfNotExist "$Env:APPDATA\Wayk\den" $true
+
 		$DataPath = $Env:APPDATA + '\Wayk';
 		if (Get-Service "WaykNowService" -ErrorAction SilentlyContinue)	{
 			if(Get-IsRunAsAdministrator)	{
@@ -226,7 +229,9 @@ function Get-WaykNowInfo()
 			}
 
 			$GlobalDataPath = $Env:ALLUSERSPROFILE + '\Wayk\WaykNow.cfg'
+			$GlobalDenPath = $Env:ALLUSERSPROFILE + '\Wayk\den'
 			$resolvedGlobalPath = Resolve-Path -Path $GlobalDataPath
+			$resolvedGlobalDenPath = Resolve-Path -Path $GlobalDenPath
 			$GlobalPath = Resolve-Path -Path ($Env:ALLUSERSPROFILE + '\Wayk')
 		}
 	} elseif ($IsMacOS) {
@@ -254,7 +259,8 @@ function Get-WaykNowInfo()
 	$WaykNowInfoObject.GlobalPath = $GlobalPath
 	$WaykNowInfoObject.GlobalDataPath = $resolvedGlobalPath
 	$WaykNowInfoObject.ConfigFile =  Resolve-Path -Path "$resolvedPath/WaykNow.cfg" 
-	$WaykNowInfoObject.DenPath = "$resolvedPath/den"
+	$WaykNowInfoObject.DenPath = "$resolvedPath\den"
+	$WaykNowInfoObject.DenGlobalPath = $resolvedGlobalDenPath
 	$WaykNowInfoObject.LogPath =  Resolve-Path -Path "$resolvedPath/logs" 
 	$WaykNowInfoObject.CertificateFile =  Resolve-Path -Path "$resolvedPath/WaykNow.crt" 
 	$WaykNowInfoObject.PrivateKeyFile =   Resolve-Path -Path "$resolvedPath/WaykNow.key" 
