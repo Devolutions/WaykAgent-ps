@@ -4,7 +4,7 @@
 . "$PSScriptRoot/../Private/Exceptions.ps1"
 . "$PSScriptRoot/../Private/Base64Url.ps1"
 . "$PSScriptRoot/../Private/UserAgent.ps1"
-. "$PSScriptRoot/../Private/PemUtils.ps1"
+. "$PSScriptRoot/../Private/RSAHelper.ps1"
 
 class WaykDenObject{
     [string]$DenUrl
@@ -359,12 +359,9 @@ function Register-WaykNowMachine(){
 
     $csr_pem = $sb.ToString()
 
-    $stream = [System.IO.MemoryStream]::new()
-    $writer = [PemUtils.PemWriter]::new($stream)
-    [void]$writer.WritePrivateKey($rsa_key);
-    [void]$stream.Seek(0, [System.IO.SeekOrigin]::Begin);
-
-    $privateKey = [System.IO.StreamReader]::new($stream).ReadToEnd()
+    $RSAParams = $rsa_key.ExportParameters($true);
+    $privateKey = ExportPrivateKeyFromRSA $RSAParams
+    $privateKey = $privateKey -Replace "`r`n", "`n"
 
     $DenCertificatePath = "$DenGlobalPath/$WaykNowUniqueID.crt"
     $DenKeyPath = "$DenGlobalPath/$WaykNowUniqueID.key"
