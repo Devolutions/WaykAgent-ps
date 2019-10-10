@@ -203,6 +203,7 @@ class WaykNowInfo
 	[string] $ConfigFile
 	[string] $DenPath
 	[string] $LogPath
+	[string] $LogGlobalPath
 	[string] $CertificateFile
 	[string] $PrivateKeyFile
 	[string] $PasswordVault
@@ -223,10 +224,13 @@ function Get-WaykNowInfo()
 			if(Get-IsRunAsAdministrator)	{
 				Add-PathIfNotExist "$Env:ALLUSERSPROFILE\Wayk" $true
 				Add-PathIfNotExist "$Env:ALLUSERSPROFILE\Wayk\WaykNow.cfg" $false
+				Add-PathIfNotExist "$Env:ALLUSERSPROFILE\Wayk\logs" $true
 			}
 
+			$LogGlobalPath = "$Env:ALLUSERSPROFILE\Wayk\logs" 
 			$GlobalDataPath = $Env:ALLUSERSPROFILE + '\Wayk\WaykNow.cfg'
 			$resolvedGlobalPath = Resolve-Path -Path $GlobalDataPath
+			$resolvedLogGlobalPath = Resolve-Path -Path $LogGlobalPath
 			$GlobalPath = Resolve-Path -Path ($Env:ALLUSERSPROFILE + '\Wayk')
 		}
 	} elseif ($IsMacOS) {
@@ -256,6 +260,7 @@ function Get-WaykNowInfo()
 	$WaykNowInfoObject.ConfigFile =  Resolve-Path -Path "$resolvedPath/WaykNow.cfg" 
 	$WaykNowInfoObject.DenPath = "$resolvedPath/den"
 	$WaykNowInfoObject.LogPath =  Resolve-Path -Path "$resolvedPath/logs" 
+	$WaykNowInfoObject.LogGlobalPath =  $resolvedLogGlobalPath
 	$WaykNowInfoObject.CertificateFile =  Resolve-Path -Path "$resolvedPath/WaykNow.crt" 
 	$WaykNowInfoObject.PrivateKeyFile =   Resolve-Path -Path "$resolvedPath/WaykNow.key" 
 	$WaykNowInfoObject.PasswordVault =  Resolve-Path -Path "$resolvedPath/WaykNow.vault" 

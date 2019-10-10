@@ -75,7 +75,8 @@ FunctionsToExport = @('Get-WaykNowVersion', 'Get-WaykNowPackage', 'Install-WaykN
     'Set-WaykNowBranding', 'Reset-WaykNowBranding', 'Test-WaykNowBranding',
     'Set-WaykNowLicense', 'Get-WaykNowLicense', 'Reset-WaykNowLicense',
     'Get-WaykNowUniqueID',
-    'Get-WaykNowDen', 'Connect-WaykNowDen', 'Disconnect-WaykNowDen','Get-WaykNowDenMachine')
+    'Get-WaykNowDen', 'Connect-WaykNowDen', 'Disconnect-WaykNowDen','Get-WaykNowDenMachine',
+    'Enable-WaykNowLogs', 'Disable-WaykNowLogs', 'Export-WaykNowLogs', 'Clear-WaykNowLogs')
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
