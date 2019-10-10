@@ -624,7 +624,7 @@ The command `Unregister-WaykNowMachine` Unregister your WaykNow client to WaykDe
 PS ~/WaykNow-ps> Unregister-WaykNowMachine
 ----
 
-==== Get WaykNowMachine
+=== Get WaykNowMachine
 The command `Get-WaykNowMachine` show the registered machine on your WaykDen.
 You need to be logged with WaykDen before use this command, you can refer to "Connect WaykNowDen"
 

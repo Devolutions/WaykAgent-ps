@@ -309,10 +309,11 @@ function Register-WaykNowMachine(){
     $DenChainPem = "$DenGlobalPath/$WaykNowUniqueID-ca-chain.pem"
     $DenIntermediateCa = "$tempDirectory/intermediate_ca.pem"
     $DenRootCa = "$tempDirectory/root_ca.pem"
+    $Utf8NoBomEncoding = [System.Text.UTF8Encoding]::new($False)
 
-    Set-Content -Value $contentsDen -Path $DenChainPem
-    Set-Content -Value $ca_chain_from_den[0] -Path $DenIntermediateCa
-	Set-Content -Value $ca_chain_from_den[1] -Path $DenRootCa
+    [System.IO.File]::WriteAllLines($DenChainPem, $contentsDen, $Utf8NoBomEncoding)
+    [System.IO.File]::WriteAllLines($DenIntermediateCa, $ca_chain_from_den[0], $Utf8NoBomEncoding)
+    [System.IO.File]::WriteAllLines($DenRootCa, $ca_chain_from_den[1], $Utf8NoBomEncoding)
 
     $intermediate_ca = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("$DenIntermediateCa")
     $root_ca = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("$DenRootCa")
@@ -368,8 +369,9 @@ function Register-WaykNowMachine(){
     $DenCertificatePath = "$DenGlobalPath/$WaykNowUniqueID.crt"
     $DenKeyPath = "$DenGlobalPath/$WaykNowUniqueID.key"
     $DenCsrPath = "$DenGlobalPath/$WaykNowUniqueID.csr"
-    Set-Content -Value $csr_pem -Path $DenCsrPath
-    Set-Content -Value $privateKey -Path $DenKeyPath
+
+    [System.IO.File]::WriteAllLines($DenCsrPath, $csr_pem, $Utf8NoBomEncoding)
+    [System.IO.File]::WriteAllLines($DenKeyPath, $privateKey, $Utf8NoBomEncoding)
 
     $csr = Get-Content "$DenCsrPath" | Out-String
     $csr = $csr -Replace "`r`n", "`n"
@@ -394,8 +396,8 @@ function Register-WaykNowMachine(){
     if(!($cert.certificate)){
         throw "Error with signed CSR"
     }
-
-    Set-Content -Value $cert.certificate -Path "$DenCertificatePath"
+    
+    [System.IO.File]::WriteAllLines($DenCertificatePath, $cert.certificate, $Utf8NoBomEncoding)
 
     $leaf_cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("$DenCertificatePath")
 
