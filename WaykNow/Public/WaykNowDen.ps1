@@ -2,27 +2,20 @@
 . "$PSScriptRoot/../Private/DenHelper.ps1"
 . "$PSScriptRoot/../Private/JsonHelper.ps1"
 . "$PSScriptRoot/../Private/Exceptions.ps1"
-<<<<<<< HEAD
 . "$PSScriptRoot/../Private/Base64Url.ps1"
 . "$PSScriptRoot/../Private/UserAgent.ps1"
 . "$PSScriptRoot/../Private/PemUtils.ps1"
-=======
->>>>>>> 34e39f1096f9bb663479ec164c789dada9d5c84c
 
 class WaykDenObject{
     [string]$DenUrl
     [string]$Realm
     [string]$DenID
-<<<<<<< HEAD
     [string]$DenLocalPath
     [string]$DenGlobalPath
 }
 
 class WaykDenRegistrationObject{
     [bool]$IsRegistered
-=======
-    [string]$DenPath
->>>>>>> 34e39f1096f9bb663479ec164c789dada9d5c84c
 }
 
 function Get-WaykNowDen(
@@ -30,19 +23,13 @@ function Get-WaykNowDen(
 ){
     $WaykNowConfig = Get-WaykNowInfo
     $DenLocalPath = $WaykNowConfig.DenPath
-<<<<<<< HEAD
     $DenGlobalPath = $WaykNowConfig.DenGlobalPath
-=======
->>>>>>> 34e39f1096f9bb663479ec164c789dada9d5c84c
+
     $localJson = Get-Content -Raw -Path "$DenLocalPath/default.json" | ConvertFrom-Json
 
     $Realm = $localJson.realm
     $denJson = Get-Content -Raw -Path "$DenLocalPath/$Realm/.state" | ConvertFrom-Json
-<<<<<<< HEAD
     $settingJson = Get-Content -Raw -Path $WaykNowConfig.GlobalDataPath | ConvertFrom-Json
-=======
-    $settingJson = Get-Content -Raw -Path $WaykNowConfig.ConfigFile | ConvertFrom-Json
->>>>>>> 34e39f1096f9bb663479ec164c789dada9d5c84c
 
     $WaykNowObject = [WaykDenObject]::New()
     $WaykNowObject.Realm = $Realm
@@ -53,12 +40,8 @@ function Get-WaykNowDen(
     if(!($WaykNowObject.DenUrl)){
         $WaykNowObject.DenUrl = "wss://den.wayk.net"
     }
-<<<<<<< HEAD
     $WaykNowObject.DenLocalPath = "$DenLocalPath\$Realm"
     $WaykNowObject.DenGlobalPath = "$DenGlobalPath\$Realm"
-=======
-    $WaykNowObject.DenPath = "$DenLocalPath/$Realm"
->>>>>>> 34e39f1096f9bb663479ec164c789dada9d5c84c
 
     return $WaykNowObject
 }
@@ -68,12 +51,8 @@ function Connect-WaykNowDen(
 ){
     $WaykNowDenObject = Get-WaykNowDen
     $WaykDenUrl = Format-WaykDenUrl $WaykNowDenObject.DenUrl
-<<<<<<< HEAD
     $WaykDenPath = $WaykNowDenObject.DenLocalPath
     $WaykDenGlobalPath = $WaykNowDenObject.DenGlobalPath
-=======
-    $WaykDenPath = $WaykNowDenObject.DenPath
->>>>>>> 34e39f1096f9bb663479ec164c789dada9d5c84c
 
     $val = (Invoke-RestMethod -Uri "$WaykDenUrl/.well-known/configuration" -Method 'GET' -ContentType 'application/json')
     $lucidUrl = $val.lucid_uri
@@ -376,12 +355,14 @@ function Register-WaykNowMachine(){
     }
 
     [void]$sb.AppendLine("-----END CERTIFICATE REQUEST-----")
+
     $csr_pem = $sb.ToString()
 
     $stream = [System.IO.MemoryStream]::new()
     $writer = [PemUtils.PemWriter]::new($stream)
     [void]$writer.WritePrivateKey($rsa_key);
     [void]$stream.Seek(0, [System.IO.SeekOrigin]::Begin);
+
     $privateKey = [System.IO.StreamReader]::new($stream).ReadToEnd()
 
     $DenCertificatePath = "$DenGlobalPath/$WaykNowUniqueID.crt"
