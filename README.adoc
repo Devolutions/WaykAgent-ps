@@ -604,7 +604,6 @@ DenUrl             Realm    DenID  DenPath
 wss://den.wayk.net wayk.net XXXXXX C:\Users\user\AppData\Roaming\Wayk\den\wayk.net
 ----
 
-
 == WaykNow Machine Management
 To use this feature, WaykNow need to be installed on Windows with the unattended mode, you need to be connected to WaykDen (you can refer to "Connection with Wayk Den" section), and Powershell need to be run as administrator.
 
