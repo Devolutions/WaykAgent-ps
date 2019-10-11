@@ -604,8 +604,28 @@ DenUrl             Realm    DenID  DenPath
 wss://den.wayk.net wayk.net XXXXXX C:\Users\user\AppData\Roaming\Wayk\den\wayk.net
 ----
 
-==== Get WaykNowDenMachine
-The command `Get-WaykNowDenMachine` show the registered machine on your WaykDen.
+== WaykNow Machine Management
+To use this feature, WaykNow need to be installed on Windows with the unattended mode, you need to be connected to WaykDen (you can refer to "Connection with Wayk Den" section), and Powershell need to be run as administrator.
+
+=== Register WaykNow Machine
+The command `Register-WaykNowMachine` register your WaykNow client to WaykDen, with the unique ID of WaykNow.
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Register-WaykNowMachine
+
+Machine Registered: 4133d6bb-6eb6-be1a-30fd-f6be391d5aci
+----
+
+=== Unregister WaykNow Machine
+The command `Unregister-WaykNowMachine` Unregister your WaykNow client to WaykDen, with the unique ID of WaykNow.
+[source,sh]
+----
+PS ~/WaykNow-ps> Unregister-WaykNowMachine
+----
+
+=== Get WaykNowMachine
+The command `Get-WaykNowMachine` show the registered machine on your WaykDen.
 You need to be logged with WaykDen before use this command, you can refer to "Connect WaykNowDen"
 
 [source,sh]

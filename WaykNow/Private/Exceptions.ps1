@@ -39,3 +39,10 @@ class NotConnectedException : System.ApplicationException
     {
     }
 }
+
+class UnattendedNotFound : System.ApplicationException
+{
+    UnattendedNotFound():base("WaykNow unattended mode is not installed")
+    {
+    }
+}
