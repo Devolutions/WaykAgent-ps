@@ -9,6 +9,9 @@ function Get-WaykNowVersion
 		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Now'
 		if ($uninstall_reg) {
 			$version = $uninstall_reg.DisplayVersion
+			if ($version -lt 2000) {
+					$version = "20" + $version
+			}
 			return $version
 		}
 	} elseif ($IsMacOS) {
