@@ -198,6 +198,21 @@ function Uninstall-WaykNow
 	}
 }
 
+function Update-WaykNow
+{
+	$wayk_now_process_was_running = Get-WaykNowProcess
+	$wayk_now_service_was_running = (Get-NowService).Status -Eq 'Running'
+
+	Stop-WaykNow
+	Install-WaykNow
+
+	if ($wayk_now_process_was_running) {
+		Start-WaykNow
+	} elseif ($wayk_now_service_was_running) {
+		Start-NowService
+	}
+}
+
 class WaykNowInfo
 {
 	[string] $DataPath
@@ -279,4 +294,4 @@ function Get-WaykNowInfo()
 	return $WaykNowInfoObject 
 }
 
-Export-ModuleMember -Function Get-WaykNowVersion, Get-WaykNowPackage, Install-WaykNow, Uninstall-WaykNow, Get-WaykNowInfo
+Export-ModuleMember -Function Get-WaykNowVersion, Get-WaykNowPackage, Install-WaykNow, Uninstall-WaykNow, Update-WaykNow, Get-WaykNowInfo
