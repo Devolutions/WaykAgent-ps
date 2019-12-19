@@ -198,18 +198,20 @@ function Uninstall-WaykNow
 	}
 }
 
-function Update-WaykNow
+function Update-WaykNow(
+    [switch] $Force
+)
 {
 	$wayk_now_process_was_running = Get-WaykNowProcess
-	$wayk_now_service_was_running = (Get-NowService).Status -Eq 'Running'
+	$wayk_now_service_was_running = (Get-WaykNowService).Status -Eq 'Running'
 
 	Stop-WaykNow
-	Install-WaykNow
+	Install-WaykNow $Force
 
 	if ($wayk_now_process_was_running) {
 		Start-WaykNow
 	} elseif ($wayk_now_service_was_running) {
-		Start-NowService
+		Start-WaykNowService
 	}
 }
 

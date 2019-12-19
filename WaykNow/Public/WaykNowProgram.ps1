@@ -11,28 +11,28 @@ function Get-WaykNowProcess
     return $wayk_now_process
 }
 
-function Get-NowService
+function Get-WaykNowService
 {
-    $now_service = $null
+    $wayk_now_service = $null
 
     if (Get-IsWindows -And $PSEdition -Eq 'Desktop') {
-        $now_service = $(Get-Service | Where-Object -Property 'Name' -Like 'WaykNowService')
+        $wayk_now_service = $(Get-Service | Where-Object -Property 'Name' -Like 'WaykNowService')
 	}
 
-    return $now_service
+    return $wayk_now_service
 }
 
-function Start-NowService
+function Start-WaykNowService
 {
-    $now_service = Get-NowService
-    if ($now_service) {
-        Start-Service $now_service
+    $wayk_now_service = Get-WaykNowService
+    if ($wayk_now_service) {
+        Start-Service $wayk_now_service
     }
 }
 
 function Start-WaykNow
 {
-    Start-NowService
+    Start-WaykNowService
 
 	if (Get-IsWindows) {
         $display_name = 'Wayk Now'
@@ -64,7 +64,7 @@ function Stop-WaykNow
         Stop-Process $wayk_now_process.Id
     }
 
-    $now_service = Get-NowService
+    $now_service = Get-WaykNowService
 
     if ($now_service) {
         Stop-Service $now_service
@@ -85,4 +85,4 @@ function Restart-WaykNow
     Start-WaykNow
 }
 
-Export-ModuleMember -Function Start-WaykNow, Stop-WaykNow, Restart-WaykNow, Get-WaykNowProcess, Get-NowService, Start-NowService
+Export-ModuleMember -Function Start-WaykNow, Stop-WaykNow, Restart-WaykNow, Get-WaykNowProcess, Get-WaykNowService, Start-WaykNowService
