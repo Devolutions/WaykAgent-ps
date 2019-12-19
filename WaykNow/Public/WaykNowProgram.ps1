@@ -1,15 +1,40 @@
+function Get-WaykNowProcess
+{
+    $wayk_now_process = $null
+
+	if (Get-IsWindows -Or $IsMacOS) {
+        $wayk_now_process = $(Get-Process | Where-Object -Property ProcessName -Like 'WaykNow')
+	} elseif ($IsLinux) {
+        $wayk_now_process = $(Get-Process | Where-Object -Property ProcessName -Like 'wayk-now')
+	}
+
+    return $wayk_now_process
+}
+
+function Get-WaykNowService
+{
+    $wayk_now_service = $null
+
+    if (Get-IsWindows -And $PSEdition -Eq 'Desktop') {
+        $wayk_now_service = $(Get-Service | Where-Object -Property 'Name' -Like 'WaykNowService')
+	}
+
+    return $wayk_now_service
+}
+
+function Start-WaykNowService
+{
+    $wayk_now_service = Get-WaykNowService
+    if ($wayk_now_service) {
+        Start-Service $wayk_now_service
+    }
+}
 
 function Start-WaykNow
 {
+    Start-WaykNowService
+
 	if (Get-IsWindows) {
-        if ($PSEdition -Eq 'Desktop') {
-            $wayk_now_service = $(Get-Service | Where-Object -Property 'Name' -Like 'WaykNowService')
-
-            if ($wayk_now_service) {
-                Start-Service $wayk_now_service
-            }
-        }
-
         $display_name = 'Wayk Now'
 		if ([System.Environment]::Is64BitOperatingSystem) {
 			$uninstall_reg = Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" `
@@ -33,37 +58,23 @@ function Start-WaykNow
 
 function Stop-WaykNow
 {
+    $wayk_now_process = Get-WaykNowProcess
+
+    if ($wayk_now_process) {
+        Stop-Process $wayk_now_process.Id
+    }
+
+    $now_service = Get-WaykNowService
+
+    if ($now_service) {
+        Stop-Service $now_service
+    }
+
 	if (Get-IsWindows) {
-        $wayk_now_process = $(Get-Process | Where-Object -Property ProcessName -Like 'WaykNow')
-
-        if ($wayk_now_process) {
-            Stop-Process $wayk_now_process.Id
-        }
-
-        if ($PSEdition -Eq 'Desktop') {
-            $wayk_now_service = $(Get-Service | Where-Object -Property 'Name' -Like 'WaykNowService')
-
-            if ($wayk_now_service) {
-                Stop-Service $wayk_now_service
-            }
-        }
-
         $now_session_process = $(Get-Process | Where-Object -Property ProcessName -Like 'NowSession')
 
         if ($now_session_process) {
             Stop-Process $now_session_process.Id
-        }
-	} elseif ($IsMacOS) {
-        $wayk_now_process = $(Get-Process | Where-Object -Property ProcessName -Like 'WaykNow')
-
-        if ($wayk_now_process) {
-            Stop-Process $wayk_now_process.Id
-        }
-	} elseif ($IsLinux) {
-        $wayk_now_process = $(Get-Process | Where-Object -Property ProcessName -Like 'wayk-now')
-
-        if ($wayk_now_process) {
-            Stop-Process $wayk_now_process.Id
         }
 	}
 }
@@ -74,4 +85,4 @@ function Restart-WaykNow
     Start-WaykNow
 }
 
-Export-ModuleMember -Function Start-WaykNow, Stop-WaykNow, Restart-WaykNow
+Export-ModuleMember -Function Start-WaykNow, Stop-WaykNow, Restart-WaykNow, Get-WaykNowProcess, Get-WaykNowService, Start-WaykNowService
