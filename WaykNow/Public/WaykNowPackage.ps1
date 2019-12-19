@@ -206,7 +206,7 @@ function Update-WaykNow(
 	$wayk_now_service_was_running = (Get-WaykNowService).Status -Eq 'Running'
 
 	Stop-WaykNow
-	Install-WaykNow $Force
+	Install-WaykNow -Force:$Force
 
 	if ($wayk_now_process_was_running) {
 		Start-WaykNow
