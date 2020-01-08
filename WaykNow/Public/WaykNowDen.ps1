@@ -29,7 +29,7 @@ function Get-WaykNowDen(
 
     $Realm = $localJson.realm
     $denJson = Get-Content -Raw -Path "$DenLocalPath/$Realm/.state" | ConvertFrom-Json
-    $settingJson = Get-Content -Raw -Path $WaykNowConfig.GlobalDataPath | ConvertFrom-Json
+    $settingJson = Get-Content -Raw -Path $WaykNowConfig.GlobalConfigFile | ConvertFrom-Json
 
     $WaykNowObject = [WaykDenObject]::New()
     $WaykNowObject.Realm = $Realm

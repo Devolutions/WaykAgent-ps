@@ -220,6 +220,7 @@ class WaykNowInfo
 	[string] $DataPath
 	[string] $GlobalPath
 	[string] $GlobalDataPath
+	[string] $GlobalConfigFile
 	[string] $ConfigFile
 	[string] $DenPath
 	[string] $DenGlobalPath
@@ -235,65 +236,36 @@ class WaykNowInfo
 function Get-WaykNowInfo()
 {
 	$DataPath = '';
-	$GlobalDataPath = '';
 	$GlobalPath = '';
-	$resolvedGlobalPath = '';
+
 	if (Get-IsWindows)	{
-		Add-PathIfNotExist "$Env:APPDATA\Wayk" $true
-		Add-PathIfNotExist "$Env:APPDATA\Wayk\den" $true
-
 		$DataPath = $Env:APPDATA + '\Wayk';
-		if (Get-Service "WaykNowService" -ErrorAction SilentlyContinue)	{
-			if(Get-IsRunAsAdministrator)	{
-				Add-PathIfNotExist "$Env:ALLUSERSPROFILE\Wayk" $true
-				Add-PathIfNotExist "$Env:ALLUSERSPROFILE\Wayk\WaykNow.cfg" $false
-				Add-PathIfNotExist "$Env:ALLUSERSPROFILE\Wayk\logs" $true
-			}
-
-			$LogGlobalPath = "$Env:ALLUSERSPROFILE\Wayk\logs" 
-			$GlobalDataPath = $Env:ALLUSERSPROFILE + '\Wayk\WaykNow.cfg'
-			$GlobalDenPath = $Env:ALLUSERSPROFILE + '\Wayk\den'
-			$resolvedGlobalPath = Resolve-Path -Path $GlobalDataPath
-			$resolvedLogGlobalPath = Resolve-Path -Path $LogGlobalPath
-			$resolvedGlobalDenPath = Resolve-Path -Path $GlobalDenPath
-			$GlobalPath = Resolve-Path -Path ($Env:ALLUSERSPROFILE + '\Wayk')
-		}
+		$GlobalPath = $Env:ALLUSERSPROFILE + '\Wayk'
 	} elseif ($IsMacOS) {
-		Add-PathIfNotExist "~/Library/Application Support/Wayk" $true
 		$DataPath = '~/Library/Application Support/Wayk'
+		$GlobalPath = '/Library/Application Support/Wayk'
 	} elseif ($IsLinux) {
-		Add-PathIfNotExist "~/.config/Wayk" $true
 		$DataPath = '~/.config/Wayk'
+		$GlobalPath = '/etc/wayk'
 	}
 
-	$resolvedPath = Resolve-Path -Path $DataPath
+	$info = [WaykNowInfo]::New()
+	$info.DataPath = $DataPath | Resolve-Path
+	$info.GlobalPath = $GlobalPath | Resolve-Path
+	$info.GlobalDataPath = $GlobalPath | Resolve-Path
+	$info.GlobalConfigFile = Join-Path -Path $GlobalPath -ChildPath 'WaykNow.cfg' | Resolve-Path
+	$info.DenGlobalPath = Join-Path -Path $GlobalPath -ChildPath 'den' | Resolve-Path
+	$info.LogGlobalPath = Join-Path -Path $GlobalPath -ChildPath 'logs' | Resolve-Path
+	$info.ConfigFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.cfg' | Resolve-Path
+	$info.DenPath = Join-Path -Path $DataPath -ChildPath 'den' | Resolve-Path
+	$info.LogPath = Join-Path -Path $DataPath -ChildPath 'logs' | Resolve-Path
+	$info.CertificateFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.crt' | Resolve-Path
+	$info.PrivateKeyFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.key' | Resolve-Path
+	$info.PasswordVault = Join-Path -Path $DataPath -ChildPath 'WaykNow.vault' | Resolve-Path
+	$info.KnownHostsFile = Join-Path -Path $DataPath -ChildPath 'known_hosts' | Resolve-Path
+	$info.BookmarksFile = Join-Path -Path $DataPath -ChildPath 'bookmarks' | Resolve-Path
 
-	Add-PathIfNotExist "$resolvedPath/WaykNow.cfg" $false
-	Add-PathIfNotExist "$resolvedPath/logs" $true
-	Add-PathIfNotExist "$resolvedPath/bookmarks" $true
-	Add-PathIfNotExist "$resolvedPath/den" $true
-
-	Add-PathIfNotExist "$resolvedPath/WaykNow.crt" $false
-	Add-PathIfNotExist "$resolvedPath/WaykNow.key" $false
-	Add-PathIfNotExist "$resolvedPath/WaykNow.vault" $false
-	Add-PathIfNotExist "$resolvedPath/known_hosts" $false
-
-	$WaykNowInfoObject = [WaykNowInfo]::New()
-	$WaykNowInfoObject.DataPath = $resolvedPath
-	$WaykNowInfoObject.GlobalPath = $GlobalPath
-	$WaykNowInfoObject.GlobalDataPath = $resolvedGlobalPath
-	$WaykNowInfoObject.ConfigFile =  Resolve-Path -Path "$resolvedPath/WaykNow.cfg" 
-	$WaykNowInfoObject.DenPath = "$resolvedPath\den"
-	$WaykNowInfoObject.DenGlobalPath = $resolvedGlobalDenPath
-	$WaykNowInfoObject.LogPath =  Resolve-Path -Path "$resolvedPath/logs" 
-	$WaykNowInfoObject.LogGlobalPath =  $resolvedLogGlobalPath
-	$WaykNowInfoObject.CertificateFile =  Resolve-Path -Path "$resolvedPath/WaykNow.crt" 
-	$WaykNowInfoObject.PrivateKeyFile =   Resolve-Path -Path "$resolvedPath/WaykNow.key" 
-	$WaykNowInfoObject.PasswordVault =  Resolve-Path -Path "$resolvedPath/WaykNow.vault" 
-	$WaykNowInfoObject.KnownHostsFile =  Resolve-Path -Path "$resolvedPath/known_hosts" 
-	$WaykNowInfoObject.BookmarksFile = Resolve-Path -Path "$resolvedPath/bookmarks"
-
-	return $WaykNowInfoObject 
+	return $info 
 }
 
 Export-ModuleMember -Function Get-WaykNowVersion, Get-WaykNowPackage, Install-WaykNow, Uninstall-WaykNow, Update-WaykNow, Get-WaykNowInfo
