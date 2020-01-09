@@ -146,7 +146,7 @@ PS ~/WaykNow-ps>  Get-WaykNowConfig
 ----
 FriendlyName               : david
 Language                   : en
-ControlMode                : AllowRemoteControlSeverOnly
+ControlMode                : AllowRemoteControlServerOnly
 AutoLaunchOnUserLogon      : False
 ShowMainWindowOnLaunch     : True
 MinimizeToNotificationArea : False
@@ -159,7 +159,7 @@ PersonalPassword           : 52gk8z
 GeneratedPasswordLength    : 6
 GeneratedPasswordCharSet   : Alphanumeric
 DenEnabled                 : True
-DenUrl                     : wss://den.wayk.net
+DenUrl                     : https://den.wayk.net
 QualityMode                : High
 LoggingLevel               : Off
 LoggingFilter              :
@@ -196,11 +196,11 @@ PS ~/WaykNow-ps> Set-WaykNowConfig -Language en
 ----
 
 ==== ControlMode
-Specifies the Remote Control Mode of WaykNow, AllRemoteControlMode: Both sides are displayed, TakeRemoteControlClientOnly: Only the client side is displayed and AllowRemoteControlSeverOnly: Only the server side is displayed.
+Specifies the Remote Control Mode of WaykNow, AllRemoteControlMode: Both sides are displayed, TakeRemoteControlClientOnly: Only the client side is displayed and AllowRemoteControlServerOnly: Only the server side is displayed.
 
 *Type:* ControlMode +
 *DefaultValue:* AllRemoteControlMode +
-*Accepted values:* AllRemoteControlMode, TakeRemoteControlClientOnly, AllowRemoteControlSeverOnly +
+*Accepted values:* AllRemoteControlMode, TakeRemoteControlClientOnly, AllowRemoteControlServerOnly +
 *Example:*
 [source,sh]
 ----
@@ -362,12 +362,12 @@ PS ~/WaykNow-ps> Set-WaykNowConfig -DenEnabled true
 Connect to the Wayk Den server with the URL
 
 *Type:* string +
-*DefaultValue:* "wss://den.wayk.net" +
+*DefaultValue:* "https://den.wayk.net" +
 *Example:*
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -DenUrl wss://den.wayk.net
+PS ~/WaykNow-ps> Set-WaykNowConfig -DenUrl https://den.wayk.net
 ----
 
 === Advanced Properties
@@ -501,6 +501,7 @@ For more information about White Labeling: +
 https://helpwayk.devolutions.net/index.html?advanced_whitelabelbranding.htm
 
 === Branding Management
+
 ==== Test Wayk Now Branding
 
 The `Test-WaykNowBranding` command with the parameter `BrandingPath` will inform you if the `branding.7z` is in a correct format, if the json file is correct, and if the encoding of the json file is correct.
@@ -601,7 +602,7 @@ The command `Get-WaykNowDen` show the WaykDen set on WaykNow
 PS ~/WaykNow-ps> Get-WaykNowDen 
 DenUrl             Realm    DenID  DenPath
 ------             -----    -----  -------
-wss://den.wayk.net wayk.net XXXXXX C:\Users\user\AppData\Roaming\Wayk\den\wayk.net
+https://den.wayk.net wayk.net XXXXXX C:\Users\user\AppData\Roaming\Wayk\den\wayk.net
 ----
 
 == WaykNow Machine Management

@@ -38,7 +38,7 @@ function Get-WaykNowDen(
 
     # TODO Remove this one when the Den Url will be alwways set in the settings file .cfg
     if(!($WaykNowObject.DenUrl)){
-        $WaykNowObject.DenUrl = "wss://den.wayk.net"
+        $WaykNowObject.DenUrl = "https://den.wayk.net"
     }
     $WaykNowObject.DenLocalPath = "$DenLocalPath\$Realm"
     $WaykNowObject.DenGlobalPath = "$DenGlobalPath\$Realm"
@@ -88,7 +88,7 @@ function Connect-WaykNowDen(
             Write-Host "`"$name`" is already connected, you can use -Force to force reconnect"
         }
         catch {
-            Write-Host "Unknow error $_"
+            Write-Host "Unknown error $_"
             Write-Host "Try to use -Force"
         }
     }
@@ -214,7 +214,7 @@ function Get-WaykNowMachine {
         $access_token = $getToken.access_token
     }
     catch {
-        Write-Host "Unknow error $_"
+        Write-Host "Unknown error $_"
         Write-Host "Try Connect-WaykNowDen -Force"
         return;
     }
@@ -286,7 +286,7 @@ function Register-WaykNowMachine(){
         $access_token = $getToken.access_token
     }
     catch {
-        Write-Host "Unknow error $_"
+        Write-Host "Unknown error $_"
         Write-Host "Try Connect-WaykNowDen -Force"
         return;
     }
@@ -480,7 +480,7 @@ function Unregister-WaykNowMachine(){
         $access_token = $getToken.access_token
     }
     catch {
-        Write-Host "Unknow error $_"
+        Write-Host "Unknown error $_"
         Write-Host "Try Connect-WaykNowDen -Force"
         return;
     }
