@@ -6,7 +6,7 @@ enum ControlMode
 {
     AllRemoteControlMode = 0
     TakeRemoteControlClientOnly = 1
-    AllowRemoteControlSeverOnly = 2
+    AllowRemoteControlServerOnly = 2
 }
 
 enum PersonalPasswordType 
@@ -100,7 +100,7 @@ function Set-WaykNowConfig
     [ValidateSet("en", "fr", "de", "zh-CN", "zh-TW")]
     [string] $Language,
 
-    # Specifies the Remote Control Mode of WaykNow, AllRemoteControlMode: Both sides are displayed, TakeRemoteControlClientOnly: Only the client side is displayed and AllowRemoteControlSeverOnly: Only the server side is displayed.    [ControlMode] $ControlMode,
+    # Specifies the Remote Control Mode of WaykNow, AllRemoteControlMode: Both sides are displayed, TakeRemoteControlClientOnly: Only the client side is displayed and AllowRemoteControlServerOnly: Only the server side is displayed.    [ControlMode] $ControlMode,
     [ControlMode] $ControlMode,
 
     # Launch Wayk Now when you log on.
@@ -411,7 +411,7 @@ function Get-WaykNowConfig()
     $WaykNowConfigObject.GeneratedPasswordLength = Get-NowOptionInt 'GeneratedPasswordLength' $GlobalServiceAvailable $true 6 $LocalJson $GlobalJson
     $WaykNowConfigObject.GeneratedPasswordCharSet = Get-NowOptionInt 'GeneratedPasswordCharSet' $GlobalServiceAvailable $true ([int]([GeneratedPasswordCharSet]::Alphanumeric)) $LocalJson $GlobalJson
     $WaykNowConfigObject.DenEnabled = (Get-NowOptionBool 'DenEnabled' $GlobalServiceAvailable $false $true $LocalJson $GlobalJson)
-    $WaykNowConfigObject.DenUrl = Get-NowOptionStr 'DenUrl' $GlobalServiceAvailable $true 'wss://den.wayk.net' $LocalJson $GlobalJson
+    $WaykNowConfigObject.DenUrl = Get-NowOptionStr 'DenUrl' $GlobalServiceAvailable $true 'https://den.wayk.net' $LocalJson $GlobalJson
     $WaykNowConfigObject.QualityMode = Get-NowOptionInt 'QualityMode' $GlobalServiceAvailable $true ([int]([QualityMode]::Medium)) $LocalJson $GlobalJson
     $WaykNowConfigObject.LoggingLevel = Get-NowOptionInt 'LoggingLevel' $GlobalServiceAvailable $true ([int]([LoggingLevel]::Off)) $LocalJson $GlobalJson
     $WaykNowConfigObject.LoggingFilter = Get-NowOptionStr 'LoggingFilter' $GlobalServiceAvailable $true $null $LocalJson $GlobalJson
