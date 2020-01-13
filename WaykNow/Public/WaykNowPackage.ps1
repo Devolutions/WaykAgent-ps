@@ -104,11 +104,6 @@ function Install-WaykNow(
 		return
 	}
 
-	if(([version]$current_version -gt [version]$latest_version) -And $Force)
-	{
-		Uninstall-WaykNow
-	}
-
 	$download_url = $package.url
 	$download_file = Split-Path -Path $download_url -Leaf
 	$download_file_path = "$tempDirectory/$download_file"
@@ -119,6 +114,11 @@ function Install-WaykNow(
 	$web_client.Dispose()
 	
 	$download_file_path = Resolve-Path $download_file_path
+
+	if(([version]$current_version -gt [version]$latest_version) -And $Force)
+	{
+		Uninstall-WaykNow
+	}
 
 	if (Get-IsWindows) {
 		$install_log_file = "$tempDirectory/WaykNow_Install.log"
@@ -205,8 +205,12 @@ function Update-WaykNow(
 	$wayk_now_process_was_running = Get-WaykNowProcess
 	$wayk_now_service_was_running = (Get-WaykNowService).Status -Eq 'Running'
 
-	Stop-WaykNow
-	Install-WaykNow -Force:$Force
+	try {
+		Install-WaykNow -Force:$Force
+	}
+	catch {
+		throw $_
+	}
 
 	if ($wayk_now_process_was_running) {
 		Start-WaykNow
