@@ -12,7 +12,7 @@
 RootModule = 'WaykNow.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.4.0'
+ModuleVersion = '2020.1.0'
 
 # Supported PSEditions
 CompatiblePSEditions = 'Desktop', 'Core'
@@ -27,7 +27,7 @@ Author = 'Devolutions'
 CompanyName = 'Devolutions'
 
 # Copyright statement for this module
-Copyright = '(c) 2019 Devolutions Inc. All rights reserved.'
+Copyright = '(c) 2019-2020 Devolutions Inc. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Devolutions Wayk Now PowerShell Module'
