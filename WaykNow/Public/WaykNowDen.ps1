@@ -36,7 +36,7 @@ function Get-WaykNowDen(
     $WaykNowObject.DenID = $denJson.denId
     $WaykNowObject.DenUrl = $settingJson.DenUrl
 
-    # TODO Remove this one when the Den Url will be alwways set in the settings file .cfg
+    # TODO Remove this one when the Den Url will be always set in the settings file .cfg
     if(!($WaykNowObject.DenUrl)){
         $WaykNowObject.DenUrl = "https://den.wayk.net"
     }

@@ -84,6 +84,7 @@ function Get-WaykNowPackage(
 }
 function Install-WaykNow(
 	[switch] $Force,
+	[switch] $Quiet,
 	[string] $Version
 ){
 	if(Get-IsWindows){
@@ -117,14 +118,19 @@ function Install-WaykNow(
 
 	if(([version]$current_version -gt [version]$latest_version) -And $Force)
 	{
-		Uninstall-WaykNow
+		Uninstall-WaykNow -Quiet:$Quiet
 	}
 
 	if (Get-IsWindows) {
+		$display = '/passive'
+		if($Quiet){
+			$display = '/quiet'
+		}
 		$install_log_file = "$tempDirectory/WaykNow_Install.log"
 		$msi_args = @(
 			'/i', $download_file_path,
-			'/quiet', '/norestart',
+			$display,
+			'/norestart',
 			'/log', $install_log_file
 		)
 		Start-Process "msiexec.exe" -ArgumentList $msi_args -Wait -NoNewWindow
@@ -159,8 +165,9 @@ function Install-WaykNow(
 	Remove-Item -Path $tempDirectory -Force -Recurse
 }
 
-function Uninstall-WaykNow
-{
+function Uninstall-WaykNow(
+	[switch] $Quiet
+){
 	Stop-WaykNow
 	
 	if (Get-IsWindows) {
@@ -169,8 +176,12 @@ function Uninstall-WaykNow
 		if ($uninstall_reg) {
 			$uninstall_string = $($uninstall_reg.UninstallString `
 				-Replace "msiexec.exe", "" -Replace "/I", "" -Replace "/X", "").Trim()
+			$display = '/passive'
+			if($Quiet){
+				$display = '/quiet'
+			}
 			$msi_args = @(
-				'/X', $uninstall_string, '/qb'
+				'/X', $uninstall_string, $display
 			)
 			Start-Process "msiexec.exe" -ArgumentList $msi_args -Wait
 		}
@@ -199,14 +210,15 @@ function Uninstall-WaykNow
 }
 
 function Update-WaykNow(
-    [switch] $Force
+	[switch] $Force,
+	[switch] $Quiet
 )
 {
 	$wayk_now_process_was_running = Get-WaykNowProcess
 	$wayk_now_service_was_running = (Get-WaykNowService).Status -Eq 'Running'
 
 	try {
-		Install-WaykNow -Force:$Force
+		Install-WaykNow -Force:$Force -Quiet:$Quiet
 	}
 	catch {
 		throw $_
