@@ -387,7 +387,7 @@ function Get-WaykNowConfig()
     $GlobalServiceAvailable = $false;
     $LocalJson = '';
     $GlobalJson = '';
-    if (Get-IsWindows -And Get-Service "WaykNowService" -ErrorAction SilentlyContinue)
+    if ((Get-IsWindows) -And (Get-Service "WaykNowService" -ErrorAction SilentlyContinue))
     {
         $GlobalServiceAvailable = $true
         $GlobalJson = Get-Content -Raw -Path $WaykInfo.GlobalDataPath | ConvertFrom-Json
