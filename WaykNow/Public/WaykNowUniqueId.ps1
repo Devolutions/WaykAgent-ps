@@ -3,7 +3,7 @@ function Get-WaykNowUniqueID{
 
     $idPath = $waykNowInfo.DataPath
 
-    if(Get-IsWindows -AND Get-Service "WaykNowService" -ErrorAction SilentlyContinue){
+    if((Get-IsWindows) -And (Get-Service "WaykNowService" -ErrorAction SilentlyContinue)){
         $idPath = $waykNowInfo.GlobalPath
     }
 
