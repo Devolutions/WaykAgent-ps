@@ -277,8 +277,8 @@ function Get-WaykNowInfo()
 	$info.LogPath = Join-Path -Path $DataPath -ChildPath 'logs' | Resolve-Path
 	$info.CertificateFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.crt' | Resolve-Path
 	$info.PrivateKeyFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.key' | Resolve-Path
-	$info.PasswordVault = Join-Path -Path $DataPath -ChildPath 'WaykNow.vault' | Resolve-Path
-	$info.KnownHostsFile = Join-Path -Path $DataPath -ChildPath 'known_hosts' | Resolve-Path
+	$info.PasswordVault = Join-Path -Path $DataPath -ChildPath 'WaykNow.vault' | Resolve-Path -ErrorAction SilentlyContinue
+	$info.KnownHostsFile = Join-Path -Path $DataPath -ChildPath 'known_hosts' | Resolve-Path -ErrorAction SilentlyContinue
 	$info.BookmarksFile = Join-Path -Path $DataPath -ChildPath 'bookmarks' | Resolve-Path
 
 	return $info 
