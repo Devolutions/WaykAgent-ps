@@ -22,13 +22,16 @@ function Get-WaykNowDen(
     [switch]$All
 ){
     $WaykNowConfig = Get-WaykNowInfo
-    $DenLocalPath = $WaykNowConfig.DenPath
-    $DenGlobalPath = $WaykNowConfig.DenGlobalPath
+    $DenPath = $WaykNowConfig.DenPath
 
-    $localJson = Get-Content -Raw -Path "$DenLocalPath/default.json" | ConvertFrom-Json
+    if ((Get-IsWindows) -And (Get-Service "WaykNowService" -ErrorAction SilentlyContinue)) {
+        $DenPath = $WaykNowConfig.DenGlobalPath
+    }
+
+    $localJson = Get-Content -Raw -Path "$DenPath/default.json" | ConvertFrom-Json
 
     $Realm = $localJson.realm
-    $denJson = Get-Content -Raw -Path "$DenLocalPath/$Realm/.state" | ConvertFrom-Json
+    $denJson = Get-Content -Raw -Path "$DenPath/$Realm/.state" | ConvertFrom-Json
     $settingJson = Get-Content -Raw -Path $WaykNowConfig.GlobalConfigFile | ConvertFrom-Json
 
     $WaykNowObject = [WaykDenObject]::New()
@@ -40,8 +43,8 @@ function Get-WaykNowDen(
     if(!($WaykNowObject.DenUrl)){
         $WaykNowObject.DenUrl = "https://den.wayk.net"
     }
-    $WaykNowObject.DenLocalPath = "$DenLocalPath\$Realm"
-    $WaykNowObject.DenGlobalPath = "$DenGlobalPath\$Realm"
+    $WaykNowObject.DenLocalPath = "$WaykNowConfig.DenLocalPath\$Realm"
+    $WaykNowObject.DenGlobalPath = "$WaykNowConfig.DenGlobalPath\$Realm"
 
     return $WaykNowObject
 }
