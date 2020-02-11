@@ -631,7 +631,7 @@ You need to be logged with WaykDen before use this command, you can refer to "Co
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Get-WaykNowDenMachine 
+PS ~/WaykNow-ps> Get-WaykNowMachine 
 
 MachineName     DenID  State   UserAgent
 -----------     -----  -----   ---------
