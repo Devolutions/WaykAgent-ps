@@ -12,7 +12,7 @@ function Set-WaykNowBranding(
         $fileLocation = "$tempDirectory/branding.7z"
         $path = ''
         if($Sample){
-            $path = 'https://cdn.devolutions.net/download/Documents/help-content/branding.7z'
+            $path = 'https://github.com/Devolutions/WaykNow-ps/blob/master/samples/branding.7z?raw=true'
         }
         else{
             $path = $BrandingPath

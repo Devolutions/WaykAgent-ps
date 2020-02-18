@@ -508,7 +508,7 @@ The `Test-WaykNowBranding` command with the parameter `BrandingPath` will inform
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Test-WaykNowBranding -BrandingPath https://cdn.devolutions.net/download/Documents/help-content/branding.7z
+PS ~/WaykNow-ps> Test-WaykNowBranding -BrandingPath https://github.com/Devolutions/WaykNow-ps/blob/master/samples/branding.7z?raw=true
 ----
 
 [source,sh]
@@ -522,7 +522,7 @@ The `Sample` flag downloads and installs a sample branding.7z file for a fiction
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowBranding -BrandingPath https://cdn.devolutions.net/download/Documents/help-content/branding.7z
+PS ~/WaykNow-ps> Set-WaykNowBranding -BrandingPath https://github.com/Devolutions/WaykNow-ps/blob/master/samples/branding.7z?raw=true
 ----
 
 [source,sh]
