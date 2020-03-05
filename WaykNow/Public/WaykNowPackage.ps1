@@ -128,10 +128,10 @@ function Install-WaykNow(
 		}
 		$install_log_file = "$tempDirectory/WaykNow_Install.log"
 		$msi_args = @(
-			'/i', $download_file_path,
+			'/i', "`"$download_file_path`"",
 			$display,
 			'/norestart',
-			'/log', $install_log_file
+			'/log', "`"$install_log_file`""
 		)
 		Start-Process "msiexec.exe" -ArgumentList $msi_args -Wait -NoNewWindow
 
