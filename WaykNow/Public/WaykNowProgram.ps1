@@ -16,7 +16,7 @@ function Get-WaykNowService
     $wayk_now_service = $null
 
     if (Get-IsWindows -And $PSEdition -Eq 'Desktop') {
-        $wayk_now_service = $(Get-Service | Where-Object -Property 'Name' -Like 'WaykNowService')
+        $wayk_now_service = $(Get-Service 'WaykNowService' -ErrorAction SilentlyContinue)
 	}
 
     return $wayk_now_service
