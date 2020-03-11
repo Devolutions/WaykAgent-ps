@@ -243,21 +243,40 @@ class WaykNowInfo
 	[string] $BookmarksFile
 }
 
-function Get-WaykNowInfo()
+function Get-WaykNowPath()
 {
-	$DataPath = '';
-	$GlobalPath = '';
+	[CmdletBinding()]
+	param(
+		[Parameter(Mandatory,Position=0)]
+		[string] $PathType
+	)
 
 	if (Get-IsWindows)	{
-		$DataPath = $Env:APPDATA + '\Wayk';
+		$LocalPath = $Env:APPDATA + '\Wayk';
 		$GlobalPath = $Env:ALLUSERSPROFILE + '\Wayk'
 	} elseif ($IsMacOS) {
-		$DataPath = '~/Library/Application Support/Wayk'
+		$LocalPath = '~/Library/Application Support/Wayk'
 		$GlobalPath = '/Library/Application Support/Wayk'
 	} elseif ($IsLinux) {
-		$DataPath = '~/.config/Wayk'
+		$LocalPath = '~/.config/Wayk'
 		$GlobalPath = '/etc/wayk'
 	}
+
+	switch ($PathType) {
+		'LocalPath' { $LocalPath }
+		'GlobalPath' { $GlobalPath }
+		default { throw("Invalid path type: $PathType") }
+	}
+}
+
+function Get-WaykNowInfo()
+{
+	[CmdletBinding()]
+	param(
+	)
+
+	$DataPath = Get-WaykNowPath LocalPath
+	$GlobalPath = Get-WaykNowPath GlobalPath
 
 	$info = [WaykNowInfo]::New()
 	$info.DataPath = $DataPath | Resolve-Path
@@ -278,4 +297,4 @@ function Get-WaykNowInfo()
 	return $info 
 }
 
-Export-ModuleMember -Function Get-WaykNowVersion, Get-WaykNowPackage, Install-WaykNow, Uninstall-WaykNow, Update-WaykNow, Get-WaykNowInfo
+Export-ModuleMember -Function Get-WaykNowVersion, Get-WaykNowPackage, Install-WaykNow, Uninstall-WaykNow, Update-WaykNow, Get-WaykNowPath, Get-WaykNowInfo
