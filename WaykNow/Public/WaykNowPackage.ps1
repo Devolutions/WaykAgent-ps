@@ -87,12 +87,6 @@ function Install-WaykNow(
 	[switch] $Quiet,
 	[string] $Version
 ){
-	if(Get-IsWindows){
-        if(!(Get-IsRunAsAdministrator)) {
-			throw (New-Object RunAsAdministratorException)
-		}
-	}
-
 	$tempDirectory = New-TemporaryDirectory
 	$package = Get-WaykNowPackage $Version
 	$latest_version = $package.Version

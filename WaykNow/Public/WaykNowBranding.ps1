@@ -5,85 +5,81 @@ function Set-WaykNowBranding(
     [string] $BrandingPath,
     [switch] $Sample
 ){
-    if((Get-IsWindows) -or ($IsMacOS)){
+    if ((Get-IsWindows) -or ($IsMacOS)) {
         [WaykNowInfo]$WaykNowInfo = Get-WaykNowInfo
         $dataPath = $WaykNowInfo.DataPath;
         $tempDirectory = New-TemporaryDirectory
         $fileLocation = "$tempDirectory/branding.7z"
         $path = ''
-        if($Sample){
+        if ($Sample) {
             $path = 'https://github.com/Devolutions/WaykNow-ps/blob/master/samples/branding.7z?raw=true'
-        }
-        else{
+        } else {
             $path = $BrandingPath
         }
 
-        try{
+        try {
             $web_client = [System.Net.WebClient]::new()
             $web_client.DownloadFile($path, $fileLocation)
             $web_client.Dispose()
-        }
-        catch{
-            if(Test-Path -Path $path){
+        } catch {
+            if (Test-Path -Path $path) {
                 $fileLocation = $path
-            }
-            else{
+            } else {
                 throw (New-Object IncorrectPath)
             }
         }
     
         $fileName = Split-Path -Path $fileLocation -Leaf
-        if(!$fileName.Equals("branding.7z"))
+        
+        if (!$fileName.Equals("branding.7z"))
         {
             Rename-Item -Path "$fileLocation" -NewName "branding.7z"
         }
 
         Copy-Item -path $fileLocation -destination $dataPath
         Remove-Item -Path $tempDirectory -Force -Recurse
-    }else{
-        throw (New-Object UnsuportedPlatformException("Windows, MacOs"))
+    } else {
+        throw (New-Object UnsupportedPlatformException("Windows, MacOs"))
     }
 }
 
-function Reset-WaykNowBranding(){
-    if((Get-IsWindows) -or ($IsMacOS)){
+function Reset-WaykNowBranding()
+{
+    if ((Get-IsWindows) -or ($IsMacOS)) {
         [WaykNowInfo]$WaykNowInfo = Get-WaykNowInfo
         $dataPath = $WaykNowInfo.DataPath;
         $brandingPath = "$dataPath/branding.7z"
 
-        if(Test-Path -Path $brandingPath){
+        if (Test-Path -Path $brandingPath){
             Remove-Item -Path $brandingPath -Force -ErrorAction SilentlyContinue
         }
 
-        if(Get-IsWindows){
+        if (Get-IsWindows) {
             $dataGlobalPath = $WaykNowInfo.GlobalPath;
             $brandingGlobalPath = "$dataGlobalPath/branding.7z"
-            if(Test-Path -Path $brandingGlobalPath){
-                if(!(Get-IsRunAsAdministrator)) {
-                    throw (New-Object RunAsAdministratorException)
-                }
+
+            if (Test-Path -Path $brandingGlobalPath) {
                 Remove-Item -Path $brandingGlobalPath -Force -ErrorAction SilentlyContinue
             }
         }
-    }else{
-        throw (New-Object UnsuportedPlatformException("Windows, MacOs"))
+    } else {
+        throw (New-Object UnsupportedPlatformException("Windows, macOS"))
     }
 }
 
 function Test-WaykNowBranding(
-    [Parameter(Mandatory = $true, HelpMessage= "branding.7z file path")]
+    [Parameter(Mandatory = $true, HelpMessage = "branding.7z file path")]
     [string] $BrandingPath
 ){
     if((Get-IsWindows)){
         if (Get-Command "7z.exe" -ErrorAction SilentlyContinue) { 
-            try{
-
-                if(!(Test-Path -Path $BrandingPath)){
+            try {
+                if (!(Test-Path -Path $BrandingPath)) {
                     throw (New-Object IncorrectPath)
                 }
 
                 $format = [System.IO.Path]::GetExtension("$BrandingPath")
-                if(!($format -eq ".7z")){
+                if (!($format -eq ".7z")) {
                     throw (New-Object IncorrectFormat($format,"7z.exe"))
                 }
 
@@ -92,15 +88,13 @@ function Test-WaykNowBranding(
 
                 $manifestPath = Resolve-Path "$tempDirectory/manifest.json"
                 $encoding = Get-FileEncoding($manifestPath)
-                if(!($encoding -eq 'UTF8-NOBOM')){
+                if (!($encoding -eq 'UTF8-NOBOM')) {
                     throw (New-Object IncorrectFormat($encoding,'UTF8-NOBOM'))
                 }
 
-                try{
-                    $jsonString = Get-Content -Raw -Path $manifestPath -Encoding utf8 | ConvertFrom-Json
-
-                }
-                catch{
+                try {
+                    $jsonString = Get-Content -Path $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
+                } catch {
                     Write-Error "For more details try to parse the json here :
                     https://jsonlint.com/"
                     Write-Error $_.Exception.Message
@@ -112,16 +106,14 @@ function Test-WaykNowBranding(
 
                 Remove-Item -Path $tempDirectory -Force -Recurse
                 Write-Host "Success"
-            }
-            catch{
+            } catch {
                 Write-Error $_.Exception.Message
             }
-        }
-        else{
+        } else {
             throw (New-Object SoftwareRequired("7z.exe", "https://www.7-zip.org/download.html"))
         }
-    }else{
-        throw (New-Object UnsuportedPlatformException("Windows"))
+    } else {
+        throw (New-Object UnsupportedPlatformException("Windows"))
     }
 }
 

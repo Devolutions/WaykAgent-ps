@@ -74,7 +74,7 @@ FunctionsToExport = @('Get-WaykNowVersion', 'Get-WaykNowPackage', 'Install-WaykN
     'Set-WaykNowSafeMode','Reset-WaykNowSafeMode', 'Set-WaykNowConfig', 'Get-WaykNowInfo', 'Get-WaykNowConfig',
     'Set-WaykNowBranding', 'Reset-WaykNowBranding', 'Test-WaykNowBranding',
     'Set-WaykNowLicense', 'Get-WaykNowLicense', 'Reset-WaykNowLicense',
-    'Get-WaykNowUniqueID',
+    'Get-WaykNowUniqueId',
     'Enable-WaykNowLogs', 'Disable-WaykNowLogs', 'Export-WaykNowLogs', 'Clear-WaykNowLogs',
     'Get-WaykNowDen', 'Connect-WaykNowDen', 'Disconnect-WaykNowDen','Get-WaykNowMachine', 'Register-WaykNowMachine', 'Unregister-WaykNowMachine', 'Get-WaykNowDenRegistration')
     

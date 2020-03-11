@@ -12,9 +12,9 @@ class IncorrectPath : System.ApplicationException
     }
 }
 
-class UnsuportedPlatformException : System.ApplicationException
+class UnsupportedPlatformException : System.ApplicationException
 {
-    UnsuportedPlatformException([string] $supportedPlatform):base("This feature is only supported on $supportedPlatform")
+    UnsupportedPlatformException([string] $supportedPlatform):base("This feature is only supported on $supportedPlatform")
     {
     }
 }
