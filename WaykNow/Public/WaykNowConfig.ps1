@@ -202,10 +202,6 @@ function Set-WaykNowConfig
             return;
         }
 
-        if(!(Get-IsRunAsAdministrator)) {
-			throw (New-Object RunAsAdministratorException)
-        }
-
         $json = Get-Content -Raw -Path $WaykInfo.GlobalDataPath | ConvertFrom-Json
     }
 

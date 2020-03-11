@@ -242,21 +242,16 @@ function Get-WaykNowMachine {
     return $MachineReport | Format-Table MachineName, DenID, State, UserAgent
 }
 
-function Register-WaykNowMachine(){
-    # 1 : Is Windows
+function Register-WaykNowMachine()
+{
     if(!(Get-IsWindows)){
-        throw (New-Object UnsuportedPlatformException("Windows"))
+        throw (New-Object UnsupportedPlatformException("Windows"))
     }
-    # 2 : Is Running in admin mode
-    if(!(Get-IsRunAsAdministrator)) {
-        throw (New-Object RunAsAdministratorException)
-    }
-    # 3 : Is Running in admin mode
-    if (!(Get-Service "WaykNowService" -ErrorAction SilentlyContinue)){
+
+    if (!(Get-Service "WaykNowService" -ErrorAction SilentlyContinue)) {
         throw (New-Object UnattendedNotFound)
     }
 
-    # 4 : Check if machine is registered
     $WaykNowDenRegistered = Get-WaykNowDenRegistration
     if($WaykNowDenRegistered.IsRegistered){
         throw "This machine is already registered"
@@ -437,22 +432,18 @@ function Register-WaykNowMachine(){
     return "Machine Registered: " + $WaykNowUniqueID
 }
 
-function Unregister-WaykNowMachine(){
-    # 1 : Is Windows
-    if(!(Get-IsWindows)){
-        throw (New-Object UnsuportedPlatformException("Windows"))
+function Unregister-WaykNowMachine()
+{
+    if (!(Get-IsWindows)){
+        throw (New-Object UnsupportedPlatformException("Windows"))
     }
-    # 2 : Is Running in admin mode
-    if(!(Get-IsRunAsAdministrator)) {
-        throw (New-Object RunAsAdministratorException)
-    }
-    # 3 : Is Running in admin mode
+
     if (!(Get-Service "WaykNowService" -ErrorAction SilentlyContinue)){
         throw (New-Object UnattendedNotFound)
     }
-    # 4 : Check if machine is registered
+
     $WaykNowDenRegistered = Get-WaykNowDenRegistration
-    if(!($WaykNowDenRegistered.IsRegistered)){
+    if (!($WaykNowDenRegistered.IsRegistered)){
         throw "This machine is not registered"
     }
 
@@ -472,7 +463,7 @@ function Unregister-WaykNowMachine(){
     $val = (Invoke-RestMethod -Uri "$WaykDenUrl/.well-known/configuration" -Method 'GET' -ContentType 'application/json')
     $lucidUrl = $val.lucid_uri
 
-    try{
+    try {
         $FormPoke = @{
             client_id = $val.wayk_client_id
             device_code = $oauthJson.device_code
@@ -481,8 +472,7 @@ function Unregister-WaykNowMachine(){
 
         $getToken = Invoke-RestMethod -Uri "$lucidUrl/auth/token" -Method 'POST' -ContentType 'application/x-www-form-urlencoded' -Body $FormPoke
         $access_token = $getToken.access_token
-    }
-    catch {
+    } catch {
         Write-Host "Unknown error $_"
         Write-Host "Try Connect-WaykNowDen -Force"
         return;
@@ -538,8 +528,8 @@ function Get-WaykNowDenRegistration(){
     $ListItem = Get-ChildItem -Path $DenGlobalPath
     $waykNowUniqueIDPattern = '[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}.crt'
 
-    foreach($item in $ListItem){
-        if($item -CMatch $waykNowUniqueIDPattern){
+    foreach ($item in $ListItem) {
+        if ($item -CMatch $waykNowUniqueIDPattern) {
             #if file .crt is empty, just continue
             If ($Null -eq (Get-Content "$DenGlobalPath/$item")) {
                 continue

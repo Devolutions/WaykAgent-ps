@@ -20,12 +20,6 @@ function Get-UninstallRegistryKey(
         | ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $display_name };
 }
 
-# Work only with windows, use the check Get-IsWindows before call this one
-function Get-IsRunAsAdministrator  
-{
-    return ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')
-}
-
 function New-TemporaryDirectory()
 {
 	$parent = [System.IO.Path]::GetTempPath()

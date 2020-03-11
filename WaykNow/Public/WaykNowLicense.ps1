@@ -6,9 +6,9 @@ function Set-WaykNowLicense
 {
     $licensePattern = '[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}'
     $WaykNowInfo = Get-WaykNowInfo
-    if($License -CMatch $licensePattern){
+    if ($License -CMatch $licensePattern) {
         $json = Get-Content -Raw -Path $WaykNowInfo.ConfigFile | ConvertFrom-Json
-        if($json.RegistrationSerial)
+        if ($json.RegistrationSerial)
         {
             $json.RegistrationSerial = $License;
         }
@@ -32,18 +32,18 @@ function Set-WaykNowLicense
     }
 }
 
-function Get-WaykNowLicense{
+function Get-WaykNowLicense {
     [WaykNowInfo]$WaykInfo = Get-WaykNowInfo
     $json = Get-Content -Raw -Path $WaykInfo.ConfigFile | ConvertFrom-Json
 
     return $json.RegistrationSerial
 }
 
-function Reset-WaykNowLicense{
+function Reset-WaykNowLicense {
     [WaykNowInfo]$WaykInfo = Get-WaykNowInfo
 
     $json = Get-Content -Raw -Path $WaykInfo.ConfigFile | ConvertFrom-Json
-    if($json.RegistrationSerial){
+    if ($json.RegistrationSerial) {
         $json.RegistrationSerial = ''
         $fileValue = $json | ConvertTo-Json
         $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
