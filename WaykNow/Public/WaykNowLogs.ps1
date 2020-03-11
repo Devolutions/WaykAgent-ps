@@ -15,14 +15,14 @@ function Enable-WaykNowLogs(
 
     if (Get-IsWindows) {
         if (Get-Service "WaykNowService" -ErrorAction SilentlyContinue) {
-            $jsonGlobal = Get-Content -Raw -Path $WaykInfo.GlobalDataPath | ConvertFrom-Json
+            $jsonGlobal = Get-Content -Path $WaykInfo.GlobalConfigFile -Raw -Encoding UTF8 | ConvertFrom-Json
             $jsonGlobal = Set-JsonValue $jsonGlobal 'LoggingLevel' $LoggingLevel
             $fileValue = $jsonGlobal | ConvertTo-Json
             [System.IO.File]::WriteAllLines($WaykInfo.GlobalDataPath, $fileValue, $Utf8NoBomEncoding)
         }
     }
 
-    $json = Get-Content -Raw -Path $WaykInfo.ConfigFile | ConvertFrom-Json
+    $json = Get-Content -Path $WaykInfo.ConfigFile -Raw -Encoding UTF8 | ConvertFrom-Json
     $json = Set-JsonValue $json 'LoggingLevel' $LoggingLevel
     $fileValue = $json | ConvertTo-Json
     [System.IO.File]::WriteAllLines($WaykInfo.ConfigFile, $fileValue, $Utf8NoBomEncoding)

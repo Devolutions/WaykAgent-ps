@@ -4,19 +4,16 @@ function Set-JsonValue(
     [PSCustomObject] $value
 )
 {
-    if($json.$name)
-    {
+    if ($json.$name) {
         $json.$name = $value;
-    }
-    else
-    {
+    } else {
         # If the json is empty
-        if(!$json){
+        if (!$json) {
             $json = '{}'
             $json = ConvertFrom-Json $json
         }
           
-        $json |  Add-Member -Type NoteProperty -Name $name -Value $value -Force
+        $json | Add-Member -Type NoteProperty -Name $name -Value $value -Force
     }
 
     return $json
@@ -27,11 +24,12 @@ function Get-WaykNowDenOauthJson(
 ){
     $oauthPath = "$WaykDenPath/oauth.cfg"
     $oauthJson = ''
-    if(Test-Path $oauthPath){
-        $oauthJson = Get-Content -Raw -Path $oauthPath | ConvertFrom-Json
-    }else{
+
+    if (Test-Path $oauthPath) {
+        $oauthJson = Get-Content -Path $oauthPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    } else {
         Add-PathIfNotExist $oauthPath $false
-        $oauthJson = Get-Content -Raw -Path $oauthPath | ConvertFrom-Json
+        $oauthJson = Get-Content -Path $oauthPath -Raw -Encoding UTF8 | ConvertFrom-Json
     }
 
     return $oauthJson

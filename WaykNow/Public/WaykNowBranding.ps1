@@ -5,42 +5,40 @@ function Set-WaykNowBranding(
     [string] $BrandingPath,
     [switch] $Sample
 ){
-    if((Get-IsWindows) -or ($IsMacOS)){
+    if ((Get-IsWindows) -or ($IsMacOS)) {
         [WaykNowInfo]$WaykNowInfo = Get-WaykNowInfo
         $dataPath = $WaykNowInfo.DataPath;
         $tempDirectory = New-TemporaryDirectory
         $fileLocation = "$tempDirectory/branding.7z"
         $path = ''
-        if($Sample){
+        if ($Sample) {
             $path = 'https://github.com/Devolutions/WaykNow-ps/blob/master/samples/branding.7z?raw=true'
-        }
-        else{
+        } else {
             $path = $BrandingPath
         }
 
-        try{
+        try {
             $web_client = [System.Net.WebClient]::new()
             $web_client.DownloadFile($path, $fileLocation)
             $web_client.Dispose()
-        }
-        catch{
-            if(Test-Path -Path $path){
+        } catch {
+            if (Test-Path -Path $path) {
                 $fileLocation = $path
-            }
-            else{
+            } else {
                 throw (New-Object IncorrectPath)
             }
         }
     
         $fileName = Split-Path -Path $fileLocation -Leaf
-        if(!$fileName.Equals("branding.7z"))
+        
+        if (!$fileName.Equals("branding.7z"))
         {
             Rename-Item -Path "$fileLocation" -NewName "branding.7z"
         }
 
         Copy-Item -path $fileLocation -destination $dataPath
         Remove-Item -Path $tempDirectory -Force -Recurse
-    }else{
+    } else {
         throw (New-Object UnsupportedPlatformException("Windows, MacOs"))
     }
 }
@@ -95,9 +93,8 @@ function Test-WaykNowBranding(
                 }
 
                 try {
-                    $jsonString = Get-Content -Raw -Path $manifestPath -Encoding utf8 | ConvertFrom-Json
-                }
-                catch{
+                    $jsonString = Get-Content -Path $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
+                } catch {
                     Write-Error "For more details try to parse the json here :
                     https://jsonlint.com/"
                     Write-Error $_.Exception.Message

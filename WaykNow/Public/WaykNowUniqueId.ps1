@@ -1,4 +1,5 @@
-function Get-WaykNowUniqueID{
+function Get-WaykNowUniqueId
+{
     $waykNowInfo = Get-WaykNowInfo
 
     $idPath = $waykNowInfo.DataPath
@@ -11,8 +12,8 @@ function Get-WaykNowUniqueID{
 
     if (Test-Path $idPath)
     {
-        return Get-Content -Raw -Path $idPath
+        return Get-Content -Path $idPath -Raw -Encoding UTF8
     }
 }
 
-Export-ModuleMember -Function Get-WaykNowUniqueID
+Export-ModuleMember -Function Get-WaykNowUniqueId

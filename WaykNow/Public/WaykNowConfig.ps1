@@ -189,10 +189,10 @@ function Set-WaykNowConfig
 )
 {
     $WaykInfo = Get-WaykNowInfo
-    $json = Get-Content -Raw -Path $WaykInfo.ConfigFile | ConvertFrom-Json
+    $json = Get-Content -Path $WaykInfo.ConfigFile -Raw -Encoding UTF8 | ConvertFrom-Json
 
-    if($Global) {
-        if(!(Get-IsWindows)) {
+    if ($Global) {
+        if (!(Get-IsWindows)) {
             Write-Host "Actually, the global settings is for windows only"
             return;
         }
@@ -202,86 +202,86 @@ function Set-WaykNowConfig
             return;
         }
 
-        $json = Get-Content -Raw -Path $WaykInfo.GlobalDataPath | ConvertFrom-Json
+        $json = Get-Content -Path $WaykInfo.GlobalConfigFile -Raw -Encoding UTF8 | ConvertFrom-Json
     }
 
     # General
-    if($FriendlyName) {
+    if ($FriendlyName) {
         $json = Set-JsonValue $json 'FriendlyName' $FriendlyName
     }
 
-    if($Language) {
+    if ($Language) {
         $json = Set-JsonValue $json 'Language' $Language
     }
 
-    if($null -ne $ControlMode) {
+    if ($null -ne $ControlMode) {
         $json = Set-JsonValue $json 'ControlMode' $ControlMode
     }
 
-    if($AutoLaunchOnUserLogon) {
+    if ($AutoLaunchOnUserLogon) {
         $json = Set-JsonValue $json 'AutoLaunchOnUserLogon' $AutoLaunchOnUserLogon
     }
 
-    if($ShowMainWindowOnLaunch) {
+    if ($ShowMainWindowOnLaunch) {
         $json = Set-JsonValue $json 'ShowMainWindowOnLaunch' $ShowMainWindowOnLaunch
     }
 
-    if($MinimizeToNotificationArea ) {
+    if ($MinimizeToNotificationArea ) {
         $json = Set-JsonValue $json 'MinimizeToNotificationArea' $MinimizeToNotificationArea
     }
 
-    if($ElevationPrompt) {
+    if ($ElevationPrompt) {
         $json = Set-JsonValue $json 'ElevationPrompt' $ElevationPrompt
     }
 
     # Security
-    if($AllowPersonalPassword) {
+    if ($AllowPersonalPassword) {
         $json = Set-JsonValue $json 'AllowPersonalPassword' $AllowPersonalPassword
     }
 
-    if($AllowSystemAuth) {
+    if ($AllowSystemAuth) {
         $json = Set-JsonValue $json 'AllowSystemAuth' $AllowSystemAuth
     }
 
-    if($AllowNoPassword) {
+    if ($AllowNoPassword) {
         $json = Set-JsonValue $json 'AllowNoPassword' $AllowNoPassword
     }
 
-    if($null -ne $PersonalPasswordType) {
+    if ($null -ne $PersonalPasswordType) {
         $json = Set-JsonValue $json 'PersonalPasswordType' $PersonalPasswordType
     }
 
-    if($PersonalPassword) {
+    if ($PersonalPassword) {
         $json = Set-JsonValue $json 'PersonalPassword' $PersonalPassword
     }
 
-    if($GeneratedPasswordLength -And $GeneratedPasswordLength -ge 3 -And $GeneratedPasswordLength -le 9) {
+    if ($GeneratedPasswordLength -And $GeneratedPasswordLength -ge 3 -And $GeneratedPasswordLength -le 9) {
         $json = Set-JsonValue $json 'GeneratedPasswordLength' $GeneratedPasswordLength
     }
 
-    if($null -ne $GeneratedPasswordCharSet) {
+    if ($null -ne $GeneratedPasswordCharSet) {
         $json = Set-JsonValue $json 'GeneratedPasswordCharSet' $GeneratedPasswordCharSet
     }
 
     # Connectivity
-    if($DenEnabled) {
+    if ($DenEnabled) {
         $json = Set-JsonValue $json 'DenEnabled' $DenEnabled
     }
 
-    if($DenUrl) {
+    if ($DenUrl) {
         $json = Set-JsonValue $json 'DenUrl' $DenUrl
     }
 
     #Advanced
-    if($null -ne $QualityMode) {
+    if ($null -ne $QualityMode) {
         $json = Set-JsonValue $json 'QualityMode' $QualityMode
     }
 
-    if($null -ne $LoggingLevel) {
+    if ($null -ne $LoggingLevel) {
         $json = Set-JsonValue $json 'LoggingLevel' $LoggingLevel
     }
 
-    if($LoggingFilter) {
+    if ($LoggingFilter) {
         $json = Set-JsonValue $json 'LoggingFilter' $LoggingFilter
     }
 
@@ -296,8 +296,8 @@ function Set-WaykNowConfig
 
     # To ignore the null value on the json we remove the values who are not set if there are not in the json file
     #Access Control
-    if($null -eq $AccessControlViewing) {
-        if($json.AccessControl.Viewing)
+    if ($null -eq $AccessControlViewing) {
+        if ($json.AccessControl.Viewing)
         {
             $AccessControl.Viewing = $json.AccessControl.Viewing
         }
@@ -307,8 +307,8 @@ function Set-WaykNowConfig
         }
     }
 
-    if($null -eq $AccessControlInteract) {
-        if($json.AccessControl.Interact)
+    if ($null -eq $AccessControlInteract) {
+        if ($json.AccessControl.Interact)
         {
             $AccessControl.Interact = $json.AccessControl.Interact
         }
@@ -318,8 +318,8 @@ function Set-WaykNowConfig
         }
     }
 
-    if($null -eq $AccessControlClipboard) {
-        if($json.AccessControl.Clipboard)
+    if ($null -eq $AccessControlClipboard) {
+        if ($json.AccessControl.Clipboard)
         {
             $AccessControl.Clipboard = $json.AccessControl.Clipboard
         }
@@ -329,8 +329,8 @@ function Set-WaykNowConfig
         }
     }
 
-    if($null -eq $AccessControlFileTransfer) {
-        if($json.AccessControl.FileTransfer)
+    if ($null -eq $AccessControlFileTransfer) {
+        if ($json.AccessControl.FileTransfer)
         {
             $AccessControl.FileTransfer = $json.AccessControl.FileTransfer
         }
@@ -340,8 +340,8 @@ function Set-WaykNowConfig
         }
     }
 
-    if($null -eq $AccessControlExec) {
-        if($json.AccessControl.Exec)
+    if ($null -eq $AccessControlExec) {
+        if ($json.AccessControl.Exec)
         {
             $AccessControl.Exec = $json.AccessControl.Exec
         }
@@ -351,8 +351,8 @@ function Set-WaykNowConfig
         }
     }
 
-    if($null -eq $AccessControlChat) {
-        if($json.AccessControl.Chat)
+    if ($null -eq $AccessControlChat) {
+        if ($json.AccessControl.Chat)
         {
             $AccessControl.Chat = $json.AccessControl.Chat
         }
@@ -364,10 +364,10 @@ function Set-WaykNowConfig
 
     $json = Set-JsonValue $json 'AccessControl' $AccessControl
 
-    if($Global) {
+    if ($Global) {
         $fileValue = $json | ConvertTo-Json
         $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
-        [System.IO.File]::WriteAllLines($WaykInfo.GlobalDataPath, $fileValue, $Utf8NoBomEncoding)
+        [System.IO.File]::WriteAllLines($WaykInfo.GlobalConfigFile, $fileValue, $Utf8NoBomEncoding)
     }
     else {
         $fileValue = $json | ConvertTo-Json
@@ -383,13 +383,14 @@ function Get-WaykNowConfig()
     $GlobalServiceAvailable = $false;
     $LocalJson = '';
     $GlobalJson = '';
+
     if ((Get-IsWindows) -And (Get-Service "WaykNowService" -ErrorAction SilentlyContinue))
     {
         $GlobalServiceAvailable = $true
-        $GlobalJson = Get-Content -Raw -Path $WaykInfo.GlobalDataPath | ConvertFrom-Json
+        $GlobalJson = Get-Content -Path $WaykInfo.GlobalConfigFile -Raw -Encoding UTF8 | ConvertFrom-Json
     }
 
-    $LocalJson = Get-Content -Raw -Path $WaykInfo.ConfigFile | ConvertFrom-Json
+    $LocalJson = Get-Content -Path $WaykInfo.ConfigFile -Raw -Encoding UTF8 | ConvertFrom-Json
     
     $WaykNowConfigObject = [WaykNowConfig]::New()
     $WaykNowConfigObject.FriendlyName = Get-NowOptionStr 'FriendlyName' $GlobalServiceAvailable $true $null $LocalJson $GlobalJson
@@ -431,7 +432,7 @@ function Get-NowOptionInt(
 )
 {
     $result = Get-GenericOption $propertiesName $serviceAvailable $virtual $localSettingsJson $globalSettingsJson
-    if($null -ne $result)
+    if ($null -ne $result)
     {
         return $result
     }
@@ -449,7 +450,7 @@ function Get-NowOptionStr(
 )
 {
     $result = Get-GenericOption $propertiesName $serviceAvailable $virtual $localSettingsJson $globalSettingsJson
-    if($null -ne $result)
+    if ($null -ne $result)
     {
         return $result
     }
@@ -467,7 +468,7 @@ function Get-NowOptionBool(
 )
 {
     $result = Get-GenericOption $propertiesName $serviceAvailable $virtual $localSettingsJson $globalSettingsJson
-    if($null -ne $result)
+    if ($null -ne $result)
     {
         return $result
     }
@@ -485,7 +486,7 @@ function Get-GenericOption(
 {
     $newPropertieNameGlobal = $globalSettingsJson;
     $newPropertieNameLocal = $localSettingsJson;
-    if($null -ne $globalSettingsJson)
+    if ($null -ne $globalSettingsJson)
     {
         $splitedValues =  $propertiesName.Split('.');
         
@@ -494,7 +495,7 @@ function Get-GenericOption(
             $newPropertieNameGlobal = $newPropertieNameGlobal.$split
         }
     }
-    if($null -ne $localSettingsJson)
+    if ($null -ne $localSettingsJson)
     {
         $splitedValues =  $propertiesName.Split('.');
         
@@ -504,7 +505,7 @@ function Get-GenericOption(
         }
     }
 
-    if($serviceAvailable -And $virtual -And $newPropertieNameGlobal)
+    if ($serviceAvailable -And $virtual -And $newPropertieNameGlobal)
     {
         return $newPropertieNameGlobal
     }
