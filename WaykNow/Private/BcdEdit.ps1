@@ -2,10 +2,12 @@
 $safeboot_name = "Safe Mode with Wayk Now"
 $safeboot_reg = "HKLM:SYSTEM\CurrentControlSet\Control\SafeBoot\Network"
 
-function Get-BcdEntries(
-	[string] $bcdeditTempPath
-)
+function Get-BcdEntries
 {
+	param(
+		[string] $bcdeditTempPath
+	)
+
 	$bcdedit_enum = $(Invoke-Process -FilePath $bcdeditTempPath -ArgumentList "/enum OSLOADER") | Out-String
 
 	$entries = @()
@@ -19,10 +21,13 @@ function Get-BcdEntries(
 	return $entries
 }
 
-function Get-BcdIdByName(
-	[string] $name,
-	[string[]] $entries
-){
+function Get-BcdIdByName
+{
+	param(
+		[string] $name,
+		[string[]] $entries
+	)
+
 	Foreach ($entry in $entries) {
 		if ($entry -Match "\s.+${name}`r`n") {
 			$identifier = $($entry | Select-String -AllMatches -Pattern '{.+}').Matches[0]
@@ -33,10 +38,13 @@ function Get-BcdIdByName(
 	return $null
 }
 
-function Get-BcdNameById(
-	[string] $id,
-	[string[]] $entries
-){
+function Get-BcdNameById
+{
+	param(
+		[string] $id,
+		[string[]] $entries
+	)
+
 	Foreach ($entry in $entries) {
 		if ($entry -Match "\s.+${id}`r`n") {
 			$result = $entry | Select-String -AllMatches -Pattern "description+\s+(.+)`r`n"
@@ -48,10 +56,13 @@ function Get-BcdNameById(
 	return $null
 }
 
-function Get-BcdSafeBootByName(
-	[string] $name,
-	[string[]] $entries
-){
+function Get-BcdSafeBootByName
+{
+	param(
+		[string] $name,
+		[string[]] $entries
+	)
+
 	Foreach ($entry in $entries) {
 		if ($entry -Match "\s.+${name}`r`n") {
 			$result = $entry | Select-String -AllMatches -Pattern "safeboot+\s+(.+)`r`n"
@@ -65,13 +76,15 @@ function Get-BcdSafeBootByName(
 	return $null
 }
 
+function Copy-BcdEditToTempDirectory
+{
+	param(
+		[string] $tempDirectory
+	)
 	
-function Copy-BcdEditToTempDirectory(
-	[string]$tempDirectory
-	){
-		$system32Path = [System.Environment]::SystemDirectory
-		$bcdEditLocation = "$system32Path/bcdedit.exe"
-		Copy-Item "$bcdEditLocation" -Destination "$tempDirectory"
+	$system32Path = [System.Environment]::SystemDirectory
+	$bcdEditLocation = "$system32Path/bcdedit.exe"
+	Copy-Item "$bcdEditLocation" -Destination "$tempDirectory"
 
-		return "$tempDirectory/bcdedit.exe"
-	}
+	return "$tempDirectory/bcdedit.exe"
+}
