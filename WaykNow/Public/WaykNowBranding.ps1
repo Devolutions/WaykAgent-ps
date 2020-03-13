@@ -12,6 +12,7 @@ function Set-WaykNowBranding
 
     $DataPath = Get-WaykNowPath -PathType "GlobalPath"
     $OutputPath = Join-Path $DataPath "branding.zip"
+    New-Item -Path $(Split-Path $OutputPath -Parent) -ItemType 'Directory' -Force
     Copy-Item -Path $BrandingPath -Destination $OutputPath -Force
 }
 
@@ -20,21 +21,11 @@ function Reset-WaykNowBranding
     [CmdletBinding()]
     param()
 
-    [WaykNowInfo]$WaykNowInfo = Get-WaykNowInfo
-    $DataPath = $WaykNowInfo.DataPath;
-    $brandingPath = "$DataPath/branding.zip"
+    $DataPath = Get-WaykNowPath -PathType "GlobalPath"
+    $BrandingPath = "$DataPath/branding.zip"
 
-    if (Test-Path -Path $brandingPath){
-        Remove-Item -Path $brandingPath -Force -ErrorAction SilentlyContinue
-    }
-
-    if (Get-IsWindows) {
-        $dataGlobalPath = $WaykNowInfo.GlobalPath;
-        $brandingGlobalPath = "$dataGlobalPath/branding.zip"
-
-        if (Test-Path -Path $brandingGlobalPath) {
-            Remove-Item -Path $brandingGlobalPath -Force -ErrorAction SilentlyContinue
-        }
+    if (Test-Path -Path $BrandingPath) {
+        Remove-Item -Path $BrandingPath -Force -ErrorAction SilentlyContinue
     }
 }
 

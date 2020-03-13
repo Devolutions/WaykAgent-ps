@@ -6,14 +6,6 @@ Describe 'Wayk Now config' {
 		Mock Get-WaykNowPath { Join-Path $TestDrive "Local" } -ParameterFilter { $PathType -eq "LocalPath" }
 
 		Context 'Empty configuration files' {
-			BeforeAll {
-				$GlobalPath = Get-WaykNowPath 'GlobalPath'
-				$LocalPath = Get-WaykNowPath 'LocalPath'
-				foreach ($DataPath in ($GlobalPath, $LocalPath)) {
-					New-Item -Path $DataPath -ItemType Directory
-					Set-Content -Path $(Join-Path $DataPath 'WaykNow.cfg') -Value '{}'
-				}
-			}
 			It 'Disables Prompt for Permission (PFP)' {
 				Set-WaykNowConfig -AllowPersonalPassword false
 				$(Get-WaykNowConfig).AllowPersonalPassword | Should -Be false

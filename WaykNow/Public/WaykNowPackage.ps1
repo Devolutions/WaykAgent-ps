@@ -267,14 +267,16 @@ function Get-WaykNowPath()
 		[string] $PathType
 	)
 
+	$HomePath = Resolve-Path '~'
+
 	if (Get-IsWindows)	{
 		$LocalPath = $Env:APPDATA + '\Wayk';
 		$GlobalPath = $Env:ALLUSERSPROFILE + '\Wayk'
 	} elseif ($IsMacOS) {
-		$LocalPath = '~/Library/Application Support/Wayk'
-		$GlobalPath = '/Library/Application Support/Wayk'
+		$LocalPath = "$HomePath/Library/Application Support/Wayk"
+		$GlobalPath = "/Library/Application Support/Wayk"
 	} elseif ($IsLinux) {
-		$LocalPath = '~/.config/Wayk'
+		$LocalPath = "$HomePath/.config/Wayk"
 		$GlobalPath = '/etc/wayk'
 	}
 
