@@ -2,7 +2,7 @@ function Set-WaykNowLicense
 {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true, HelpMessage= "Wayk Now License")]
+        [Parameter(Mandatory,Position=0)]
         [string] $License
     )
 
@@ -18,7 +18,7 @@ function Set-WaykNowLicense
         else
         {
             # If the json is empty
-            if(!$json){
+            if (!$json) {
                 $json = '{}'
                 $json = ConvertFrom-Json $json
             }

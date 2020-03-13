@@ -294,20 +294,20 @@ function Get-WaykNowInfo()
 	$GlobalPath = Get-WaykNowPath GlobalPath
 
 	$info = [WaykNowInfo]::New()
-	$info.DataPath = $DataPath | Resolve-Path
-	$info.GlobalPath = $GlobalPath | Resolve-Path
-	$info.GlobalDataPath = $GlobalPath | Resolve-Path
-	$info.GlobalConfigFile = Join-Path -Path $GlobalPath -ChildPath 'WaykNow.cfg' | Resolve-Path
-	$info.DenGlobalPath = Join-Path -Path $GlobalPath -ChildPath 'den' | Resolve-Path
-	$info.LogGlobalPath = Join-Path -Path $GlobalPath -ChildPath 'logs' | Resolve-Path
-	$info.ConfigFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.cfg' | Resolve-Path
-	$info.DenPath = Join-Path -Path $DataPath -ChildPath 'den' | Resolve-Path
-	$info.LogPath = Join-Path -Path $DataPath -ChildPath 'logs' | Resolve-Path
-	$info.CertificateFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.crt' | Resolve-Path
-	$info.PrivateKeyFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.key' | Resolve-Path
-	$info.PasswordVault = Join-Path -Path $DataPath -ChildPath 'WaykNow.vault' | Resolve-Path -ErrorAction SilentlyContinue
-	$info.KnownHostsFile = Join-Path -Path $DataPath -ChildPath 'known_hosts' | Resolve-Path -ErrorAction SilentlyContinue
-	$info.BookmarksFile = Join-Path -Path $DataPath -ChildPath 'bookmarks' | Resolve-Path
+	$info.DataPath = $DataPath
+	$info.GlobalPath = $GlobalPath
+	$info.GlobalDataPath = $GlobalPath
+	$info.GlobalConfigFile = Join-Path -Path $GlobalPath -ChildPath 'WaykNow.cfg'
+	$info.DenGlobalPath = Join-Path -Path $GlobalPath -ChildPath 'den'
+	$info.LogGlobalPath = Join-Path -Path $GlobalPath -ChildPath 'logs'
+	$info.ConfigFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.cfg'
+	$info.DenPath = Join-Path -Path $DataPath -ChildPath 'den'
+	$info.LogPath = Join-Path -Path $DataPath -ChildPath 'logs'
+	$info.CertificateFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.crt'
+	$info.PrivateKeyFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.key'
+	$info.PasswordVault = Join-Path -Path $DataPath -ChildPath 'WaykNow.vault'
+	$info.KnownHostsFile = Join-Path -Path $DataPath -ChildPath 'known_hosts'
+	$info.BookmarksFile = Join-Path -Path $DataPath -ChildPath 'bookmarks'
 
 	return $info 
 }

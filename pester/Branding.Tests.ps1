@@ -1,6 +1,6 @@
 Import-Module "$PSScriptRoot/../WaykNow"
 
-Describe 'Wayk Now config' {
+Describe 'Wayk Now branding' {
 	InModuleScope WaykNow {
 		Mock Get-WaykNowPath { Join-Path $TestDrive "Global" } -ParameterFilter { $PathType -eq "GlobalPath" }
 		Mock Get-WaykNowPath { Join-Path $TestDrive "Local" } -ParameterFilter { $PathType -eq "LocalPath" }
@@ -14,15 +14,13 @@ Describe 'Wayk Now config' {
 					Set-Content -Path $(Join-Path $DataPath 'WaykNow.cfg') -Value '{}'
 				}
 			}
-			It 'Disables Prompt for Permission (PFP)' {
-				Set-WaykNowConfig -AllowPersonalPassword false
-				$(Get-WaykNowConfig).AllowPersonalPassword | Should -Be false
+			It 'Sets a sample branding.zip file' {
+				$BrandingZip = Join-Path $PSScriptRoot "../samples/branding.zip" -Resolve
+				Set-WaykNowBranding -BrandingPath $BrandingZip
 				Assert-MockCalled 'Get-WaykNowPath'
-			}
-			It 'Sets server-only remote control mode' {
-				Set-WaykNowConfig -ControlMode AllowRemoteControlServerOnly
-				$(Get-WaykNowConfig).ControlMode | Should -Be 'AllowRemoteControlServerOnly'
-				Assert-MockCalled 'Get-WaykNowPath'
+				$GlobalPath = Get-WaykNowPath 'GlobalPath'
+				$BrandingPath = Join-Path $GlobalPath "branding.zip"
+				Test-Path -Path $BrandingPath | Should -BeTrue
 			}
 		}
 	}
