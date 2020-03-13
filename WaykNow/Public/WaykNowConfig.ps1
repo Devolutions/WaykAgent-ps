@@ -368,8 +368,7 @@ function Set-WaykNowConfig
         $fileValue = $json | ConvertTo-Json
         $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
         [System.IO.File]::WriteAllLines($WaykInfo.GlobalConfigFile, $fileValue, $Utf8NoBomEncoding)
-    }
-    else {
+    } else {
         $fileValue = $json | ConvertTo-Json
         $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
         [System.IO.File]::WriteAllLines($WaykInfo.ConfigFile, $fileValue, $Utf8NoBomEncoding)

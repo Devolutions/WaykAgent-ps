@@ -5,6 +5,9 @@
 
 function Get-WaykNowVersion
 {
+    [CmdletBinding()]
+    param()
+
 	if (Get-IsWindows) {
 		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Now'
 		if ($uninstall_reg) {
@@ -33,22 +36,24 @@ function Get-WaykNowVersion
 
 	return $null
 }
-function Get-WaykNowPackage(
-	[string] $Version
-)
+function Get-WaykNowPackage
 {
+    [CmdletBinding()]
+    param(
+		[string] $Version
+	)
+
 	$version_quad = '';
 	$products_url = "https://devolutions.net/products.htm"
 	$products_htm = Invoke-RestMethod -Uri $products_url -Method 'GET' -ContentType 'text/plain'
 	$matches = $($products_htm | Select-String -AllMatches -Pattern "Wayk.Version=(\S+)").Matches
-	if($version)
-	{
+
+	if ($version) {
 		$version_quad = $version
-	}
-	else
-	{
+	} else {
 		$version_quad = $matches.Groups[1].Value
 	}
+	
 	$download_base = "https://cdn.devolutions.net/download"
 	$download_url_x64 = "$download_base/Wayk/$version_quad/WaykNow-x64-$version_quad.msi"
 	$download_url_x86 = "$download_base/Wayk/$version_quad/WaykNow-x86-$version_quad.msi"
@@ -82,11 +87,15 @@ function Get-WaykNowPackage(
 
 	return $result
 }
-function Install-WaykNow(
-	[switch] $Force,
-	[switch] $Quiet,
-	[string] $Version
-){
+function Install-WaykNow
+{
+    [CmdletBinding()]
+    param(
+		[switch] $Force,
+		[switch] $Quiet,
+		[string] $Version
+	)
+
 	$tempDirectory = New-TemporaryDirectory
 	$package = Get-WaykNowPackage $Version
 	$latest_version = $package.Version
@@ -110,14 +119,14 @@ function Install-WaykNow(
 	
 	$download_file_path = Resolve-Path $download_file_path
 
-	if(([version]$current_version -gt [version]$latest_version) -And $Force)
+	if (([version]$current_version -gt [version]$latest_version) -And $Force)
 	{
 		Uninstall-WaykNow -Quiet:$Quiet
 	}
 
 	if (Get-IsWindows) {
 		$display = '/passive'
-		if($Quiet){
+		if ($Quiet){
 			$display = '/quiet'
 		}
 		$install_log_file = "$tempDirectory/WaykNow_Install.log"
@@ -159,9 +168,13 @@ function Install-WaykNow(
 	Remove-Item -Path $tempDirectory -Force -Recurse
 }
 
-function Uninstall-WaykNow(
-	[switch] $Quiet
-){
+function Uninstall-WaykNow
+{
+    [CmdletBinding()]
+    param(
+		[switch] $Quiet
+	)
+	
 	Stop-WaykNow
 	
 	if (Get-IsWindows) {
@@ -171,7 +184,7 @@ function Uninstall-WaykNow(
 			$uninstall_string = $($uninstall_reg.UninstallString `
 				-Replace "msiexec.exe", "" -Replace "/I", "" -Replace "/X", "").Trim()
 			$display = '/passive'
-			if($Quiet){
+			if ($Quiet){
 				$display = '/quiet'
 			}
 			$msi_args = @(
@@ -203,11 +216,14 @@ function Uninstall-WaykNow(
 	}
 }
 
-function Update-WaykNow(
-	[switch] $Force,
-	[switch] $Quiet
-)
+function Update-WaykNow
 {
+    [CmdletBinding()]
+    param(
+		[switch] $Force,
+		[switch] $Quiet
+	)
+
 	$wayk_now_process_was_running = Get-WaykNowProcess
 	$wayk_now_service_was_running = (Get-WaykNowService).Status -Eq 'Running'
 
@@ -272,8 +288,7 @@ function Get-WaykNowPath()
 function Get-WaykNowInfo()
 {
 	[CmdletBinding()]
-	param(
-	)
+	param()
 
 	$DataPath = Get-WaykNowPath LocalPath
 	$GlobalPath = Get-WaykNowPath GlobalPath

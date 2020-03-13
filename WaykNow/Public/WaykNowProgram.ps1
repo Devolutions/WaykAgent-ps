@@ -1,5 +1,8 @@
 function Get-WaykNowProcess
 {
+    [CmdletBinding()]
+    param()
+
     $wayk_now_process = $null
 
 	if (Get-IsWindows -Or $IsMacOS) {
@@ -13,6 +16,9 @@ function Get-WaykNowProcess
 
 function Get-WaykNowService
 {
+    [CmdletBinding()]
+    param()
+
     $wayk_now_service = $null
 
     if (Get-IsWindows -And $PSEdition -Eq 'Desktop') {
@@ -24,6 +30,9 @@ function Get-WaykNowService
 
 function Start-WaykNowService
 {
+    [CmdletBinding()]
+    param()
+
     $wayk_now_service = Get-WaykNowService
     if ($wayk_now_service) {
         Start-Service $wayk_now_service
@@ -32,6 +41,9 @@ function Start-WaykNowService
 
 function Start-WaykNow
 {
+    [CmdletBinding()]
+    param()
+
     Start-WaykNowService
 
 	if (Get-IsWindows) {
@@ -58,6 +70,9 @@ function Start-WaykNow
 
 function Stop-WaykNow
 {
+    [CmdletBinding()]
+    param()
+
     $wayk_now_process = Get-WaykNowProcess
 
     if ($wayk_now_process) {
@@ -81,6 +96,9 @@ function Stop-WaykNow
 
 function Restart-WaykNow
 {
+    [CmdletBinding()]
+    param()
+
     Stop-WaykNow
     Start-WaykNow
 }

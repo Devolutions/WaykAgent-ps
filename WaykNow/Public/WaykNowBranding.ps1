@@ -1,10 +1,14 @@
 . "$PSScriptRoot/../Private/PlatformHelpers.ps1"
 . "$PSScriptRoot/../Private/Invoke-Process.ps1"
 
-function Set-WaykNowBranding(
-    [string] $BrandingPath,
-    [switch] $Sample
-){
+function Set-WaykNowBranding
+{
+    [CmdletBinding()]
+    param(
+        [string] $BrandingPath,
+        [switch] $Sample
+    )
+
     if ((Get-IsWindows) -or ($IsMacOS)) {
         [WaykNowInfo]$WaykNowInfo = Get-WaykNowInfo
         $dataPath = $WaykNowInfo.DataPath;
@@ -43,8 +47,13 @@ function Set-WaykNowBranding(
     }
 }
 
-function Reset-WaykNowBranding()
+function Reset-WaykNowBranding
 {
+    [CmdletBinding()]
+    param(
+
+    )
+
     if ((Get-IsWindows) -or ($IsMacOS)) {
         [WaykNowInfo]$WaykNowInfo = Get-WaykNowInfo
         $dataPath = $WaykNowInfo.DataPath;
@@ -67,11 +76,15 @@ function Reset-WaykNowBranding()
     }
 }
 
-function Test-WaykNowBranding(
-    [Parameter(Mandatory = $true, HelpMessage = "branding.7z file path")]
-    [string] $BrandingPath
-){
-    if((Get-IsWindows)){
+function Test-WaykNowBranding
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, HelpMessage = "branding.7z file path")]
+        [string] $BrandingPath
+    )
+
+    if ((Get-IsWindows)){
         if (Get-Command "7z.exe" -ErrorAction SilentlyContinue) { 
             try {
                 if (!(Test-Path -Path $BrandingPath)) {

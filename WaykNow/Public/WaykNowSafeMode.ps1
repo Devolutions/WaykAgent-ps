@@ -7,6 +7,9 @@ New-Variable -Name 'SafeModeWithWaykNow' -Value 'Safe Mode with Wayk Now' -Optio
 
 function Set-WaykNowSafeMode
 {
+    [CmdletBinding()]
+    param()
+
     if (!(Get-IsWindows)) {
         throw (New-Object UnsupportedPlatformException("Windows"))
     }
@@ -60,6 +63,9 @@ function Set-WaykNowSafeMode
 
 function Reset-WaykNowSafeMode
 {
+    [CmdletBinding()]
+    param()
+
     if (!(Get-IsWindows)) {
         throw (New-Object UnsupportedPlatformException("Windows"))
     }

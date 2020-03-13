@@ -1,11 +1,14 @@
 function Set-WaykNowLicense
-(    
-    [Parameter(Mandatory = $true, HelpMessage= "Wayk Now License")]
-    [string] $License
-)
 {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, HelpMessage= "Wayk Now License")]
+        [string] $License
+    )
+
     $licensePattern = '[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}'
     $WaykNowInfo = Get-WaykNowInfo
+
     if ($License -CMatch $licensePattern) {
         $json = Get-Content -Path $WaykNowInfo.ConfigFile -Raw -Encoding UTF8 | ConvertFrom-Json
         if ($json.RegistrationSerial)
@@ -26,23 +29,30 @@ function Set-WaykNowLicense
         $fileValue = $json | ConvertTo-Json
         $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
         [System.IO.File]::WriteAllLines($WaykNowInfo.ConfigFile, $fileValue, $Utf8NoBomEncoding)
-    }
-    else{
+    } else {
         Write-Error "Invalid License Format"
     }
 }
 
-function Get-WaykNowLicense {
+function Get-WaykNowLicense
+{
+    [CmdletBinding()]
+    param()
+
     [WaykNowInfo]$WaykInfo = Get-WaykNowInfo
     $json = Get-Content -Path $WaykInfo.ConfigFile -Raw -Encoding UTF8 | ConvertFrom-Json
-
     return $json.RegistrationSerial
 }
 
-function Reset-WaykNowLicense {
+function Reset-WaykNowLicense
+{
+    [CmdletBinding()]
+    param()
+
     [WaykNowInfo]$WaykInfo = Get-WaykNowInfo
 
     $json = Get-Content -Path $WaykInfo.ConfigFile -Raw -Encoding UTF8 | ConvertFrom-Json
+
     if ($json.RegistrationSerial) {
         $json.RegistrationSerial = ''
         $fileValue = $json | ConvertTo-Json
