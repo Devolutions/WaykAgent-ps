@@ -189,7 +189,12 @@ function Set-WaykNowConfig
 )
 {
     $WaykInfo = Get-WaykNowInfo
-    $json = Get-Content -Path $WaykInfo.ConfigFile -Raw -Encoding UTF8 | ConvertFrom-Json
+
+    if (Test-Path $WaykInfo.ConfigFile) {
+        $json = Get-Content -Path $WaykInfo.ConfigFile -Raw -Encoding UTF8 | ConvertFrom-Json
+    } else {
+        $json = '{}' | ConvertFrom-Json
+    }
 
     if ($Global) {
         if (!(Get-IsWindows)) {
@@ -365,15 +370,16 @@ function Set-WaykNowConfig
     $json = Set-JsonValue $json 'AccessControl' $AccessControl
 
     if ($Global) {
-        $fileValue = $json | ConvertTo-Json
-        $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
-        [System.IO.File]::WriteAllLines($WaykInfo.GlobalConfigFile, $fileValue, $Utf8NoBomEncoding)
+        $ConfigFile = $WaykInfo.GlobalConfigFile
+    } else {
+        $ConfigFile = $WaykInfo.ConfigFile
     }
-    else {
-        $fileValue = $json | ConvertTo-Json
-        $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
-        [System.IO.File]::WriteAllLines($WaykInfo.ConfigFile, $fileValue, $Utf8NoBomEncoding)
-    }
+
+    New-Item -Path $(Split-Path $ConfigFile -Parent) -ItemType 'Directory' -Force
+
+    $fileValue = $json | ConvertTo-Json
+    $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+    [System.IO.File]::WriteAllLines($ConfigFile, $fileValue, $Utf8NoBomEncoding)
 }
 
 function Get-WaykNowConfig()

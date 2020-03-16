@@ -1,5 +1,8 @@
 function Get-WaykNowUniqueId
 {
+    [CmdletBinding()]
+    param()
+
     $waykNowInfo = Get-WaykNowInfo
 
     $idPath = $waykNowInfo.DataPath

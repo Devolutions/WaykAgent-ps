@@ -2,10 +2,14 @@
 . "$PSScriptRoot/../Public/WaykNowProgram.ps1"
 . "$PSScriptRoot/../Private/JsonHelper.ps1"
 
-function Enable-WaykNowLogs(
-    [LoggingLevel] $LoggingLevel,
-    [switch]$Restart
-){
+function Enable-WaykNowLogs
+{
+    [CmdletBinding()]
+    param(
+        [LoggingLevel] $LoggingLevel,
+        [switch] $Restart
+    )
+
     if ($null -eq $LoggingLevel) {
         $LoggingLevel = [LoggingLevel]::Debug
     }
@@ -34,9 +38,13 @@ function Enable-WaykNowLogs(
     }
 }
 
-function Disable-WaykNowLogs(
-    [switch]$Restart
-){
+function Disable-WaykNowLogs
+{
+    [CmdletBinding()]
+    param(
+        [switch] $Restart
+    )
+
     if ($Restart) {
         Enable-WaykNowLogs -LoggingLevel "Off" -Restart
     } else {
@@ -44,13 +52,17 @@ function Disable-WaykNowLogs(
     }
 }
 
-function Export-WaykNowLogs(
-    [Parameter(Mandatory = $true)]
-    [string] $ExportPath
-){
-    try{
+function Export-WaykNowLogs
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $ExportPath
+    )
+
+    try {
         $ExportPath = Resolve-Path -Path $ExportPath
-    }catch{
+    } catch {
         throw "This path does not exist"
     }
 
@@ -65,8 +77,11 @@ function Export-WaykNowLogs(
     Copy-Item -Path $WaykInfo.LogPath -Destination $ExportPath -Force -Recurse
 }
 
-function Clear-WaykNowLogs() {
-    $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+function Clear-WaykNowLogs
+{
+    [CmdletBinding()]
+    param()
+
     $WaykInfo = Get-WaykNowInfo
 
     if (Get-IsWindows) {

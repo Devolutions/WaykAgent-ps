@@ -6,7 +6,8 @@
 . "$PSScriptRoot/../Private/UserAgent.ps1"
 . "$PSScriptRoot/../Private/RSAHelper.ps1"
 
-class WaykDenObject{
+class WaykDenObject
+{
     [string]$DenUrl
     [string]$Realm
     [string]$DenID
@@ -14,13 +15,18 @@ class WaykDenObject{
     [string]$DenGlobalPath
 }
 
-class WaykDenRegistrationObject{
+class WaykDenRegistrationObject
+{
     [bool]$IsRegistered
 }
 
-function Get-WaykNowDen(
-    [switch]$All
-){
+function Get-WaykNowDen
+{
+    [CmdletBinding()]
+    param(
+        [switch]$All
+    )
+
     $WaykNowConfig = Get-WaykNowInfo
     $DenPath = $WaykNowConfig.DenPath
 
@@ -50,9 +56,13 @@ function Get-WaykNowDen(
     return $WaykNowObject
 }
 
-function Connect-WaykNowDen(
-    [switch]$Force
-){
+function Connect-WaykNowDen
+{
+    [CmdletBinding()]
+    param(
+        [switch] $Force
+    )
+
     $WaykNowDenObject = Get-WaykNowDen
     $WaykDenUrl = Format-WaykDenUrl $WaykNowDenObject.DenUrl
     $WaykDenPath = $WaykNowDenObject.DenLocalPath
@@ -71,12 +81,12 @@ function Connect-WaykNowDen(
             grant_type = "urn:ietf:params:oauth:grant-type:device_code"
         }
 
-        try{
+        try {
             $result = Invoke-RestMethod -Uri "$lucidUrl/auth/token" -Method 'POST' -ContentType 'application/x-www-form-urlencoded' -Body $FormPoke
             $openIdConfig = Invoke-RestMethod -Uri "$lucidUrl/openid/.well-known/openid-configuration" -Method 'GET' -ContentType 'application/json'
             $access_token = $result.access_token
             
-            $Header= @{
+            $Header = @{
                 Authorization = "Bearer " + $access_token
                 Accept = '*/*'
             }
@@ -85,18 +95,15 @@ function Connect-WaykNowDen(
             $name = ''
             if ($userInfo.name){
                 $name = $userInfo.name
-            }
-            else{
+            } else {
                 $name = $userInfo.username
             }
             Write-Host "`"$name`" is already connected, you can use -Force to force reconnect"
-        }
-        catch {
+        } catch {
             Write-Host "Unknown error $_"
             Write-Host "Try to use -Force"
         }
-    }
-    else{
+    } else {
         # if force, disconnect the current sessions
         if ($Force){
             $_ = Disconnect-WaykNowDen
@@ -121,32 +128,29 @@ function Connect-WaykNowDen(
         Start-Process $verificationUri -ErrorAction SilentlyContinue
     
         $pokeCode = '400'
-        while($pokeCode -eq '400'){
+        while ($pokeCode -eq '400') {
             Start-Sleep -Seconds $device_authorization.interval -ErrorAction SilentlyContinue
     
-            try{
+            try {
                 $result = Invoke-RestMethod -Uri "$lucidUrl/auth/token" -Method 'POST' -ContentType 'application/x-www-form-urlencoded' -Body $FormPoke
                 $pokeCode = '200'
                 $openIdConfig = Invoke-RestMethod -Uri "$lucidUrl/openid/.well-known/openid-configuration" -Method 'GET' -ContentType 'application/json'
                 $access_token = $result.access_token
             
-                $Header= @{
-                Authorization = "Bearer " + $access_token
-                Accept = '*/*'
-            }
+                $Header = @{
+                    Authorization = "Bearer " + $access_token
+                    Accept = '*/*'
+                }
 
-            $userInfo = Invoke-RestMethod -Uri $openIdConfig.userinfo_endpoint -Method 'GET' -Headers $Header
-            $name = ''
-            if ($userInfo.name){
-                $name = $userInfo.name
-            }
-            else{
-                $name = $userInfo.username
-            }
-            Write-Host "`"$name`" is now connected"
-
-            }
-            catch [Microsoft.PowerShell.Commands.HttpResponseException]{
+                $userInfo = Invoke-RestMethod -Uri $openIdConfig.userinfo_endpoint -Method 'GET' -Headers $Header
+                $name = ''
+                if ($userInfo.name) {
+                    $name = $userInfo.name
+                } else {
+                    $name = $userInfo.username
+                }
+                Write-Host "`"$name`" is now connected"
+            } catch [Microsoft.PowerShell.Commands.HttpResponseException] {
                 $pokeCode = $_.Exception.Response.StatusCode.Value__
                 if (!($pokeCode -eq '400')){
                     throw $_
@@ -164,8 +168,11 @@ function Connect-WaykNowDen(
     }
 }
 
-function Disconnect-WaykNowDen(
-){
+function Disconnect-WaykNowDen
+{
+    [CmdletBinding()]
+    param()
+
     $WaykNowDenObject = Get-WaykNowDen
     $WaykDenUrl = Format-WaykDenUrl $WaykNowDenObject.DenUrl
     $WaykDenPath = $WaykNowDenObject.DenLocalPath
@@ -175,12 +182,11 @@ function Disconnect-WaykNowDen(
     $lucidUrl = $val.lucid_uri
 
     $oauthDeviceCodeJson = Get-WaykNowDenOauthJson $WaykDenPath
-    if ($oauthDeviceCodeJson.device_code){
+    if ($oauthDeviceCodeJson.device_code) {
         $deviceCode = $oauthDeviceCodeJson.device_code
-        try{
+        try {
             $_ = Invoke-RestMethod -Uri "$lucidUrl/auth/device-logout?code=$deviceCode" -Method 'POST' -ContentType 'application/x-www-form-urlencoded'
-        }
-        catch{
+        } catch {
             #Just hide error from here, you can try to disconnect with an device code who not work at all so // miam
         }
 
@@ -194,7 +200,11 @@ function Disconnect-WaykNowDen(
     }
 }
 
-function Get-WaykNowMachine {
+function Get-WaykNowMachine
+{
+    [CmdletBinding()]
+    param()
+
     $WaykNowDenObject = Get-WaykNowDen
     $WaykDenUrl = Format-WaykDenUrl $WaykNowDenObject.DenUrl
     $WaykDenPath = $WaykNowDenObject.DenLocalPath
@@ -207,7 +217,7 @@ function Get-WaykNowMachine {
     $val = (Invoke-RestMethod -Uri "$WaykDenUrl/.well-known/configuration" -Method 'GET' -ContentType 'application/json')
     $lucidUrl = $val.lucid_uri
 
-    try{
+    try {
         $FormPoke = @{
             client_id = $val.wayk_client_id
             device_code = $oauthJson.device_code
@@ -216,8 +226,7 @@ function Get-WaykNowMachine {
 
         $getToken = Invoke-RestMethod -Uri "$lucidUrl/auth/token" -Method 'POST' -ContentType 'application/x-www-form-urlencoded' -Body $FormPoke
         $access_token = $getToken.access_token
-    }
-    catch {
+    } catch {
         Write-Host "Unknown error $_"
         Write-Host "Try Connect-WaykNowDen -Force"
         return;
@@ -230,7 +239,7 @@ function Get-WaykNowMachine {
     $machineResult = Invoke-RestMethod -Uri "$WaykDenUrl/machine" -Method 'GET' -ContentType 'application/json' -Headers $Header
 
     $MachineReport = @()
-    foreach($machine in $machineResult){
+    foreach ($machine in $machineResult) {
         $PSObject = New-Object PSObject -Property @{
             UserAgent = $machine.user_agent
             MachineName = $machine.machine_name
@@ -243,8 +252,11 @@ function Get-WaykNowMachine {
     return $MachineReport | Format-Table MachineName, DenID, State, UserAgent
 }
 
-function Register-WaykNowMachine()
+function Register-WaykNowMachine
 {
+    [CmdletBinding()]
+    param()
+
     if (!(Get-IsWindows)){
         throw (New-Object UnsupportedPlatformException("Windows"))
     }
@@ -274,7 +286,7 @@ function Register-WaykNowMachine()
     $val = (Invoke-RestMethod -Uri "$WaykDenUrl/.well-known/configuration" -Method 'GET' -ContentType 'application/json')
     $lucidUrl = $val.lucid_uri
 
-    try{
+    try {
         $FormPoke = @{
             client_id = $val.wayk_client_id
             device_code = $oauthJson.device_code
@@ -283,8 +295,7 @@ function Register-WaykNowMachine()
 
         $getToken = Invoke-RestMethod -Uri "$lucidUrl/auth/token" -Method 'POST' -ContentType 'application/x-www-form-urlencoded' -Body $FormPoke
         $access_token = $getToken.access_token
-    }
-    catch {
+    } catch {
         Write-Host "Unknown error $_"
         Write-Host "Try Connect-WaykNowDen -Force"
         return;
@@ -417,8 +428,8 @@ function Register-WaykNowMachine()
     $IsUntrustedRoot = ([Linq.Enumerable]::First($chain.ChainStatus)).Status -eq [System.Security.Cryptography.X509Certificates.X509ChainStatusFlags]::UntrustedRoot
 
     if (($chain.ChainStatus.Length -gt 0) `
-    -AND ($IsUntrustedRoot)`
-    -AND ($storeContainsCertficate))
+        -AND ($IsUntrustedRoot)`
+        -AND ($storeContainsCertficate))
     {
         $isValidCertificate = $true
     }
@@ -433,13 +444,16 @@ function Register-WaykNowMachine()
     return "Machine Registered: " + $WaykNowUniqueID
 }
 
-function Unregister-WaykNowMachine()
+function Unregister-WaykNowMachine
 {
+    [CmdletBinding()]
+    param()
+
     if (!(Get-IsWindows)){
         throw (New-Object UnsupportedPlatformException("Windows"))
     }
 
-    if (!(Get-Service "WaykNowService" -ErrorAction SilentlyContinue)){
+    if (!(Get-Service "WaykNowService" -ErrorAction SilentlyContinue)) {
         throw (New-Object UnattendedNotFound)
     }
 
@@ -489,38 +503,46 @@ function Unregister-WaykNowMachine()
     $_ = Remove-WaykNowMachineCertificate $DenGlobalPath
 } 
 
-function Remove-WaykNowMachineCertificate(
-    [string] $DenGlobalPath
-){
+function Remove-WaykNowMachineCertificate
+{
+    [CmdletBinding()]
+    param(
+        [string] $DenGlobalPath
+    )
+
     $ListItem = Get-ChildItem -Path $DenGlobalPath
     $waykNowCRT = '[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}.crt'
     $waykNowCSR = '[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}.csr'
     $waykNowKEY = '[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}.key'
     $waykNowCaChainPEM = '[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}-ca-chain.pem'
 
-    foreach($item in $ListItem){
+    foreach ($item in $ListItem) {
         $path = "$DenGlobalPath\$item"
 
-        if ($item -CMatch $waykNowCRT){
+        if ($item -CMatch $waykNowCRT) {
             Remove-Item -Path $path -Force -Recurse
             continue;
         }
-        if ($item -CMatch $waykNowCSR){
+        if ($item -CMatch $waykNowCSR) {
             Remove-Item -Path $path -Force -Recurse
             continue;
         }
-        if ($item -CMatch $waykNowKEY){
+        if ($item -CMatch $waykNowKEY) {
             Remove-Item -Path $path -Force -Recurse
             continue;
         }
-        if ($item -CMatch $waykNowCaChainPEM){
+        if ($item -CMatch $waykNowCaChainPEM) {
             Remove-Item -Path $path -Force -Recurse
             continue;
         }
     }
 }
 
-function Get-WaykNowDenRegistration(){
+function Get-WaykNowDenRegistration
+{
+    [CmdletBinding()]
+    param()
+
     $WaykNowDenObject = Get-WaykNowDen
     $WaykNowDenRegistration = [WaykDenRegistrationObject]::new();
     $WaykNowDenRegistration.IsRegistered = $false;
