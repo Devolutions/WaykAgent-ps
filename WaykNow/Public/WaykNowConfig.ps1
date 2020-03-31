@@ -160,90 +160,28 @@ function Set-WaykNowConfig
     }
 
     $properties = [WaykNowConfig].GetProperties() | ForEach-Object { $_.Name }
+
     foreach ($param in $PSBoundParameters.GetEnumerator()) {
-        if ($properties -Contains $param.Key) {
-            $json = Set-JsonValue $json $param.Key $param.Value
+        if ($param.Key -NotLike 'AccessControl*') {
+            if ($properties -Contains $param.Key) {
+                $json | Add-Member -Type NoteProperty -Name $param.Key -Value $param.Value
+            }
         }
     }
 
-    $AccessControl = [pscustomobject]@{
-        'Viewing' = $AccessControlViewing
-        'Interact' = $AccessControlInteract
-        'Clipboard' = $AccessControlClipboard
-        'FileTransfer' = $AccessControlFileTransfer
-        'Exec' = $AccessControlExec
-        'Chat' = $AccessControlChat
+    $AccessControlNames = @('Viewing', 'Interact', 'Clipboard', 'FileTransfer', 'Exec', 'Chat')
+
+    if (-Not $json.AccessControl) {
+        $json | Add-Member -Type NoteProperty -Name "AccessControl" -Value $([PSCustomObject]@{})
     }
 
-    # To ignore the null value on the json we remove the values who are not set if there are not in the json file
-    # Access Control
-    if ($null -eq $AccessControlViewing) {
-        if ($json.AccessControl.Viewing)
-        {
-            $AccessControl.Viewing = $json.AccessControl.Viewing
-        }
-        else
-        {
-            $AccessControl.PSObject.Properties.Remove('Viewing')
+    foreach ($ShortName in $AccessControlNames) {
+        $LongName = "AccessControl$ShortName"
+        $Value = $PSBoundParameters[$LongName]
+        if ($Value) {
+            $json.AccessControl | Add-Member -Type NoteProperty -Name $ShortName -Value $Value -Force
         }
     }
-
-    if ($null -eq $AccessControlInteract) {
-        if ($json.AccessControl.Interact)
-        {
-            $AccessControl.Interact = $json.AccessControl.Interact
-        }
-        else
-        {
-            $AccessControl.PSObject.Properties.Remove('Interact')
-        }
-    }
-
-    if ($null -eq $AccessControlClipboard) {
-        if ($json.AccessControl.Clipboard)
-        {
-            $AccessControl.Clipboard = $json.AccessControl.Clipboard
-        }
-        else
-        {
-            $AccessControl.PSObject.Properties.Remove('Clipboard')
-        }
-    }
-
-    if ($null -eq $AccessControlFileTransfer) {
-        if ($json.AccessControl.FileTransfer)
-        {
-            $AccessControl.FileTransfer = $json.AccessControl.FileTransfer
-        }
-        else
-        {
-            $AccessControl.PSObject.Properties.Remove('FileTransfer')
-        }
-    }
-
-    if ($null -eq $AccessControlExec) {
-        if ($json.AccessControl.Exec)
-        {
-            $AccessControl.Exec = $json.AccessControl.Exec
-        }
-        else
-        {
-            $AccessControl.PSObject.Properties.Remove('Exec')
-        }
-    }
-
-    if ($null -eq $AccessControlChat) {
-        if ($json.AccessControl.Chat)
-        {
-            $AccessControl.Chat = $json.AccessControl.Chat
-        }
-        else
-        {
-            $AccessControl.PSObject.Properties.Remove('Chat')
-        }
-    }
-
-    $json = Set-JsonValue $json 'AccessControl' $AccessControl
 
     New-Item -Path $(Split-Path $ConfigFile -Parent) -ItemType 'Directory' -Force | Out-Null
 
@@ -275,21 +213,48 @@ function Get-WaykNowConfig
     }
 
     $config = [WaykNowConfig]::new()
+
     [WaykNowConfig].GetProperties() | ForEach-Object {
-        $Name = $_.Name
+        if ($_.Name -NotLike 'AccessControl*') {
+            $Name = $_.Name
+            $Property = $null
+
+            if ($LocalJson -And $LocalJson.PSObject.Properties[$Name]) {
+                $Property = $LocalJson.PSObject.Properties[$Name]
+            }
+
+            if ($GlobalJson -And $GlobalJson.PSObject.Properties[$Name]) {
+                $Property = $GlobalJson.PSObject.Properties[$Name]
+            }
+
+            if ($Property) {
+                $Value = $Property.Value
+                $config.$Name = $Value
+            }
+        }
+    }
+
+    $AccessControlNames = @('Viewing', 'Interact', 'Clipboard', 'FileTransfer', 'Exec', 'Chat')
+
+    foreach ($ShortName in $AccessControlNames) {
+        $LongName = "AccessControl$ShortName"
+
+        $AccessControl = $null
         $Property = $null
 
-        if ($LocalJson -And $LocalJson.PSObject.Properties[$Name]) {
-            $Property = $LocalJson.PSObject.Properties[$Name]
+        if ($LocalJson -And $LocalJson.PSObject.Properties['AccessControl']) {
+            $AccessControl = $LocalJson.PSObject.Properties['AccessControl'].Value
+            $Property = $AccessControl.PSObject.Properties[$ShortName]
         }
 
-        if ($GlobalJson -And $GlobalJson.PSObject.Properties[$Name]) {
-            $Property = $GlobalJson.PSObject.Properties[$Name]
+        if ($GlobalJson -And $GlobalJson.PSObject.Properties['AccessControl']) {
+            $AccessControl = $GlobalJson.PSObject.Properties['AccessControl'].Value
+            $Property = $AccessControl.PSObject.Properties[$ShortName]
         }
 
         if ($Property) {
             $Value = $Property.Value
-            $config.$Name = $Value
+            $config.$LongName = $Value
         }
     }
 

@@ -35,6 +35,14 @@ Describe 'Wayk Now config' {
 				{ Set-WaykNowConfig -GeneratedPasswordLength 1 } | Should -Throw
 				$(Get-WaykNowConfig).GeneratedPasswordLength | Should -Be 8
 			}
+			It 'Sets the codec quality mode' {
+				Set-WaykNowConfig -QualityMode 'High'
+				$(Get-WaykNowConfig).QualityMode | Should -Be 'High'
+			}
+			It 'Sets the Wayk Den URL' {
+				Set-WaykNowConfig -DenUrl 'https://den.contoso.com'
+				$(Get-WaykNowConfig).DenUrl | Should -Be 'https://den.contoso.com'
+			}
 		}
 	}
 }
