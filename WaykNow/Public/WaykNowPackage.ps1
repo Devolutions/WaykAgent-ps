@@ -292,8 +292,8 @@ function Get-WaykNowInfo()
 	[CmdletBinding()]
 	param()
 
-	$DataPath = Get-WaykNowPath LocalPath
-	$GlobalPath = Get-WaykNowPath GlobalPath
+	$DataPath = Get-WaykNowPath 'LocalPath'
+	$GlobalPath = Get-WaykNowPath 'GlobalPath'
 
 	$info = [WaykNowInfo]::New()
 	$info.DataPath = $DataPath
