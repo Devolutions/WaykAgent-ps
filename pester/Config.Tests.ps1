@@ -12,13 +12,28 @@ Describe 'Wayk Now config' {
 				Assert-MockCalled 'Get-WaykNowPath'
 			}
 			It 'Sets server-only remote control mode' {
-				Set-WaykNowConfig -Global -ControlMode AllowRemoteControlServerOnly
-				$(Get-WaykNowConfig).ControlMode | Should -Be 'AllowRemoteControlServerOnly'
+				Set-WaykNowConfig -Global -ControlMode Both
+				$(Get-WaykNowConfig).ControlMode | Should -Be 'Both'
 				Assert-MockCalled 'Get-WaykNowPath'
+			}
+			It 'Sets friendly name with special characters' {
+				Set-WaykNowConfig -FriendlyName 'Señor Marc-André'
+				$(Get-WaykNowConfig).FriendlyName | Should -Be 'Señor Marc-André'
 			}
 			It 'Disables the version check' {
 				Set-WaykNowConfig -Global -VersionCheck $false
 				$(Get-WaykNowConfig).VersionCheck | Should -Be $false
+			}
+			It 'Disables remote execution' {
+				Set-WaykNowConfig -Global -AccessControlExec 'Disable'
+				Set-WaykNowConfig -AccessControlExec 'Confirm'
+				$(Get-WaykNowConfig).AccessControlExec | Should -Be 'Disable'
+			}
+			It 'Sets generated password length' {
+				Set-WaykNowConfig -GeneratedPasswordLength 8
+				$(Get-WaykNowConfig).GeneratedPasswordLength | Should -Be 8
+				{ Set-WaykNowConfig -GeneratedPasswordLength 1 } | Should -Throw
+				$(Get-WaykNowConfig).GeneratedPasswordLength | Should -Be 8
 			}
 		}
 	}
