@@ -114,7 +114,7 @@ function Set-WaykNowConfig
         [switch] $Global,
 
         [string] $FriendlyName,
-        [ValidateSet("en", "fr", "de", "zh-CN", "zh-TW")]
+        [ValidateSet("en", "fr", "de", "it", "pl", "zh-CN", "zh-TW")]
         [string] $Language,
         [ControlMode] $ControlMode,
         [bool] $AutoLaunchOnUserLogon,
