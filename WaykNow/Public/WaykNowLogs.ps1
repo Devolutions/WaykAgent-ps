@@ -1,12 +1,12 @@
 . "$PSScriptRoot/../Public/WaykNowLicense.ps1"
 . "$PSScriptRoot/../Public/WaykNowProgram.ps1"
-. "$PSScriptRoot/../Private/JsonHelper.ps1"
 
 function Enable-WaykNowLogs
 {
     [CmdletBinding()]
     param(
         [LoggingLevel] $LoggingLevel,
+        [switch] $Global,
         [switch] $Restart
     )
 
@@ -14,25 +14,10 @@ function Enable-WaykNowLogs
         $LoggingLevel = [LoggingLevel]::Debug
     }
 
-    $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
-    $WaykInfo = Get-WaykNowInfo
-
-    if (Get-IsWindows) {
-        if (Get-Service "WaykNowService" -ErrorAction SilentlyContinue) {
-            $jsonGlobal = Get-Content -Path $WaykInfo.GlobalConfigFile -Raw -Encoding UTF8 | ConvertFrom-Json
-            $jsonGlobal = Set-JsonValue $jsonGlobal 'LoggingLevel' $LoggingLevel
-            $fileValue = $jsonGlobal | ConvertTo-Json
-            [System.IO.File]::WriteAllLines($WaykInfo.GlobalDataPath, $fileValue, $Utf8NoBomEncoding)
-        }
-    }
-
-    $json = Get-Content -Path $WaykInfo.ConfigFile -Raw -Encoding UTF8 | ConvertFrom-Json
-    $json = Set-JsonValue $json 'LoggingLevel' $LoggingLevel
-    $fileValue = $json | ConvertTo-Json
-    [System.IO.File]::WriteAllLines($WaykInfo.ConfigFile, $fileValue, $Utf8NoBomEncoding)
+    Set-WaykNowConfig -Global:$Global -LoggingLevel $LoggingLevel
 
     if ($Restart) {
-        $_ = Restart-WaykNow
+        Restart-WaykNow
     } else {
         Write-Host "Changes will only be applied after an application restart" 
     }
@@ -42,39 +27,36 @@ function Disable-WaykNowLogs
 {
     [CmdletBinding()]
     param(
+        [switch] $Global,
         [switch] $Restart
     )
 
-    if ($Restart) {
-        Enable-WaykNowLogs -LoggingLevel "Off" -Restart
-    } else {
-        Enable-WaykNowLogs -LoggingLevel "Off"
-    }
+    Enable-WaykNowLogs -LoggingLevel 'Off' -Global:$Global -Restart:$Restart
 }
 
 function Export-WaykNowLogs
 {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory=$true, Position=0)]
         [string] $ExportPath
     )
 
-    try {
-        $ExportPath = Resolve-Path -Path $ExportPath
-    } catch {
-        throw "This path does not exist"
+    if (-Not (Test-Path $ExportPath)) {
+        New-Item -Path $ExportPath -ItemType 'Directory' -ErrorAction Stop | Out-Null
     }
 
     $WaykInfo = Get-WaykNowInfo
+    $GlobalLogPath = $WaykInfo.LogGlobalPath
+    $LocalLogPath = $WaykInfo.LogPath
 
-    if (Get-IsWindows) {
-        if (Get-Service "WaykNowService" -ErrorAction SilentlyContinue) {
-            Copy-Item -Path $WaykInfo.LogGlobalPath -Destination $ExportPath -Force -Recurse
-        }
+    Get-ChildItem -Path $GlobalLogPath -File -ErrorAction SilentlyContinue | ForEach-Object {
+        Copy-Item -Path $_.FullName -Destination $(Join-Path $ExportPath $_.Name) -Force
     }
 
-    Copy-Item -Path $WaykInfo.LogPath -Destination $ExportPath -Force -Recurse
+    Get-ChildItem -Path $LocalLogPath -File -ErrorAction SilentlyContinue | ForEach-Object {
+        Copy-Item -Path $_.FullName -Destination $(Join-Path $ExportPath $_.Name) -Force
+    }
 }
 
 function Clear-WaykNowLogs
@@ -83,14 +65,11 @@ function Clear-WaykNowLogs
     param()
 
     $WaykInfo = Get-WaykNowInfo
+    $GlobalLogPath = $WaykInfo.LogGlobalPath
+    $LocalLogPath = $WaykInfo.LogPath
 
-    if (Get-IsWindows) {
-        if (Get-Service "WaykNowService" -ErrorAction SilentlyContinue) {
-            Remove-Item -Path $WaykInfo.LogGlobalPath -Force -Recurse
-        }
-    }
-
-    Remove-Item -Path $WaykInfo.LogPath -Force -Recurse
+    Remove-Item -Path $GlobalLogPath -Force -Recurse -ErrorAction SilentlyContinue
+    Remove-Item -Path $LocalLogPath -Force -Recurse -ErrorAction SilentlyContinue
 }
 
 Export-ModuleMember -Function Enable-WaykNowLogs, Disable-WaykNowLogs, Export-WaykNowLogs, Clear-WaykNowLogs
