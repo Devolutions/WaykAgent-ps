@@ -12,7 +12,7 @@
 RootModule = 'WaykNow.psm1'
 
 # Version number of this module.
-ModuleVersion = '2020.1.4'
+ModuleVersion = '2020.1.5'
 
 # Supported PSEditions
 CompatiblePSEditions = 'Desktop', 'Core'
