@@ -164,7 +164,7 @@ function Set-WaykNowConfig
     foreach ($param in $PSBoundParameters.GetEnumerator()) {
         if ($param.Key -NotLike 'AccessControl*') {
             if ($properties -Contains $param.Key) {
-                $json | Add-Member -Type NoteProperty -Name $param.Key -Value $param.Value
+                $json | Add-Member -Type NoteProperty -Name $param.Key -Value $param.Value -Force
             }
         }
     }

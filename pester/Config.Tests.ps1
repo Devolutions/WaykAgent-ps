@@ -23,6 +23,10 @@ Describe 'Wayk Now config' {
 			It 'Disables the version check' {
 				Set-WaykNowConfig -Global -VersionCheck $false
 				$(Get-WaykNowConfig).VersionCheck | Should -Be $false
+				Set-WaykNowConfig -Global -VersionCheck $true
+				$(Get-WaykNowConfig).VersionCheck | Should -Be $true
+				Set-WaykNowConfig -VersionCheck $false
+				$(Get-WaykNowConfig).VersionCheck | Should -Be $true
 			}
 			It 'Disables remote execution' {
 				Set-WaykNowConfig -Global -AccessControlExec 'Disable'
