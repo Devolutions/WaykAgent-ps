@@ -642,30 +642,30 @@ DEVOLUTIONS147W 619181 OFFLINE WaykNow/3.3.2 (Windows; Windows 10 Pro 1809)
 
 == WaykNow Logs Management
 ==== Enable WaykNow Logs
-The command `Enable-WaykNowLog` will enable the logs on WaykNow with the Logging Level `Debug` by default, you can choose this one with the parameter `LoggingLevel` and you can choose to restart WaykNow with the command `-Restart`, because the changes will only be applied after an application restart.
+The command `Enable-WaykNowLogs` will enable the logs on WaykNow with the Logging Level `Debug` by default, you can choose this one with the parameter `LoggingLevel` and you can choose to restart WaykNow with the command `-Restart`, because the changes will only be applied after an application restart.
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Enable-WaykNowLog -Restart -LoggingLevel Info
+PS ~/WaykNow-ps> Enable-WaykNowLogs -Restart -LoggingLevel Info
 ----
 
 ==== Disable WaykNow Logs
-The command `Disable-WaykNowLog` will disable the logs on WaykNow, you can choose to restart WaykNow with the command `-Restart`, because the changes will only be applied after an application restart.
+The command `Disable-WaykNowLogs` will disable the logs on WaykNow, you can choose to restart WaykNow with the command `-Restart`, because the changes will only be applied after an application restart.
 [source,sh]
 ----
-PS ~/WaykNow-ps> Disable-WaykNowLog -Restart
+PS ~/WaykNow-ps> Disable-WaykNowLogs -Restart
 ----
 
 ==== Export WaykNow Logs
-The command `Export-WaykNowLog` will export the logs from WaykNow, you need to set the parameter `-ExportPath` to choose the destination of the logs
+The command `Export-WaykNowLogs` will export the logs from WaykNow, you need to set the parameter `-ExportPath` to choose the destination of the logs
 [source,sh]
 ----
-PS ~/WaykNow-ps> Export-WaykNowLog -ExportPath C:\Users\user\Desktop
+PS ~/WaykNow-ps> Export-WaykNowLogs -ExportPath C:\Users\user\Desktop
 ----
 
 ==== Clear WaykNow Logs
-The command `Clear-WaykNowLog` will clear the logs from WaykNow
+The command `Clear-WaykNowLogs` will clear the logs from WaykNow
 [source,sh]
 ----
-PS ~/WaykNow-ps> Clear-WaykNowLog
+PS ~/WaykNow-ps> Clear-WaykNowLogs
 ----
