@@ -12,7 +12,7 @@ function Set-WaykNowBranding
 
     $DataPath = Get-WaykNowPath -PathType "GlobalPath"
     $OutputPath = Join-Path $DataPath "branding.zip"
-    New-Item -Path $(Split-Path $OutputPath -Parent) -ItemType 'Directory' -Force
+    New-Item -Path $(Split-Path $OutputPath -Parent) -ItemType 'Directory' -Force | Out-Null
     Copy-Item -Path $BrandingPath -Destination $OutputPath -Force
 }
 
