@@ -7,6 +7,19 @@ function Get-IsWindows
     }
 }
 
+function Get-WindowsHostArch
+{
+    if ([System.Environment]::Is64BitOperatingSystem) {
+        if (($Env:PROCESSOR_ARCHITECTURE -eq 'ARM64') -or ($Env:PROCESSOR_ARCHITEW6432 -eq 'ARM64')) {
+            return "ARM64"
+        } else {
+            return "x64"
+        }
+    } else {
+        return "x86"
+    }
+}
+
 function Get-UninstallRegistryKey(
 	[string] $display_name = 'Wayk Now'
 ){

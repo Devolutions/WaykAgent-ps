@@ -70,7 +70,11 @@ function Get-WaykNowPackage
 
 	if (Get-IsWindows) {
 		if ([System.Environment]::Is64BitOperatingSystem) {
-			$download_url = $download_url_x64
+			if (Get-WindowsHostArch -eq 'ARM64') {
+				$download_url = $download_url_x86 # Windows on ARM64, use intel 32-bit build
+			} else {
+				$download_url = $download_url_x64
+			}
 		} else {
 			$download_url = $download_url_x86
 		}
