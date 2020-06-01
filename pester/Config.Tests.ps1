@@ -28,6 +28,14 @@ Describe 'Wayk Now config' {
 				Set-WaykNowConfig -VersionCheck $false
 				$(Get-WaykNowConfig).VersionCheck | Should -Be $true
 			}
+			It 'Disables automatic updates' {
+				Set-WaykNowConfig -Global -AutoUpdateEnabled $false
+				$(Get-WaykNowConfig).AutoUpdateEnabled | Should -Be $false
+				Set-WaykNowConfig -Global -AutoUpdateEnabled $true
+				$(Get-WaykNowConfig).AutoUpdateEnabled | Should -Be $true
+				Set-WaykNowConfig -AutoUpdateEnabled $false
+				$(Get-WaykNowConfig).AutoUpdateEnabled | Should -Be $true
+			}
 			It 'Disables remote execution' {
 				Set-WaykNowConfig -Global -AccessControlExec 'Disable'
 				Set-WaykNowConfig -AccessControlExec 'Confirm'

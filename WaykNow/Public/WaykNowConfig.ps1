@@ -88,6 +88,7 @@ class WaykNowConfig
     [bool] $CrashReporterEnabled = $true
     [bool] $CrashReporterAutoUpload = $true
     [bool] $VersionCheck = $true
+    [bool] $AutoUpdateEnabled = $true
 }
 
 function Get-WaykNowConfigFile
@@ -148,7 +149,8 @@ function Set-WaykNowConfig
         [bool] $AnalyticsEnabled,
         [bool] $CrashReporterEnabled,
         [bool] $CrashReporterAutoUpload,
-        [bool] $VersionCheck
+        [bool] $VersionCheck,
+        [bool] $AutoUpdateEnabled
     )
 
     $ConfigFile = Get-WaykNowConfigFile -Global:$Global
