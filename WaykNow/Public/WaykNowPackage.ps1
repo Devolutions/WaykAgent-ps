@@ -284,6 +284,14 @@ function Get-WaykNowPath()
 		$GlobalPath = '/etc/wayk'
 	}
 
+	if (Test-Path Env:WAYK_DATA_PATH) {
+		$LocalPath = $Env:WAYK_DATA_PATH
+	}
+
+	if (Test-Path Env:WAYK_SYSTEM_PATH) {
+		$GlobalPath = $Env:WAYK_SYSTEM_PATH
+	}
+
 	switch ($PathType) {
 		'LocalPath' { $LocalPath }
 		'GlobalPath' { $GlobalPath }
