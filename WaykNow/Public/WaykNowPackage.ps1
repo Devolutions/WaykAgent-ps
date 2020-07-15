@@ -97,7 +97,9 @@ function Install-WaykNow
     param(
 		[switch] $Force,
 		[switch] $Quiet,
-		[string] $Version
+		[string] $Version,
+		[switch] $NoDesktopShortcut,
+		[switch] $NoStartMenuShortcut
 	)
 
 	$tempDirectory = New-TemporaryDirectory
@@ -140,6 +142,13 @@ function Install-WaykNow
 			'/norestart',
 			'/log', "`"$install_log_file`""
 		)
+		if ($NoDesktopShortcut){
+			$msi_args += "INSTALLDESKTOPSHORTCUT=`"`""
+		}
+		if ($NoStartMenuShortcut){
+			$msi_args += "INSTALLSTARTMENUSHORTCUT=`"`""
+		}
+
 		Start-Process "msiexec.exe" -ArgumentList $msi_args -Wait -NoNewWindow
 
 		Remove-Item -Path $install_log_file -Force -ErrorAction SilentlyContinue
