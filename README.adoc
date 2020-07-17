@@ -65,6 +65,10 @@ By default, the `Install-WaykNow` skips the installation if the local Wayk Now v
 
 The `-Version` optional parameter can be used to force using a specific version of Wayk Now instead of the latest one.
 
+The `-NoDesktopShortcut` optional parameter can be used to NOT create a Desktop Shortcut for Wayk Now
+
+The `-NoStartMenuShortcut` optional parameter can be used to NOT create a Start Menu Shortcut for Wayk Now
+
 === Version/Package
 
 The `Get-WaykNowVersion` command detects the current Wayk Now installation version number.
