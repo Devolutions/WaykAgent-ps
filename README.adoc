@@ -200,15 +200,15 @@ PS ~/WaykNow-ps> Set-WaykNowConfig -Language en
 ----
 
 ==== ControlMode
-Specifies the Remote Control Mode of WaykNow, AllRemoteControlMode: Both sides are displayed, TakeRemoteControlClientOnly: Only the client side is displayed and AllowRemoteControlServerOnly: Only the server side is displayed.
+Specifies the Remote Control Mode of WaykNow, Both: Both sides are displayed, Client: Only the client side is displayed and Server: Only the server side is displayed.
 
 *Type:* ControlMode +
-*DefaultValue:* AllRemoteControlMode +
-*Accepted values:* AllRemoteControlMode, TakeRemoteControlClientOnly, AllowRemoteControlServerOnly +
+*DefaultValue:* Both +
+*Accepted values:* Both, Client, Server +
 *Example:*
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -ControlMode AllRemoteControlMode
+PS ~/WaykNow-ps> Set-WaykNowConfig -ControlMode Both
 ----
 
 ==== AutoLaunchOnUserLogon
