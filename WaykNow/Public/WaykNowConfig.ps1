@@ -1,6 +1,5 @@
 . "$PSScriptRoot/../Private/Invoke-Process.ps1"
 . "$PSScriptRoot/../Private/Exceptions.ps1"
-. "$PSScriptRoot/../Private/JsonHelper.ps1"
 
 enum ControlMode 
 {

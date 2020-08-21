@@ -1,3 +1,49 @@
+
+function Get-WaykNowCommand
+{
+    [CmdletBinding()]
+    param()
+
+    $WaykNowCommand = $null
+
+	if ($IsLinux) {
+        $Command = Get-Command 'wayk-now' -ErrorAction SilentlyContinue
+
+        if ($Command) {
+            $WaykNowCommand = $Command.Source
+        }
+    } elseif ($IsMacOS) {
+        $Command = Get-Command 'wayk-now' -ErrorAction SilentlyContinue
+
+        if ($Command) {
+            $WaykNowCommand = $Command.Source
+        } else {
+            $WaykNowAppExe = "/Applications/WaykNow.app/Contents/MacOS/WaykNow"
+
+            if (Test-Path -Path $WaykNowAppExe -PathType Leaf) {
+                $WaykNowCommand = $WaykNowAppExe
+            }
+        }
+    } else { # IsWindows
+        $DisplayName = 'Wayk Now'
+
+		$UninstallReg = Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" `
+            | ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $DisplayName }
+            
+		if (-Not $UninstallReg) {
+			$UninstallReg = Get-ChildItem "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall" `
+				| ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $DisplayName }
+        }
+        
+        if ($UninstallReg) {
+            $InstallLocation = $UninstallReg.InstallLocation
+            $WaykNowCommand = Join-Path -Path $InstallLocation -ChildPath "WaykNow.exe"
+        }
+	}
+    
+    return $WaykNowCommand
+}
+
 function Get-WaykNowProcess
 {
     [CmdletBinding()]
@@ -103,4 +149,5 @@ function Restart-WaykNow
     Start-WaykNow
 }
 
-Export-ModuleMember -Function Start-WaykNow, Stop-WaykNow, Restart-WaykNow, Get-WaykNowProcess, Get-WaykNowService, Start-WaykNowService
+Export-ModuleMember -Function Start-WaykNow, Stop-WaykNow, Restart-WaykNow,
+    Get-WaykNowCommand, Get-WaykNowProcess, Get-WaykNowService, Start-WaykNowService

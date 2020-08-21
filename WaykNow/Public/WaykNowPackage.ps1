@@ -40,18 +40,22 @@ function Get-WaykNowPackage
 {
     [CmdletBinding()]
     param(
-		[string] $Version
+		[string] $Version,
+		[ValidateSet("Windows","macOS","Linux")]
+		[string] $Platform,
+		[ValidateSet("x86","x64")]
+		[string] $Architecture
 	)
 
 	$version_quad = '';
 	$products_url = "https://devolutions.net/products.htm"
 	$products_htm = Invoke-RestMethod -Uri $products_url -Method 'GET' -ContentType 'text/plain'
-	$matches = $($products_htm | Select-String -AllMatches -Pattern "Wayk.Version=(\S+)").Matches
+	$version_matches = $($products_htm | Select-String -AllMatches -Pattern "Wayk.Version=(\S+)").Matches
 
 	if ($version) {
 		$version_quad = $version
 	} else {
-		$version_quad = $matches.Groups[1].Value
+		$version_quad = $version_matches.Groups[1].Value
 	}
 	
 	$download_base = "https://cdn.devolutions.net/download"
@@ -68,19 +72,41 @@ function Get-WaykNowPackage
 
 	$download_url = $null
 
-	if (Get-IsWindows) {
-		if ([System.Environment]::Is64BitOperatingSystem) {
-			if ((Get-WindowsHostArch) -eq 'ARM64') {
-				$download_url = $download_url_x86 # Windows on ARM64, use intel 32-bit build
+	if (-Not $Platform) {
+		if ($IsLinux) {
+			$Platform = 'Linux'
+		} elseif ($IsMacOS) {
+			$Platform = 'macOS'
+		} else {
+			$Platform = 'Windows'
+		}
+	}
+
+	if (-Not $Architecture) {
+		if (Get-IsWindows) {
+			if ([System.Environment]::Is64BitOperatingSystem) {
+				if ((Get-WindowsHostArch) -eq 'ARM64') {
+					$Architecture = 'x86' # Windows on ARM64, use intel 32-bit build
+				} else {
+					$Architecture = 'x64'
+				}
 			} else {
-				$download_url = $download_url_x64
+				$Architecture = 'x86'
 			}
 		} else {
+			$Architecture = 'x64' # default
+		}
+	}
+
+	if ($Platform -eq 'Windows') {
+		if ($Architecture -eq 'x64') {
+			$download_url = $download_url_x64
+		} elseif ($Architecture -eq 'x86') {
 			$download_url = $download_url_x86
 		}
-	} elseif ($IsMacOS) {
+	} elseif ($Platform -eq 'macOS') {
 		$download_url = $download_url_mac
-	} elseif ($IsLinux) {
+	} elseif ($Platform -eq 'Linux') {
 		$download_url = $download_url_deb
 	}
  

@@ -70,14 +70,14 @@ CLRVersion = '4.0'
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = @('Get-WaykNowVersion', 'Get-WaykNowPackage', 'Install-WaykNow', 'Uninstall-WaykNow', 'Update-WaykNow',
-    'Start-WaykNow', 'Stop-WaykNow', 'Restart-WaykNow',
+    'Start-WaykNow', 'Stop-WaykNow', 'Restart-WaykNow', 'Get-WaykNowCommand',
     'Set-WaykNowSafeMode','Reset-WaykNowSafeMode', 'Set-WaykNowConfig', 'Get-WaykNowInfo', 'Get-WaykNowPath', 'Get-WaykNowConfig',
     'Set-WaykNowBranding', 'Reset-WaykNowBranding', 'Test-WaykNowBranding',
     'Set-WaykNowLicense', 'Get-WaykNowLicense', 'Reset-WaykNowLicense',
     'Get-WaykNowUniqueId',
     'Enable-WaykNowLogs', 'Disable-WaykNowLogs', 'Export-WaykNowLogs', 'Clear-WaykNowLogs',
-    'Get-WaykNowDen', 'Connect-WaykNowDen', 'Disconnect-WaykNowDen','Get-WaykNowMachine', 'Register-WaykNowMachine', 'Unregister-WaykNowMachine', 'Get-WaykNowDenRegistration')
-    
+    'Register-WaykNow')
+
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
 
