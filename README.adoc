@@ -67,6 +67,17 @@ The `-NoDesktopShortcut` optional parameter can be used to NOT create a Desktop 
 
 The `-NoStartMenuShortcut` optional parameter can be used to NOT create a Start Menu Shortcut for Wayk Now
 
+=== wayk-now Command
+
+The Wayk Now executable path (referred to as 'wayk-now' in CLI commands) can be detected by the `Get-WaykNowCommand`:
+
+----
+Get-WaykNowCommand
+C:\Program Files (x86)\Devolutions\Wayk Now\WaykNow.exe
+----
+
+This detection correctly handles non-standard installation paths.
+
 === Version/Package
 
 The `Get-WaykNowVersion` command detects the current Wayk Now installation version number.
