@@ -6,12 +6,10 @@ WaykNow-ps is a PowerShell cmdlet for https://wayk.devolutions.net[Devolutions W
 
 == Installation
 
-On Windows, the regular PowerShell can be used. On macOS and Linux, you need PowerShell Core 6.0:
+On Windows, the regular Windows PowerShell 5.1 already present on the system can be used. On macOS and Linux, you will need 
+https://github.com/PowerShell/PowerShell#get-powershell[PowerShell 7]
 
-PowerShell Core 6.0::
-https://github.com/PowerShell/PowerShell#get-powershell
-
-To launch a PowerShell Core terminal, use the `pwsh` command.
+To launch a PowerShell 7 terminal, use the `pwsh` command.
 
 === Installation from PSGallery
 
@@ -69,6 +67,17 @@ The `-NoDesktopShortcut` optional parameter can be used to NOT create a Desktop 
 
 The `-NoStartMenuShortcut` optional parameter can be used to NOT create a Start Menu Shortcut for Wayk Now
 
+=== wayk-now Command
+
+The Wayk Now executable path (referred to as 'wayk-now' in CLI commands) can be detected by the `Get-WaykNowCommand`:
+
+----
+Get-WaykNowCommand
+C:\Program Files (x86)\Devolutions\Wayk Now\WaykNow.exe
+----
+
+This detection correctly handles non-standard installation paths.
+
 === Version/Package
 
 The `Get-WaykNowVersion` command detects the current Wayk Now installation version number.
@@ -81,7 +90,7 @@ PS ~/WaykNow-ps> Get-WaykNowVersion
 
 The `Get-WaykNowPackage` command discovers the latest Wayk Now version available and the corresponding download URL.
 
-An optional parameter `-Version` is available if you want to see an older version of Wayk Now.
+An optional parameter `-Version` is available if you want to see an older version of Wayk Now. The `-Platform` parameter can be used to force a specific platform (Windows, macOS, Linux), along with `-Architecture` (x86, x64).
 
 [source,sh]
 ----
@@ -107,7 +116,8 @@ You can not reboot the system (`Restart-Computer` or `shutdown /r`), and it will
 To revert to the original state, open a PowerShell console again, but use the `Reset-WaykNowSafeMode` command. This will set the original boot entry as the default, and delete the special "Wayk Now Safe Mode". You can now restart the computer again and it will boot in its regular state.
 
 === Wayk Now Information
-The `Get-WaykNowInfo` command returns information about the differents WaykNow paths
+
+The `Get-WaykNowInfo` command returns information about the different WaykNow paths
 
 [source,sh]
 ----
@@ -128,7 +138,8 @@ BookmarksFile   : C:/Users/User/AppData/Roaming/Wayk/bookmarks
 ----
 
 == Configuration
-The `Set-WaykNowConfig` command, is used for modfy multiple settings from WaykNow.
+The `Set-WaykNowConfig` command, is used to modify multiple settings from WaykNow.
+
 Here is a list of properties that you can modify:
 
 With Windows you can set the global settings or the local settings, by default the local setting is used, if you want to use the global settings in you command add this flag:
@@ -521,29 +532,22 @@ PS ~/WaykNow-ps> Test-WaykNowBranding -BrandingPath C:\Devolutions\BrandingFolde
 ----
 
 ==== Set Wayk Now Branding
-The `Set-WaykNowBranding` command with the parameter `BrandingPath` will copy your archive `branding.7z` to the correct path of WaykNow, you can use an url, or a local path.
-The `Sample` flag downloads and installs a sample branding.7z file for a fictional company that you can use as a reference or starting point.
+
+The `Set-WaykNowBranding` command with the parameter `BrandingPath` will copy your archive `branding.zip` to the correct path of WaykNow. You can find a https://github.com/Devolutions/WaykNow-ps/blob/master/samples/branding.zip?raw=true[sample branding.zip file here].
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowBranding -BrandingPath https://github.com/Devolutions/WaykNow-ps/blob/master/samples/branding.7z?raw=true
-----
-
-[source,sh]
-----
-PS ~/WaykNow-ps> Set-WaykNowBranding -BrandingPath C:\Devolutions\BrandingFolder\branding.7z
-----
-
-[source,sh]
-----
-PS ~/WaykNow-ps> Set-WaykNowBranding -Sample
+PS ~/WaykNow-ps> Set-WaykNowBranding -BrandingPath C:\branding.zip
 ----
 
 ==== Reset Wayk Now Branding
+
 The `Reset-WaykNowBranding` command remove the `branding.7z` from the `%APPDATA%\Wayk` and the `%PROGRAMDATA%\Wayk` paths.
 
 == Wayk Now License
+
 ==== Set Wayk Now License
+
 The `Set-WaykNowLicense` command with the parameter `License`, sets your Wayk Now license.
 
 [source,sh]
@@ -552,6 +556,7 @@ PS ~/WaykNow-ps> Set-WaykNowLicense -License XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
 ----
 
 ==== Get Wayk Now License
+
 The `Get-WaykNowLicense` command returns your license from Wayk Now.
 
 [source,sh]
@@ -561,6 +566,7 @@ XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
 ----
 
 ==== Reset Wayk Now license
+
 The `Reset-WaykNowLicense` command removes your license from Wayk Now.
 
 [source,sh]
@@ -570,7 +576,9 @@ PS ~/WaykNow-ps> Reset-WaykNowLicense
 ----
 
 == Wayk Now Unique ID
+
 ==== Get Wayk Now Unique ID
+
 The `Get-WaykNowUniqueID` command returns the unique ID of Wayk Now
 
 [source,sh]
@@ -579,73 +587,30 @@ PS ~/WaykNow-ps> Get-WaykNowUniqueID
 xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ----
 
-== Connection with Wayk Den
-==== Connect WaykNowDen
-The command `Connect-WaykNowDen` will start a connection to the WaykDen set on WaykNow, you can use the parameter -Force to force reconnect the actual session.
+== Machine Registration
 
-[source,sh]
-----
-PS ~/WaykNow-ps> Connect-WaykNowDen 
-"name" is now connected
-----
-
-==== Disconnect WaykNowDen
-The command `Disconnect-WaykNowDen` will logout your connection with WaykDen.
-
-[source,sh]
-----
-PS ~/WaykNow-ps> Disconnect-WaykNowDen 
+The `Register-WaykNow` command can be used to automatically connect and register to a https://github.com/Devolutions/WaykDen-ps/blob/master/docs/deployment-automation.adoc#enrollment[Wayk Den using an enrollment token]. It is the PowerShell equivalent of the "wayk-now enroll" command. The most common usage is with the -TokenId and -DenUrl parameters:
 
 ----
-
-==== Get WaykNowDen
-The command `Get-WaykNowDen` show the WaykDen set on WaykNow
-
-[source,sh]
-----
-PS ~/WaykNow-ps> Get-WaykNowDen 
-DenUrl             Realm    DenID  DenPath
-------             -----    -----  -------
-https://den.wayk.net wayk.net XXXXXX C:\Users\user\AppData\Roaming\Wayk\den\wayk.net
+Register-WaykNow -TokenId 'f762156f-9470-4dcc-9ba3-157437e465ce' -DenUrl 'https://den.contoso.com'
 ----
 
-== WaykNow Machine Management
-To use this feature, WaykNow need to be installed on Windows with the unattended mode, you need to be connected to WaykDen (you can refer to "Connection with Wayk Den" section), and Powershell need to be run as administrator.
-
-=== Register WaykNow Machine
-The command `Register-WaykNowMachine` register your WaykNow client to WaykDen, with the unique ID of WaykNow.
-
-[source,sh]
-----
-PS ~/WaykNow-ps> Register-WaykNowMachine
-
-Machine Registered: 4133d6bb-6eb6-be1a-30fd-f6be391d5aci
-----
-
-=== Unregister WaykNow Machine
-The command `Unregister-WaykNowMachine` Unregister your WaykNow client to WaykDen, with the unique ID of WaykNow.
-[source,sh]
-----
-PS ~/WaykNow-ps> Unregister-WaykNowMachine
-----
-
-=== Get WaykNowMachine
-The command `Get-WaykNowMachine` show the registered machine on your WaykDen.
-You need to be logged with WaykDen before use this command, you can refer to "Connect WaykNowDen"
-
-[source,sh]
-----
-PS ~/WaykNow-ps> Get-WaykNowMachine 
-
-MachineName     DenID  State   UserAgent
------------     -----  -----   ---------
-DEVOLUTIONS146W 616529 ONLINE  WaykNow/3.3.2 (Windows; Windows 10 Pro 1809)
-DEVOLUTIONS147W 619181 OFFLINE WaykNow/3.3.2 (Windows; Windows 10 Pro 1809)
+The `-TokenData` can also be used to pass the full token data (no separate `-DenUrl` parameter is necessary):
 
 ----
+Register-WaykNow -TokenData 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Rlbi5idXp6d29yZC5tYXJrZXRpbmciLCJqdGkiOiJmNzYyMTU2Zi05NDcwLTRkY2MtOWJhMy0xNTc0MzdlNDY1Y2UiLCJpYXQiOjE1OTcwODI3NjMsImV4cCI6MTU5OTY3NDc2M30.hWaKDCHXuCHd6dXNwkvdCVKSY3eZXN7qWKKPkeSFdT4NkhT8H-p_GNXxpXuE-OTfOFislg9F1eacV5p86ef3qukgWp_qw_LJ6O8kBcq1AQccSFM7nkyB5yvXnAFbvuOJyUnGxmGG0eO9b3ihA3RVZdQFaQrn7uDyQSAnPssq1M0tli9ywcXki__IzAFI7ZXDPZPKwEw_xedADNSNfL7Gb_pnFnTsyuSOLynq7T8TPdR0G5YSG6palnRjWKPlZeEfYhYq6qu_zDSDLDLgfLFxjSxVHUGd62cSC3r1ne5Viu7GZKZIQJR2T1ljWPBfttqYjrHZMTe6JiU3-E7VUVYLVQ'
+----
 
-== WaykNow Logs Management
+For the sake of convenience, the token can also be saved to a file and passed using the `-TokenPath` parameter:
+
+----
+Register-WaykNow -TokenPath 'C:\token.txt'
+----
+
+== Log Management
+
 ==== Enable WaykNow Logs
+
 The command `Enable-WaykNowLogs` will enable the logs on WaykNow with the Logging Level `Debug` by default, you can choose this one with the parameter `LoggingLevel` and you can choose to restart WaykNow with the command `-Restart`, because the changes will only be applied after an application restart.
 
 [source,sh]
@@ -654,6 +619,7 @@ PS ~/WaykNow-ps> Enable-WaykNowLogs -Restart -LoggingLevel Info
 ----
 
 ==== Disable WaykNow Logs
+
 The command `Disable-WaykNowLogs` will disable the logs on WaykNow, you can choose to restart WaykNow with the command `-Restart`, because the changes will only be applied after an application restart.
 [source,sh]
 ----
@@ -661,6 +627,7 @@ PS ~/WaykNow-ps> Disable-WaykNowLogs -Restart
 ----
 
 ==== Export WaykNow Logs
+
 The command `Export-WaykNowLogs` will export the logs from WaykNow, you need to set the parameter `-ExportPath` to choose the destination of the logs
 [source,sh]
 ----
@@ -668,6 +635,7 @@ PS ~/WaykNow-ps> Export-WaykNowLogs -ExportPath C:\Users\user\Desktop
 ----
 
 ==== Clear WaykNow Logs
+
 The command `Clear-WaykNowLogs` will clear the logs from WaykNow
 [source,sh]
 ----
