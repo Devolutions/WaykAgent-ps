@@ -232,7 +232,7 @@ Select this option if you wish to launch Wayk Now when you log on.
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -AutoLaunchOnUserLogon false
+PS ~/WaykNow-ps> Set-WaykNowConfig -AutoLaunchOnUserLogon $false
 ----
 
 ==== ShowMainWindowOnLaunch
@@ -244,7 +244,7 @@ this option is to prevent the main application window from showing when Wayk Now
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -ShowMainWindowOnLaunch true
+PS ~/WaykNow-ps> Set-WaykNowConfig -ShowMainWindowOnLaunch $true
 ----
 
 ==== MinimizeToNotificationArea
@@ -256,7 +256,7 @@ This option is to hide Wayk Now from the taskbar when minimized.
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -MinimizeToNotificationArea false
+PS ~/WaykNow-ps> Set-WaykNowConfig -MinimizeToNotificationArea $false
 ----
 
 ==== ElevationPrompt
@@ -268,7 +268,7 @@ This option is to disable the prompt to elevate program permissions, and run Way
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -ElevationPrompt false
+PS ~/WaykNow-ps> Set-WaykNowConfig -ElevationPrompt $false
 ----
 
 === Security Properties
@@ -281,7 +281,7 @@ Setting to enabled/disabled SRP: When Secure Remote Password is disabled, the pa
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -AllowPersonalPassword true
+PS ~/WaykNow-ps> Set-WaykNowConfig -AllowPersonalPassword $true
 ----
 
 ==== AllowSystemAuth
@@ -293,7 +293,7 @@ Setting to enabled/disabled SRD: Secure Remote Delegation is the method used for
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -AllowSystemAuth true
+PS ~/WaykNow-ps> Set-WaykNowConfig -AllowSystemAuth $true
 ----
 
 ==== AllowNoPassword
@@ -305,7 +305,7 @@ Setting to enabled/disabled PFP: Prompt for Permission authentication requests e
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -AllowNoPassword true
+PS ~/WaykNow-ps> Set-WaykNowConfig -AllowNoPassword $true
 ----
 
 ==== PersonalPasswordType
@@ -371,7 +371,7 @@ Connect to Wayk Den to enable simplified peer-to-peer connectivity with a 6-digi
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -DenEnabled true
+PS ~/WaykNow-ps> Set-WaykNowConfig -DenEnabled $true
 ----
 
 ==== DenUrl
@@ -425,8 +425,8 @@ Do not use unless instructed.
 PS ~/WaykNow-ps> Set-WaykNowConfig -LoggingFilter filter
 ----
 
-==== CheckVersion
-Check For Updates When App Opens
+==== VersionCheck
+Check for updates when Wayk Now is launched
 
 *Type:* boolean +
 *DefaultValue:* true +
@@ -434,7 +434,7 @@ Check For Updates When App Opens
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -CheckVersion true
+PS ~/WaykNow-ps> Set-WaykNowConfig -VersionCheck $true
 ----
 
 === Access Control Properties
