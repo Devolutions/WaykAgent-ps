@@ -184,6 +184,7 @@ AccessControlClipboard     : Disable
 AccessControlFileTransfer  : Confirm
 AccessControlExec          : Allow
 AccessControlChat          : Allow
+VersionCheck               : True
 ----
 
 === General Properties
@@ -422,6 +423,18 @@ Do not use unless instructed.
 [source,sh]
 ----
 PS ~/WaykNow-ps> Set-WaykNowConfig -LoggingFilter filter
+----
+
+==== CheckVersion
+Check For Updates When App Opens
+
+*Type:* boolean +
+*DefaultValue:* true +
+*Example:*
+
+[source,sh]
+----
+PS ~/WaykNow-ps> Set-WaykNowConfig -CheckVersion true
 ----
 
 === Access Control Properties
