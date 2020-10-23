@@ -1,59 +1,59 @@
-Import-Module "$PSScriptRoot/../WaykNow"
+Import-Module "$PSScriptRoot/../WaykAgent"
 
-Describe 'Wayk Now config' {
-	InModuleScope WaykNow {
-		Mock Get-WaykNowPath { Join-Path $TestDrive "Global" } -ParameterFilter { $PathType -eq "GlobalPath" }
-		Mock Get-WaykNowPath { Join-Path $TestDrive "Local" } -ParameterFilter { $PathType -eq "LocalPath" }
+Describe 'Wayk Agent config' {
+	InModuleScope WaykAgent {
+		Mock Get-WaykAgentPath { Join-Path $TestDrive "Global" } -ParameterFilter { $PathType -eq "GlobalPath" }
+		Mock Get-WaykAgentPath { Join-Path $TestDrive "Local" } -ParameterFilter { $PathType -eq "LocalPath" }
 
 		Context 'Empty configuration files' {
 			It 'Disables Prompt for Permission (PFP)' {
-				Set-WaykNowConfig -Global -AllowPersonalPassword $false
-				$(Get-WaykNowConfig).AllowPersonalPassword | Should -Be $false
-				Assert-MockCalled 'Get-WaykNowPath'
+				Set-WaykAgentConfig -Global -AllowPersonalPassword $false
+				$(Get-WaykAgentConfig).AllowPersonalPassword | Should -Be $false
+				Assert-MockCalled 'Get-WaykAgentPath'
 			}
 			It 'Sets server-only remote control mode' {
-				Set-WaykNowConfig -Global -ControlMode Both
-				$(Get-WaykNowConfig).ControlMode | Should -Be 'Both'
-				Assert-MockCalled 'Get-WaykNowPath'
+				Set-WaykAgentConfig -Global -ControlMode Both
+				$(Get-WaykAgentConfig).ControlMode | Should -Be 'Both'
+				Assert-MockCalled 'Get-WaykAgentPath'
 			}
 			It 'Sets friendly name with special characters' {
-				Set-WaykNowConfig -FriendlyName 'Señor Marc-André'
-				$(Get-WaykNowConfig).FriendlyName | Should -Be 'Señor Marc-André'
+				Set-WaykAgentConfig -FriendlyName 'Señor Marc-André'
+				$(Get-WaykAgentConfig).FriendlyName | Should -Be 'Señor Marc-André'
 			}
 			It 'Disables the version check' {
-				Set-WaykNowConfig -Global -VersionCheck $false
-				$(Get-WaykNowConfig).VersionCheck | Should -Be $false
-				Set-WaykNowConfig -Global -VersionCheck $true
-				$(Get-WaykNowConfig).VersionCheck | Should -Be $true
-				Set-WaykNowConfig -VersionCheck $false
-				$(Get-WaykNowConfig).VersionCheck | Should -Be $true
+				Set-WaykAgentConfig -Global -VersionCheck $false
+				$(Get-WaykAgentConfig).VersionCheck | Should -Be $false
+				Set-WaykAgentConfig -Global -VersionCheck $true
+				$(Get-WaykAgentConfig).VersionCheck | Should -Be $true
+				Set-WaykAgentConfig -VersionCheck $false
+				$(Get-WaykAgentConfig).VersionCheck | Should -Be $true
 			}
 			It 'Disables automatic updates' {
-				Set-WaykNowConfig -Global -AutoUpdateEnabled $false
-				$(Get-WaykNowConfig).AutoUpdateEnabled | Should -Be $false
-				Set-WaykNowConfig -Global -AutoUpdateEnabled $true
-				$(Get-WaykNowConfig).AutoUpdateEnabled | Should -Be $true
-				Set-WaykNowConfig -AutoUpdateEnabled $false
-				$(Get-WaykNowConfig).AutoUpdateEnabled | Should -Be $true
+				Set-WaykAgentConfig -Global -AutoUpdateEnabled $false
+				$(Get-WaykAgentConfig).AutoUpdateEnabled | Should -Be $false
+				Set-WaykAgentConfig -Global -AutoUpdateEnabled $true
+				$(Get-WaykAgentConfig).AutoUpdateEnabled | Should -Be $true
+				Set-WaykAgentConfig -AutoUpdateEnabled $false
+				$(Get-WaykAgentConfig).AutoUpdateEnabled | Should -Be $true
 			}
 			It 'Disables remote execution' {
-				Set-WaykNowConfig -Global -AccessControlExec 'Disable'
-				Set-WaykNowConfig -AccessControlExec 'Confirm'
-				$(Get-WaykNowConfig).AccessControlExec | Should -Be 'Disable'
+				Set-WaykAgentConfig -Global -AccessControlExec 'Disable'
+				Set-WaykAgentConfig -AccessControlExec 'Confirm'
+				$(Get-WaykAgentConfig).AccessControlExec | Should -Be 'Disable'
 			}
 			It 'Sets generated password length' {
-				Set-WaykNowConfig -GeneratedPasswordLength 8
-				$(Get-WaykNowConfig).GeneratedPasswordLength | Should -Be 8
-				{ Set-WaykNowConfig -GeneratedPasswordLength 1 } | Should -Throw
-				$(Get-WaykNowConfig).GeneratedPasswordLength | Should -Be 8
+				Set-WaykAgentConfig -GeneratedPasswordLength 8
+				$(Get-WaykAgentConfig).GeneratedPasswordLength | Should -Be 8
+				{ Set-WaykAgentConfig -GeneratedPasswordLength 1 } | Should -Throw
+				$(Get-WaykAgentConfig).GeneratedPasswordLength | Should -Be 8
 			}
 			It 'Sets the codec quality mode' {
-				Set-WaykNowConfig -QualityMode 'High'
-				$(Get-WaykNowConfig).QualityMode | Should -Be 'High'
+				Set-WaykAgentConfig -QualityMode 'High'
+				$(Get-WaykAgentConfig).QualityMode | Should -Be 'High'
 			}
 			It 'Sets the Wayk Den URL' {
-				Set-WaykNowConfig -DenUrl 'https://den.contoso.com'
-				$(Get-WaykNowConfig).DenUrl | Should -Be 'https://den.contoso.com'
+				Set-WaykAgentConfig -DenUrl 'https://den.contoso.com'
+				$(Get-WaykAgentConfig).DenUrl | Should -Be 'https://den.contoso.com'
 			}
 		}
 	}

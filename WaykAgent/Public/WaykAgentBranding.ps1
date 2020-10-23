@@ -1,7 +1,6 @@
 . "$PSScriptRoot/../Private/PlatformHelpers.ps1"
-. "$PSScriptRoot/../Private/Invoke-Process.ps1"
 
-function Set-WaykNowBranding
+function Set-WaykAgentBranding
 {
     [CmdletBinding()]
     param(
@@ -10,18 +9,18 @@ function Set-WaykNowBranding
         [switch] $Force
     )
 
-    $DataPath = Get-WaykNowPath -PathType "GlobalPath"
+    $DataPath = Get-WaykAgentPath -PathType "GlobalPath"
     $OutputPath = Join-Path $DataPath "branding.zip"
     New-Item -Path $(Split-Path $OutputPath -Parent) -ItemType 'Directory' -Force | Out-Null
     Copy-Item -Path $BrandingPath -Destination $OutputPath -Force
 }
 
-function Reset-WaykNowBranding
+function Reset-WaykAgentBranding
 {
     [CmdletBinding()]
     param()
 
-    $DataPath = Get-WaykNowPath -PathType "GlobalPath"
+    $DataPath = Get-WaykAgentPath -PathType "GlobalPath"
     $BrandingPath = "$DataPath/branding.zip"
 
     if (Test-Path -Path $BrandingPath) {
@@ -29,4 +28,4 @@ function Reset-WaykNowBranding
     }
 }
 
-Export-ModuleMember -Function Set-WaykNowBranding, Reset-WaykNowBranding
+Export-ModuleMember -Function Set-WaykAgentBranding, Reset-WaykAgentBranding

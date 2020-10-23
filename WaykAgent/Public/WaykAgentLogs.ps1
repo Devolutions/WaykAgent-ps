@@ -1,7 +1,6 @@
-. "$PSScriptRoot/../Public/WaykNowLicense.ps1"
-. "$PSScriptRoot/../Public/WaykNowProgram.ps1"
+. "$PSScriptRoot/../Public/WaykAgentProgram.ps1"
 
-function Enable-WaykNowLogs
+function Enable-WaykAgentLogs
 {
     [CmdletBinding()]
     param(
@@ -14,16 +13,16 @@ function Enable-WaykNowLogs
         $LoggingLevel = [LoggingLevel]::Debug
     }
 
-    Set-WaykNowConfig -Global:$Global -LoggingLevel $LoggingLevel
+    Set-WaykAgentConfig -Global:$Global -LoggingLevel $LoggingLevel
 
     if ($Restart) {
-        Restart-WaykNow
+        Restart-WaykAgent
     } else {
         Write-Host "Changes will only be applied after an application restart" 
     }
 }
 
-function Disable-WaykNowLogs
+function Disable-WaykAgentLogs
 {
     [CmdletBinding()]
     param(
@@ -31,10 +30,10 @@ function Disable-WaykNowLogs
         [switch] $Restart
     )
 
-    Enable-WaykNowLogs -LoggingLevel 'Off' -Global:$Global -Restart:$Restart
+    Enable-WaykAgentLogs -LoggingLevel 'Off' -Global:$Global -Restart:$Restart
 }
 
-function Export-WaykNowLogs
+function Export-WaykAgentLogs
 {
     [CmdletBinding()]
     param(
@@ -46,7 +45,7 @@ function Export-WaykNowLogs
         New-Item -Path $ExportPath -ItemType 'Directory' -ErrorAction Stop | Out-Null
     }
 
-    $WaykInfo = Get-WaykNowInfo
+    $WaykInfo = Get-WaykAgentInfo
     $GlobalLogPath = $WaykInfo.LogGlobalPath
     $LocalLogPath = $WaykInfo.LogPath
 
@@ -59,12 +58,12 @@ function Export-WaykNowLogs
     }
 }
 
-function Clear-WaykNowLogs
+function Clear-WaykAgentLogs
 {
     [CmdletBinding()]
     param()
 
-    $WaykInfo = Get-WaykNowInfo
+    $WaykInfo = Get-WaykAgentInfo
     $GlobalLogPath = $WaykInfo.LogGlobalPath
     $LocalLogPath = $WaykInfo.LogPath
 
@@ -72,4 +71,4 @@ function Clear-WaykNowLogs
     Remove-Item -Path $LocalLogPath -Force -Recurse -ErrorAction SilentlyContinue
 }
 
-Export-ModuleMember -Function Enable-WaykNowLogs, Disable-WaykNowLogs, Export-WaykNowLogs, Clear-WaykNowLogs
+Export-ModuleMember -Function Enable-WaykAgentLogs, Disable-WaykAgentLogs, Export-WaykAgentLogs, Clear-WaykAgentLogs

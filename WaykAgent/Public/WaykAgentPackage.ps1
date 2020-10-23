@@ -1,9 +1,6 @@
-
-. "$PSScriptRoot/../Private/Invoke-Process.ps1"
 . "$PSScriptRoot/../Private/PlatformHelpers.ps1"
-. "$PSScriptRoot/../Private/Exceptions.ps1"
 
-function Get-WaykNowVersion
+function Get-WaykAgentVersion
 {
     [CmdletBinding()]
     param()
@@ -18,7 +15,7 @@ function Get-WaykNowVersion
 			return $version
 		}
 	} elseif ($IsMacOS) {
-		$info_plist_path = "/Applications/WaykNow.app/Contents/Info.plist"
+		$info_plist_path = "/Applications/WaykAgent.app/Contents/Info.plist"
 		$cf_bundle_version_xpath = "//dict/key[. ='CFBundleVersion']/following-sibling::string[1]"
 		if (Test-Path -Path $info_plist_path) {
 			$version = $(Select-Xml -Path $info_plist_path -XPath $cf_bundle_version_xpath `
@@ -26,7 +23,7 @@ function Get-WaykNowVersion
 			return $version
 		}
 	} elseif ($IsLinux) {
-		$dpkg_status = $(Invoke-Process -FilePath 'dpkg' -ArgumentList "-s wayk-now" -IgnoreExitCode)
+		$dpkg_status = $(dpkg -s wayk-agent)
 		$matches = $($dpkg_status | Select-String -AllMatches -Pattern 'version: (\S+)').Matches
 		if ($matches) {
 			$version = $matches.Groups[1].Value
@@ -36,7 +33,7 @@ function Get-WaykNowVersion
 
 	return $null
 }
-function Get-WaykNowPackage
+function Get-WaykAgentPackage
 {
     [CmdletBinding()]
     param(
@@ -59,8 +56,8 @@ function Get-WaykNowPackage
 	}
 	
 	$download_base = "https://cdn.devolutions.net/download"
-	$download_url_x64 = "$download_base/Wayk/$version_quad/WaykNow-x64-$version_quad.msi"
-	$download_url_x86 = "$download_base/Wayk/$version_quad/WaykNow-x86-$version_quad.msi"
+	$download_url_x64 = "$download_base/Wayk/$version_quad/WaykAgent-x64-$version_quad.msi"
+	$download_url_x86 = "$download_base/Wayk/$version_quad/WaykAgent-x86-$version_quad.msi"
 	$download_url_mac = "$download_base/Mac/Wayk/$version_quad/Wayk.Mac.$version_quad.dmg"
 	$download_url_deb = "$download_base/Linux/Wayk/$version_quad/wayk-now_${version_quad}_amd64.deb"
 
@@ -117,7 +114,7 @@ function Get-WaykNowPackage
 
 	return $result
 }
-function Install-WaykNow
+function Install-WaykAgent
 {
     [CmdletBinding()]
     param(
@@ -129,9 +126,9 @@ function Install-WaykNow
 	)
 
 	$tempDirectory = New-TemporaryDirectory
-	$package = Get-WaykNowPackage $Version
+	$package = Get-WaykAgentPackage $Version
 	$latest_version = $package.Version
-	$current_version = Get-WaykNowVersion
+	$current_version = Get-WaykAgentVersion
 
 	if (([version]$latest_version -gt [version]$current_version) -Or $Force) {
 		Write-Host "Installing Wayk Now ${latest_version}"
@@ -153,7 +150,7 @@ function Install-WaykNow
 
 	if (([version]$current_version -gt [version]$latest_version) -And $Force)
 	{
-		Uninstall-WaykNow -Quiet:$Quiet
+		Uninstall-WaykAgent -Quiet:$Quiet
 	}
 
 	if (Get-IsWindows) {
@@ -161,7 +158,7 @@ function Install-WaykNow
 		if ($Quiet){
 			$display = '/quiet'
 		}
-		$install_log_file = "$tempDirectory/WaykNow_Install.log"
+		$install_log_file = "$tempDirectory/WaykAgent_Install.log"
 		$msi_args = @(
 			'/i', "`"$download_file_path`"",
 			$display,
@@ -179,18 +176,18 @@ function Install-WaykNow
 
 		Remove-Item -Path $install_log_file -Force -ErrorAction SilentlyContinue
 	} elseif ($IsMacOS) {
-		$volumes_wayk_now = "/Volumes/WaykNow"
+		$volumes_wayk_now = "/Volumes/WaykAgent"
 		if (Test-Path -Path $volumes_wayk_now -PathType 'Container') {
 			Start-Process 'hdiutil' -ArgumentList @('unmount', $volumes_wayk_now) -Wait
 		}
 		Start-Process 'hdiutil' -ArgumentList @('mount', "$download_file_path") `
 			-Wait -RedirectStandardOutput '/dev/null'
 		Wait-Process $(Start-Process 'sudo' -ArgumentList @('cp', '-R', `
-			"${volumes_wayk_now}/WaykNow.app", "/Applications") -PassThru).Id
+			"${volumes_wayk_now}/WaykAgent.app", "/Applications") -PassThru).Id
 		Start-Process 'hdiutil' -ArgumentList @('unmount', $volumes_wayk_now) `
 			-Wait -RedirectStandardOutput '/dev/null'
 		Wait-Process $(Start-Process 'sudo' -ArgumentList @('ln', '-sfn', `
-			"/Applications/WaykNow.app/Contents/MacOS/WaykNow",
+			"/Applications/WaykAgent.app/Contents/MacOS/WaykAgent",
 			"/usr/local/bin/wayk-now") -PassThru).Id
 	} elseif ($IsLinux) {
 		$dpkg_args = @(
@@ -207,14 +204,14 @@ function Install-WaykNow
 	Remove-Item -Path $tempDirectory -Force -Recurse
 }
 
-function Uninstall-WaykNow
+function Uninstall-WaykAgent
 {
     [CmdletBinding()]
     param(
 		[switch] $Quiet
 	)
 	
-	Stop-WaykNow
+	Stop-WaykAgent
 	
 	if (Get-IsWindows) {
 		# https://stackoverflow.com/a/25546511
@@ -232,7 +229,7 @@ function Uninstall-WaykNow
 			Start-Process "msiexec.exe" -ArgumentList $msi_args -Wait
 		}
 	} elseif ($IsMacOS) {
-		$wayk_now_app = "/Applications/WaykNow.app"
+		$wayk_now_app = "/Applications/WaykAgent.app"
 		if (Test-Path -Path $wayk_now_app -PathType 'Container') {
 			Start-Process 'sudo' -ArgumentList @('rm', '-rf', $wayk_now_app) -Wait
 		}
@@ -241,7 +238,7 @@ function Uninstall-WaykNow
 			Start-Process 'sudo' -ArgumentList @('rm', $wayk_now_symlink) -Wait
 		}
 	} elseif ($IsLinux) {
-		if (Get-WaykNowVersion) {
+		if (Get-WaykAgentVersion) {
 			$apt_args = @(
 				'-y', 'remove', 'wayk-now', '--purge'
 			)
@@ -255,7 +252,7 @@ function Uninstall-WaykNow
 	}
 }
 
-function Update-WaykNow
+function Update-WaykAgent
 {
     [CmdletBinding()]
     param(
@@ -263,24 +260,24 @@ function Update-WaykNow
 		[switch] $Quiet
 	)
 
-	$wayk_now_process_was_running = Get-WaykNowProcess
-	$wayk_now_service_was_running = (Get-WaykNowService).Status -Eq 'Running'
+	$wayk_now_process_was_running = Get-WaykAgentProcess
+	$wayk_now_service_was_running = (Get-WaykAgentService).Status -Eq 'Running'
 
 	try {
-		Install-WaykNow -Force:$Force -Quiet:$Quiet
+		Install-WaykAgent -Force:$Force -Quiet:$Quiet
 	}
 	catch {
 		throw $_
 	}
 
 	if ($wayk_now_process_was_running) {
-		Start-WaykNow
+		Start-WaykAgent
 	} elseif ($wayk_now_service_was_running) {
-		Start-WaykNowService
+		Start-WaykAgentService
 	}
 }
 
-class WaykNowInfo
+class WaykAgentInfo
 {
 	[string] $DataPath
 	[string] $GlobalPath
@@ -298,7 +295,7 @@ class WaykNowInfo
 	[string] $BookmarksFile
 }
 
-function Get-WaykNowPath()
+function Get-WaykAgentPath()
 {
 	[CmdletBinding()]
 	param(
@@ -334,31 +331,31 @@ function Get-WaykNowPath()
 	}
 }
 
-function Get-WaykNowInfo()
+function Get-WaykAgentInfo()
 {
 	[CmdletBinding()]
 	param()
 
-	$DataPath = Get-WaykNowPath 'LocalPath'
-	$GlobalPath = Get-WaykNowPath 'GlobalPath'
+	$DataPath = Get-WaykAgentPath 'LocalPath'
+	$GlobalPath = Get-WaykAgentPath 'GlobalPath'
 
-	$info = [WaykNowInfo]::New()
+	$info = [WaykAgentInfo]::New()
 	$info.DataPath = $DataPath
 	$info.GlobalPath = $GlobalPath
 	$info.GlobalDataPath = $GlobalPath
-	$info.GlobalConfigFile = Join-Path -Path $GlobalPath -ChildPath 'WaykNow.cfg'
+	$info.GlobalConfigFile = Join-Path -Path $GlobalPath -ChildPath 'WaykAgent.cfg'
 	$info.DenGlobalPath = Join-Path -Path $GlobalPath -ChildPath 'den'
 	$info.LogGlobalPath = Join-Path -Path $GlobalPath -ChildPath 'logs'
-	$info.ConfigFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.cfg'
+	$info.ConfigFile = Join-Path -Path $DataPath -ChildPath 'WaykAgent.cfg'
 	$info.DenPath = Join-Path -Path $DataPath -ChildPath 'den'
 	$info.LogPath = Join-Path -Path $DataPath -ChildPath 'logs'
-	$info.CertificateFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.crt'
-	$info.PrivateKeyFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.key'
-	$info.PasswordVault = Join-Path -Path $DataPath -ChildPath 'WaykNow.vault'
+	$info.CertificateFile = Join-Path -Path $DataPath -ChildPath 'WaykAgent.crt'
+	$info.PrivateKeyFile = Join-Path -Path $DataPath -ChildPath 'WaykAgent.key'
+	$info.PasswordVault = Join-Path -Path $DataPath -ChildPath 'WaykAgent.vault'
 	$info.KnownHostsFile = Join-Path -Path $DataPath -ChildPath 'known_hosts'
 	$info.BookmarksFile = Join-Path -Path $DataPath -ChildPath 'bookmarks'
 
 	return $info 
 }
 
-Export-ModuleMember -Function Get-WaykNowVersion, Get-WaykNowPackage, Install-WaykNow, Uninstall-WaykNow, Update-WaykNow, Get-WaykNowPath, Get-WaykNowInfo
+Export-ModuleMember -Function Get-WaykAgentVersion, Get-WaykAgentPackage, Install-WaykAgent, Uninstall-WaykAgent, Update-WaykAgent, Get-WaykAgentPath, Get-WaykAgentInfo
