@@ -43,7 +43,7 @@ enum AccessControl
     Disable = 4
 }
 
-class WaykAgentConfig
+class WaykClientConfig
 {
 	# General
     [string] $FriendlyName
@@ -88,13 +88,13 @@ class WaykAgentConfig
     [bool] $AutoUpdateEnabled = $true
 }
 
-function Get-WaykAgentConfigFile
+function Get-WaykClientConfigFile
 {
     param(
         [switch] $Global
     )
 
-    [WaykAgentInfo]$WaykInfo = Get-WaykAgentInfo
+    [WaykClientInfo]$WaykInfo = Get-WaykClientInfo
 
     if ($Global) {
         $ConfigFile = $WaykInfo.GlobalConfigFile
@@ -105,7 +105,7 @@ function Get-WaykAgentConfigFile
     return $ConfigFile
 }
 
-function Set-WaykAgentConfig
+function Set-WaykClientConfig
 {
     [CmdletBinding()]
     param(
@@ -150,7 +150,7 @@ function Set-WaykAgentConfig
         [bool] $AutoUpdateEnabled
     )
 
-    $ConfigFile = Get-WaykAgentConfigFile -Global:$Global
+    $ConfigFile = Get-WaykClientConfigFile -Global:$Global
 
     if (Test-Path $ConfigFile) {
         $json = Get-Content -Path $ConfigFile -Encoding UTF8 | ConvertFrom-Json
@@ -158,7 +158,7 @@ function Set-WaykAgentConfig
         $json = '{}' | ConvertFrom-Json
     }
 
-    $properties = [WaykAgentConfig].GetProperties() | ForEach-Object { $_.Name }
+    $properties = [WaykClientConfig].GetProperties() | ForEach-Object { $_.Name }
 
     foreach ($param in $PSBoundParameters.GetEnumerator()) {
         if ($param.Key -NotLike 'AccessControl*') {
@@ -189,31 +189,31 @@ function Set-WaykAgentConfig
     [System.IO.File]::WriteAllLines($ConfigFile, $FileValue, $Utf8NoBomEncoding)
 }
 
-function Get-WaykAgentConfig
+function Get-WaykClientConfig
 {
     [CmdletBinding()]
-    [OutputType('WaykAgentConfig')]
+    [OutputType('WaykClientConfig')]
     param(
         [switch] $Global = $false
     )
 
     if (-Not $Global) {
-        $LocalConfigFile = Get-WaykAgentConfigFile
+        $LocalConfigFile = Get-WaykClientConfigFile
 
         if (Test-Path $LocalConfigFile) {
             $LocalJson = Get-Content -Path $LocalConfigFile -Encoding UTF8 | ConvertFrom-Json
         }
     }
 
-    $GlobalConfigFile = Get-WaykAgentConfigFile -Global
+    $GlobalConfigFile = Get-WaykClientConfigFile -Global
 
     if (Test-Path $GlobalConfigFile) {
         $GlobalJson = Get-Content -Path $GlobalConfigFile -Encoding UTF8 | ConvertFrom-Json
     }
 
-    $config = [WaykAgentConfig]::new()
+    $config = [WaykClientConfig]::new()
 
-    [WaykAgentConfig].GetProperties() | ForEach-Object {
+    [WaykClientConfig].GetProperties() | ForEach-Object {
         if ($_.Name -NotLike 'AccessControl*') {
             $Name = $_.Name
             $Property = $null
@@ -260,4 +260,4 @@ function Get-WaykAgentConfig
     return $config
 }
 
-Export-ModuleMember -Function Set-WaykAgentConfig, Get-WaykAgentConfig
+Export-ModuleMember -Function Set-WaykClientConfig, Get-WaykClientConfig

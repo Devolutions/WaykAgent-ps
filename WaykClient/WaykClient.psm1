@@ -1,4 +1,4 @@
-$module = 'WaykAgent'
+$module = 'WaykClient'
 $manifest = Import-PowerShellDataFile -Path "$PSScriptRoot/$module.psd1"
 
 Export-ModuleMember -Cmdlet @($manifest.CmdletsToExport)
@@ -21,13 +21,3 @@ Foreach ($Import in @($Public + $Private))
 if (Get-IsWindows) {
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12;
 }
-
-$LegacyFunctionNames = @($manifest.AliasesToExport) | Where-Object { $_ -Match 'WaykNow' }
-
-Foreach ($FunctionName in $LegacyFunctionNames) {
-    $OldFunctionName = $FunctionName
-    $NewFunctionName = $FunctionName -Replace 'WaykNow', 'WaykAgent'
-    New-Alias -Name $OldFunctionName -Value $NewFunctionName
-}
-
-Export-ModuleMember -Alias $LegacyFunctionNames

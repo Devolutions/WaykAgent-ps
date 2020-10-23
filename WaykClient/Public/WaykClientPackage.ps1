@@ -1,12 +1,12 @@
 . "$PSScriptRoot/../Private/PlatformHelpers.ps1"
 
-function Get-WaykAgentVersion
+function Get-WaykClientVersion
 {
     [CmdletBinding()]
     param()
 
 	if (Get-IsWindows) {
-		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Now'
+		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Client'
 		if ($uninstall_reg) {
 			$version = $uninstall_reg.DisplayVersion
 			if ($version -lt 2000) {
@@ -15,7 +15,7 @@ function Get-WaykAgentVersion
 			return $version
 		}
 	} elseif ($IsMacOS) {
-		$info_plist_path = "/Applications/WaykAgent.app/Contents/Info.plist"
+		$info_plist_path = "/Applications/WaykClient.app/Contents/Info.plist"
 		$cf_bundle_version_xpath = "//dict/key[. ='CFBundleVersion']/following-sibling::string[1]"
 		if (Test-Path -Path $info_plist_path) {
 			$version = $(Select-Xml -Path $info_plist_path -XPath $cf_bundle_version_xpath `
@@ -33,7 +33,7 @@ function Get-WaykAgentVersion
 
 	return $null
 }
-function Get-WaykAgentPackage
+function Get-WaykClientPackage
 {
     [CmdletBinding()]
     param(
@@ -56,8 +56,8 @@ function Get-WaykAgentPackage
 	}
 	
 	$download_base = "https://cdn.devolutions.net/download"
-	$download_url_x64 = "$download_base/Wayk/$version_quad/WaykAgent-x64-$version_quad.msi"
-	$download_url_x86 = "$download_base/Wayk/$version_quad/WaykAgent-x86-$version_quad.msi"
+	$download_url_x64 = "$download_base/Wayk/$version_quad/WaykClient-x64-$version_quad.msi"
+	$download_url_x86 = "$download_base/Wayk/$version_quad/WaykClient-x86-$version_quad.msi"
 	$download_url_mac = "$download_base/Mac/Wayk/$version_quad/Wayk.Mac.$version_quad.dmg"
 	$download_url_deb = "$download_base/Linux/Wayk/$version_quad/wayk-now_${version_quad}_amd64.deb"
 
@@ -114,7 +114,7 @@ function Get-WaykAgentPackage
 
 	return $result
 }
-function Install-WaykAgent
+function Install-WaykClient
 {
     [CmdletBinding()]
     param(
@@ -126,14 +126,14 @@ function Install-WaykAgent
 	)
 
 	$tempDirectory = New-TemporaryDirectory
-	$package = Get-WaykAgentPackage $Version
+	$package = Get-WaykClientPackage $Version
 	$latest_version = $package.Version
-	$current_version = Get-WaykAgentVersion
+	$current_version = Get-WaykClientVersion
 
 	if (([version]$latest_version -gt [version]$current_version) -Or $Force) {
-		Write-Host "Installing Wayk Now ${latest_version}"
+		Write-Host "Installing Wayk Client ${latest_version}"
 	} else {
-		Write-Host "Wayk Now is already up to date"
+		Write-Host "Wayk Client is already up to date"
 		return
 	}
 
@@ -150,7 +150,7 @@ function Install-WaykAgent
 
 	if (([version]$current_version -gt [version]$latest_version) -And $Force)
 	{
-		Uninstall-WaykAgent -Quiet:$Quiet
+		Uninstall-WaykClient -Quiet:$Quiet
 	}
 
 	if (Get-IsWindows) {
@@ -158,7 +158,7 @@ function Install-WaykAgent
 		if ($Quiet){
 			$display = '/quiet'
 		}
-		$install_log_file = "$tempDirectory/WaykAgent_Install.log"
+		$install_log_file = "$tempDirectory/WaykClient_Install.log"
 		$msi_args = @(
 			'/i', "`"$download_file_path`"",
 			$display,
@@ -176,18 +176,18 @@ function Install-WaykAgent
 
 		Remove-Item -Path $install_log_file -Force -ErrorAction SilentlyContinue
 	} elseif ($IsMacOS) {
-		$volumes_wayk_now = "/Volumes/WaykAgent"
+		$volumes_wayk_now = "/Volumes/WaykClient"
 		if (Test-Path -Path $volumes_wayk_now -PathType 'Container') {
 			Start-Process 'hdiutil' -ArgumentList @('unmount', $volumes_wayk_now) -Wait
 		}
 		Start-Process 'hdiutil' -ArgumentList @('mount', "$download_file_path") `
 			-Wait -RedirectStandardOutput '/dev/null'
 		Wait-Process $(Start-Process 'sudo' -ArgumentList @('cp', '-R', `
-			"${volumes_wayk_now}/WaykAgent.app", "/Applications") -PassThru).Id
+			"${volumes_wayk_now}/WaykClient.app", "/Applications") -PassThru).Id
 		Start-Process 'hdiutil' -ArgumentList @('unmount', $volumes_wayk_now) `
 			-Wait -RedirectStandardOutput '/dev/null'
 		Wait-Process $(Start-Process 'sudo' -ArgumentList @('ln', '-sfn', `
-			"/Applications/WaykAgent.app/Contents/MacOS/WaykAgent",
+			"/Applications/WaykClient.app/Contents/MacOS/WaykClient",
 			"/usr/local/bin/wayk-now") -PassThru).Id
 	} elseif ($IsLinux) {
 		$dpkg_args = @(
@@ -204,18 +204,18 @@ function Install-WaykAgent
 	Remove-Item -Path $tempDirectory -Force -Recurse
 }
 
-function Uninstall-WaykAgent
+function Uninstall-WaykClient
 {
     [CmdletBinding()]
     param(
 		[switch] $Quiet
 	)
 	
-	Stop-WaykAgent
+	Stop-WaykClient
 	
 	if (Get-IsWindows) {
 		# https://stackoverflow.com/a/25546511
-		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Now'
+		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Client'
 		if ($uninstall_reg) {
 			$uninstall_string = $($uninstall_reg.UninstallString `
 				-Replace "msiexec.exe", "" -Replace "/I", "" -Replace "/X", "").Trim()
@@ -229,18 +229,18 @@ function Uninstall-WaykAgent
 			Start-Process "msiexec.exe" -ArgumentList $msi_args -Wait
 		}
 	} elseif ($IsMacOS) {
-		$wayk_now_app = "/Applications/WaykAgent.app"
+		$wayk_now_app = "/Applications/WaykClient.app"
 		if (Test-Path -Path $wayk_now_app -PathType 'Container') {
 			Start-Process 'sudo' -ArgumentList @('rm', '-rf', $wayk_now_app) -Wait
 		}
-		$wayk_now_symlink = "/usr/local/bin/wayk-now"
+		$wayk_now_symlink = "/usr/local/bin/wayk-client"
 		if (Test-Path -Path $wayk_now_symlink) {
 			Start-Process 'sudo' -ArgumentList @('rm', $wayk_now_symlink) -Wait
 		}
 	} elseif ($IsLinux) {
-		if (Get-WaykAgentVersion) {
+		if (Get-WaykClientVersion) {
 			$apt_args = @(
-				'-y', 'remove', 'wayk-now', '--purge'
+				'-y', 'remove', 'wayk-client', '--purge'
 			)
 			if ((id -u) -eq 0) {
 				Start-Process 'apt-get' -ArgumentList $apt_args -Wait
@@ -252,7 +252,7 @@ function Uninstall-WaykAgent
 	}
 }
 
-function Update-WaykAgent
+function Update-WaykClient
 {
     [CmdletBinding()]
     param(
@@ -260,24 +260,24 @@ function Update-WaykAgent
 		[switch] $Quiet
 	)
 
-	$wayk_now_process_was_running = Get-WaykAgentProcess
-	$wayk_now_service_was_running = (Get-WaykAgentService).Status -Eq 'Running'
+	$wayk_now_process_was_running = Get-WaykClientProcess
+	$wayk_now_service_was_running = (Get-WaykClientService).Status -Eq 'Running'
 
 	try {
-		Install-WaykAgent -Force:$Force -Quiet:$Quiet
+		Install-WaykClient -Force:$Force -Quiet:$Quiet
 	}
 	catch {
 		throw $_
 	}
 
 	if ($wayk_now_process_was_running) {
-		Start-WaykAgent
+		Start-WaykClient
 	} elseif ($wayk_now_service_was_running) {
-		Start-WaykAgentService
+		Start-WaykClientService
 	}
 }
 
-class WaykAgentInfo
+class WaykClientInfo
 {
 	[string] $DataPath
 	[string] $GlobalPath
@@ -295,7 +295,7 @@ class WaykAgentInfo
 	[string] $BookmarksFile
 }
 
-function Get-WaykAgentPath()
+function Get-WaykClientPath()
 {
 	[CmdletBinding()]
 	param(
@@ -331,31 +331,31 @@ function Get-WaykAgentPath()
 	}
 }
 
-function Get-WaykAgentInfo()
+function Get-WaykClientInfo()
 {
 	[CmdletBinding()]
 	param()
 
-	$DataPath = Get-WaykAgentPath 'LocalPath'
-	$GlobalPath = Get-WaykAgentPath 'GlobalPath'
+	$DataPath = Get-WaykClientPath 'LocalPath'
+	$GlobalPath = Get-WaykClientPath 'GlobalPath'
 
-	$info = [WaykAgentInfo]::New()
+	$info = [WaykClientInfo]::New()
 	$info.DataPath = $DataPath
 	$info.GlobalPath = $GlobalPath
 	$info.GlobalDataPath = $GlobalPath
-	$info.GlobalConfigFile = Join-Path -Path $GlobalPath -ChildPath 'WaykAgent.cfg'
+	$info.GlobalConfigFile = Join-Path -Path $GlobalPath -ChildPath 'WaykNow.cfg'
 	$info.DenGlobalPath = Join-Path -Path $GlobalPath -ChildPath 'den'
 	$info.LogGlobalPath = Join-Path -Path $GlobalPath -ChildPath 'logs'
-	$info.ConfigFile = Join-Path -Path $DataPath -ChildPath 'WaykAgent.cfg'
+	$info.ConfigFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.cfg'
 	$info.DenPath = Join-Path -Path $DataPath -ChildPath 'den'
 	$info.LogPath = Join-Path -Path $DataPath -ChildPath 'logs'
-	$info.CertificateFile = Join-Path -Path $DataPath -ChildPath 'WaykAgent.crt'
-	$info.PrivateKeyFile = Join-Path -Path $DataPath -ChildPath 'WaykAgent.key'
-	$info.PasswordVault = Join-Path -Path $DataPath -ChildPath 'WaykAgent.vault'
+	$info.CertificateFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.crt'
+	$info.PrivateKeyFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.key'
+	$info.PasswordVault = Join-Path -Path $DataPath -ChildPath 'WaykNow.vault'
 	$info.KnownHostsFile = Join-Path -Path $DataPath -ChildPath 'known_hosts'
 	$info.BookmarksFile = Join-Path -Path $DataPath -ChildPath 'bookmarks'
 
 	return $info 
 }
 
-Export-ModuleMember -Function Get-WaykAgentVersion, Get-WaykAgentPackage, Install-WaykAgent, Uninstall-WaykAgent, Update-WaykAgent, Get-WaykAgentPath, Get-WaykAgentInfo
+Export-ModuleMember -Function Get-WaykClientVersion, Get-WaykClientPackage, Install-WaykClient, Uninstall-WaykClient, Update-WaykClient, Get-WaykClientPath, Get-WaykClientInfo

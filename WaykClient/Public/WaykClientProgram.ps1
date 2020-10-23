@@ -1,31 +1,31 @@
 
-function Get-WaykAgentCommand
+function Get-WaykClientCommand
 {
     [CmdletBinding()]
     param()
 
-    $WaykAgentCommand = $null
+    $WaykClientCommand = $null
 
 	if ($IsLinux) {
-        $Command = Get-Command 'wayk-now' -ErrorAction SilentlyContinue
+        $Command = Get-Command 'wayk-client' -ErrorAction SilentlyContinue
 
         if ($Command) {
-            $WaykAgentCommand = $Command.Source
+            $WaykClientCommand = $Command.Source
         }
     } elseif ($IsMacOS) {
-        $Command = Get-Command 'wayk-now' -ErrorAction SilentlyContinue
+        $Command = Get-Command 'wayk-client' -ErrorAction SilentlyContinue
 
         if ($Command) {
-            $WaykAgentCommand = $Command.Source
+            $WaykClientCommand = $Command.Source
         } else {
-            $WaykAgentAppExe = "/Applications/WaykAgent.app/Contents/MacOS/WaykAgent"
+            $WaykClientAppExe = "/Applications/WaykClient.app/Contents/MacOS/WaykClient"
 
-            if (Test-Path -Path $WaykAgentAppExe -PathType Leaf) {
-                $WaykAgentCommand = $WaykAgentAppExe
+            if (Test-Path -Path $WaykClientAppExe -PathType Leaf) {
+                $WaykClientCommand = $WaykClientAppExe
             }
         }
     } else { # IsWindows
-        $DisplayName = 'Wayk Now'
+        $DisplayName = 'Wayk Client'
 
 		$UninstallReg = Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" `
             | ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $DisplayName }
@@ -37,14 +37,14 @@ function Get-WaykAgentCommand
         
         if ($UninstallReg) {
             $InstallLocation = $UninstallReg.InstallLocation
-            $WaykAgentCommand = Join-Path -Path $InstallLocation -ChildPath "WaykAgent.exe"
+            $WaykClientCommand = Join-Path -Path $InstallLocation -ChildPath "WaykClient.exe"
         }
 	}
     
-    return $WaykAgentCommand
+    return $WaykClientCommand
 }
 
-function Get-WaykAgentProcess
+function Get-WaykClientProcess
 {
     [CmdletBinding()]
     param()
@@ -52,15 +52,15 @@ function Get-WaykAgentProcess
     $wayk_now_process = $null
 
 	if (Get-IsWindows -Or $IsMacOS) {
-        $wayk_now_process = $(Get-Process | Where-Object -Property ProcessName -Like 'WaykAgent')
+        $wayk_now_process = $(Get-Process | Where-Object -Property ProcessName -Like 'WaykClient')
 	} elseif ($IsLinux) {
-        $wayk_now_process = $(Get-Process | Where-Object -Property ProcessName -Like 'wayk-now')
+        $wayk_now_process = $(Get-Process | Where-Object -Property ProcessName -Like 'wayk-client')
 	}
 
     return $wayk_now_process
 }
 
-function Get-WaykAgentService
+function Get-WaykClientService
 {
     [CmdletBinding()]
     param()
@@ -68,29 +68,29 @@ function Get-WaykAgentService
     $wayk_now_service = $null
 
     if (Get-IsWindows -And $PSEdition -Eq 'Desktop') {
-        $wayk_now_service = $(Get-Service 'WaykAgentService' -ErrorAction SilentlyContinue)
+        $wayk_now_service = $(Get-Service 'WaykClientService' -ErrorAction SilentlyContinue)
 	}
 
     return $wayk_now_service
 }
 
-function Start-WaykAgentService
+function Start-WaykClientService
 {
     [CmdletBinding()]
     param()
 
-    $wayk_now_service = Get-WaykAgentService
+    $wayk_now_service = Get-WaykClientService
     if ($wayk_now_service) {
         Start-Service $wayk_now_service
     }
 }
 
-function Start-WaykAgent
+function Start-WaykClient
 {
     [CmdletBinding()]
     param()
 
-    Start-WaykAgentService
+    Start-WaykClientService
 
 	if (Get-IsWindows) {
         $display_name = 'Wayk Now'
@@ -104,28 +104,28 @@ function Start-WaykAgent
         
         if ($uninstall_reg) {
             $install_location = $uninstall_reg.InstallLocation
-            $wayk_now_exe = Join-Path -Path $install_location -ChildPath "WaykAgent.exe"
+            $wayk_now_exe = Join-Path -Path $install_location -ChildPath "WaykClient.exe"
             Start-Process $wayk_now_exe
         }
 	} elseif ($IsMacOS) {
-		Start-Process 'open' -ArgumentList @('-a', 'WaykAgent')
+		Start-Process 'open' -ArgumentList @('-a', 'WaykClient')
 	} elseif ($IsLinux) {
-        Start-Process 'wayk-now'
+        Start-Process 'wayk-client'
 	}
 }
 
-function Stop-WaykAgent
+function Stop-WaykClient
 {
     [CmdletBinding()]
     param()
 
-    $wayk_now_process = Get-WaykAgentProcess
+    $wayk_now_process = Get-WaykClientProcess
 
     if ($wayk_now_process) {
         Stop-Process $wayk_now_process.Id
     }
 
-    $now_service = Get-WaykAgentService
+    $now_service = Get-WaykClientService
 
     if ($now_service) {
         Stop-Service $now_service
@@ -140,14 +140,14 @@ function Stop-WaykAgent
 	}
 }
 
-function Restart-WaykAgent
+function Restart-WaykClient
 {
     [CmdletBinding()]
     param()
 
-    Stop-WaykAgent
-    Start-WaykAgent
+    Stop-WaykClient
+    Start-WaykClient
 }
 
-Export-ModuleMember -Function Start-WaykAgent, Stop-WaykAgent, Restart-WaykAgent,
-    Get-WaykAgentCommand, Get-WaykAgentProcess, Get-WaykAgentService, Start-WaykAgentService
+Export-ModuleMember -Function Start-WaykClient, Stop-WaykClient, Restart-WaykClient,
+    Get-WaykClientCommand, Get-WaykClientProcess, Get-WaykClientService, Start-WaykClientService
