@@ -5,7 +5,6 @@ function Enable-WaykAgentLogs
     [CmdletBinding()]
     param(
         [LoggingLevel] $LoggingLevel,
-        [switch] $Global,
         [switch] $Restart
     )
 
@@ -13,7 +12,7 @@ function Enable-WaykAgentLogs
         $LoggingLevel = [LoggingLevel]::Debug
     }
 
-    Set-WaykAgentConfig -Global:$Global -LoggingLevel $LoggingLevel
+    Set-WaykAgentConfig -LoggingLevel $LoggingLevel
 
     if ($Restart) {
         Restart-WaykAgent
@@ -26,11 +25,10 @@ function Disable-WaykAgentLogs
 {
     [CmdletBinding()]
     param(
-        [switch] $Global,
         [switch] $Restart
     )
 
-    Enable-WaykAgentLogs -LoggingLevel 'Off' -Global:$Global -Restart:$Restart
+    Enable-WaykAgentLogs -LoggingLevel 'Off' -Restart:$Restart
 }
 
 function Export-WaykAgentLogs
@@ -45,15 +43,10 @@ function Export-WaykAgentLogs
         New-Item -Path $ExportPath -ItemType 'Directory' -ErrorAction Stop | Out-Null
     }
 
-    $WaykInfo = Get-WaykAgentInfo
-    $GlobalLogPath = $WaykInfo.LogGlobalPath
-    $LocalLogPath = $WaykInfo.LogPath
+    $ConfigPath = Get-WaykAgentPath
+    $LogPath = Join-Path $ConfigPath "logs"
 
-    Get-ChildItem -Path $GlobalLogPath -File -ErrorAction SilentlyContinue | ForEach-Object {
-        Copy-Item -Path $_.FullName -Destination $(Join-Path $ExportPath $_.Name) -Force
-    }
-
-    Get-ChildItem -Path $LocalLogPath -File -ErrorAction SilentlyContinue | ForEach-Object {
+    Get-ChildItem -Path $LogPath -File -ErrorAction SilentlyContinue | ForEach-Object {
         Copy-Item -Path $_.FullName -Destination $(Join-Path $ExportPath $_.Name) -Force
     }
 }
@@ -63,12 +56,8 @@ function Clear-WaykAgentLogs
     [CmdletBinding()]
     param()
 
-    $WaykInfo = Get-WaykAgentInfo
-    $GlobalLogPath = $WaykInfo.LogGlobalPath
-    $LocalLogPath = $WaykInfo.LogPath
+    $ConfigPath = Get-WaykAgentPath
+    $LogPath = Join-Path $ConfigPath "logs"
 
-    Remove-Item -Path $GlobalLogPath -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $LocalLogPath -Force -Recurse -ErrorAction SilentlyContinue
+    Remove-Item -Path $LogPath -Force -Recurse -ErrorAction SilentlyContinue
 }
-
-Export-ModuleMember -Function Enable-WaykAgentLogs, Disable-WaykAgentLogs, Export-WaykAgentLogs, Clear-WaykAgentLogs

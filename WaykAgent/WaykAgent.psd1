@@ -69,9 +69,10 @@ CLRVersion = '4.0'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @('Get-WaykAgentVersion', 'Get-WaykAgentPackage', 'Install-WaykAgent', 'Uninstall-WaykAgent', 'Update-WaykAgent',
+FunctionsToExport = @('Get-WaykAgentVersion', 'Get-WaykAgentPackage',
+    'Install-WaykAgent', 'Uninstall-WaykAgent', 'Update-WaykAgent',
     'Start-WaykAgent', 'Stop-WaykAgent', 'Restart-WaykAgent', 'Get-WaykAgentCommand',
-    'Set-WaykAgentSafeMode','Reset-WaykAgentSafeMode', 'Set-WaykAgentConfig', 'Get-WaykAgentInfo', 'Get-WaykAgentPath', 'Get-WaykAgentConfig',
+    'Set-WaykAgentConfig', 'Get-WaykAgentPath', 'Get-WaykAgentConfig',
     'Set-WaykAgentBranding', 'Reset-WaykAgentBranding', 'Get-WaykAgentUniqueId',
     'Enable-WaykAgentLogs', 'Disable-WaykAgentLogs', 'Export-WaykAgentLogs', 'Clear-WaykAgentLogs',
     'Register-WaykAgent')
@@ -83,9 +84,10 @@ CmdletsToExport = @()
 VariablesToExport = @()
 
 # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-AliasesToExport = @('Get-WaykNowVersion', 'Get-WaykNowPackage', 'Install-WaykNow', 'Uninstall-WaykNow', 'Update-WaykNow',
+AliasesToExport = @('Get-WaykNowVersion', 'Get-WaykNowPackage',
+    'Install-WaykNow', 'Uninstall-WaykNow', 'Update-WaykNow',
     'Start-WaykNow', 'Stop-WaykNow', 'Restart-WaykNow', 'Get-WaykNowCommand',
-    'Set-WaykNowSafeMode','Reset-WaykNowSafeMode', 'Set-WaykNowConfig', 'Get-WaykNowInfo', 'Get-WaykNowPath', 'Get-WaykNowConfig',
+    'Set-WaykNowConfig', 'Get-WaykNowPath', 'Get-WaykNowConfig',
     'Set-WaykNowBranding', 'Reset-WaykNowBranding', 'Get-WaykNowUniqueId',
     'Enable-WaykNowLogs', 'Disable-WaykNowLogs', 'Export-WaykNowLogs', 'Clear-WaykNowLogs',
     'Register-WaykNow')
@@ -108,13 +110,13 @@ PrivateData = @{
         Tags = 'Wayk', 'Agent', 'WaykAgent', 'WaykNow', 'WaykBastion', 'Windows', 'macOS', 'Linux', 'RemoteDesktop'
 
         # A URL to the license for this module.
-        # LicenseUri = 'https://github.com/Devolutions/WaykAgent-ps/blob/master/LICENSE-MIT'
+        LicenseUri = 'https://github.com/Devolutions/WaykAgent-ps/blob/master/LICENSE-MIT'
 
         # A URL to the main website for this project.
         ProjectUri = 'https://github.com/Devolutions/WaykAgent-ps'
 
         # A URL to an icon representing this module.
-        IconUri = 'https://webdevolutions.blob.core.windows.net/images/projects/wayk-now/logos/wayk-now-icon-ps.png'
+        IconUri = 'https://raw.githubusercontent.com/Devolutions/WaykAgent-ps/master/logo.png'
 
         # ReleaseNotes of this module
         # ReleaseNotes = ''

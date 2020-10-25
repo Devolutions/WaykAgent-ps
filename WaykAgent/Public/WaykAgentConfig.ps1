@@ -91,17 +91,10 @@ class WaykAgentConfig
 function Get-WaykAgentConfigFile
 {
     param(
-        [switch] $Global
     )
 
-    [WaykAgentInfo]$WaykInfo = Get-WaykAgentInfo
-
-    if ($Global) {
-        $ConfigFile = $WaykInfo.GlobalConfigFile
-    } else {
-        $ConfigFile = $WaykInfo.ConfigFile
-    }
-
+    $ConfigPath = Get-WaykAgentPath
+    $ConfigFile = Join-Path $ConfigPath "WaykNow.cfg"
     return $ConfigFile
 }
 
@@ -109,8 +102,6 @@ function Set-WaykAgentConfig
 {
     [CmdletBinding()]
     param(
-        [switch] $Global,
-
         [string] $FriendlyName,
         [ValidateSet("en", "fr", "de", "it", "pl", "zh-CN", "zh-TW")]
         [string] $Language,
@@ -150,7 +141,7 @@ function Set-WaykAgentConfig
         [bool] $AutoUpdateEnabled
     )
 
-    $ConfigFile = Get-WaykAgentConfigFile -Global:$Global
+    $ConfigFile = Get-WaykAgentConfigFile
 
     if (Test-Path $ConfigFile) {
         $json = Get-Content -Path $ConfigFile -Encoding UTF8 | ConvertFrom-Json
@@ -192,23 +183,13 @@ function Set-WaykAgentConfig
 function Get-WaykAgentConfig
 {
     [CmdletBinding()]
-    [OutputType('WaykAgentConfig')]
     param(
-        [switch] $Global = $false
     )
 
-    if (-Not $Global) {
-        $LocalConfigFile = Get-WaykAgentConfigFile
+    $ConfigFile = Get-WaykAgentConfigFile
 
-        if (Test-Path $LocalConfigFile) {
-            $LocalJson = Get-Content -Path $LocalConfigFile -Encoding UTF8 | ConvertFrom-Json
-        }
-    }
-
-    $GlobalConfigFile = Get-WaykAgentConfigFile -Global
-
-    if (Test-Path $GlobalConfigFile) {
-        $GlobalJson = Get-Content -Path $GlobalConfigFile -Encoding UTF8 | ConvertFrom-Json
+    if (Test-Path $ConfigFile) {
+        $ConfigJson = Get-Content -Path $ConfigFile -Encoding UTF8 | ConvertFrom-Json
     }
 
     $config = [WaykAgentConfig]::new()
@@ -218,12 +199,8 @@ function Get-WaykAgentConfig
             $Name = $_.Name
             $Property = $null
 
-            if ($LocalJson -And $LocalJson.PSObject.Properties[$Name]) {
-                $Property = $LocalJson.PSObject.Properties[$Name]
-            }
-
-            if ($GlobalJson -And $GlobalJson.PSObject.Properties[$Name]) {
-                $Property = $GlobalJson.PSObject.Properties[$Name]
+            if ($ConfigJson -And $ConfigJson.PSObject.Properties[$Name]) {
+                $Property = $ConfigJson.PSObject.Properties[$Name]
             }
 
             if ($Property) {
@@ -241,13 +218,8 @@ function Get-WaykAgentConfig
         $AccessControl = $null
         $Property = $null
 
-        if ($LocalJson -And $LocalJson.PSObject.Properties['AccessControl']) {
-            $AccessControl = $LocalJson.PSObject.Properties['AccessControl'].Value
-            $Property = $AccessControl.PSObject.Properties[$ShortName]
-        }
-
-        if ($GlobalJson -And $GlobalJson.PSObject.Properties['AccessControl']) {
-            $AccessControl = $GlobalJson.PSObject.Properties['AccessControl'].Value
+        if ($ConfigJson -And $ConfigJson.PSObject.Properties['AccessControl']) {
+            $AccessControl = $ConfigJson.PSObject.Properties['AccessControl'].Value
             $Property = $AccessControl.PSObject.Properties[$ShortName]
         }
 
@@ -259,5 +231,3 @@ function Get-WaykAgentConfig
 
     return $config
 }
-
-Export-ModuleMember -Function Set-WaykAgentConfig, Get-WaykAgentConfig

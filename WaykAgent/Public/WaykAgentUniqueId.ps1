@@ -1,22 +1,15 @@
 function Get-WaykAgentUniqueId
 {
     [CmdletBinding()]
-    param()
+    param(
+    )
 
-    $WaykAgentInfo = Get-WaykAgentInfo
+    $ConfigPath = Get-WaykAgentPath
+    $ServerPath = Join-Path $ConfigPath "server"
+    $UniqueIdFile = Join-Path $ServerPath ".unique"
 
-    $idPath = $WaykAgentInfo.DataPath
-
-    if ((Get-IsWindows) -And (Get-Service "WaykAgentService" -ErrorAction SilentlyContinue)){
-        $idPath = $WaykAgentInfo.GlobalPath
-    }
-
-    $idPath = "$idPath/.unique"
-
-    if (Test-Path $idPath)
-    {
-        return Get-Content -Path $idPath -Raw -Encoding UTF8
+    if (Test-Path $UniqueIdFile -PathType 'Leaf') {
+        $UniqueId = Get-Content -Path $UniqueIdFile -Raw -Encoding UTF8
+        return $UniqueId
     }
 }
-
-Export-ModuleMember -Function Get-WaykAgentUniqueId

@@ -24,9 +24,9 @@ function Get-WaykAgentVersion
 		}
 	} elseif ($IsLinux) {
 		$dpkg_status = $(dpkg -s wayk-agent)
-		$matches = $($dpkg_status | Select-String -AllMatches -Pattern 'version: (\S+)').Matches
-		if ($matches) {
-			$version = $matches.Groups[1].Value
+		$DpkgMatches = $($dpkg_status | Select-String -AllMatches -Pattern 'version: (\S+)').Matches
+		if ($DpkgMatches) {
+			$version = $DpkgMatches.Groups[1].Value
 			return $version
 		}
 	}
@@ -270,7 +270,7 @@ function Uninstall-WaykAgent
 	} elseif ($IsLinux) {
 		if (Get-WaykAgentVersion) {
 			$apt_args = @(
-				'-y', 'remove', 'wayk-now', '--purge'
+				'-y', 'remove', 'wayk-agent', '--purge'
 			)
 			if ((id -u) -eq 0) {
 				Start-Process 'apt-get' -ArgumentList $apt_args -Wait
@@ -307,85 +307,28 @@ function Update-WaykAgent
 	}
 }
 
-class WaykAgentInfo
-{
-	[string] $DataPath
-	[string] $GlobalPath
-	[string] $GlobalDataPath
-	[string] $GlobalConfigFile
-	[string] $ConfigFile
-	[string] $DenPath
-	[string] $DenGlobalPath
-	[string] $LogPath
-	[string] $LogGlobalPath
-	[string] $CertificateFile
-	[string] $PrivateKeyFile
-	[string] $PasswordVault
-	[string] $KnownHostsFile
-	[string] $BookmarksFile
-}
-
 function Get-WaykAgentPath()
 {
 	[CmdletBinding()]
 	param(
-		[Parameter(Mandatory,Position=0)]
-		[string] $PathType
+		[Parameter(Position=0)]
+		[string] $PathType = "ConfigPath"
 	)
 
-	$HomePath = Resolve-Path '~'
-
 	if (Get-IsWindows)	{
-		$LocalPath = $Env:APPDATA + '\Wayk';
-		$GlobalPath = $Env:ALLUSERSPROFILE + '\Wayk'
+		$ConfigPath = $Env:ALLUSERSPROFILE + '\Wayk'
 	} elseif ($IsMacOS) {
-		$LocalPath = "$HomePath/Library/Application Support/Wayk"
-		$GlobalPath = "/Library/Application Support/Wayk"
+		$ConfigPath = "/Library/Application Support/Wayk"
 	} elseif ($IsLinux) {
-		$LocalPath = "$HomePath/.config/Wayk"
-		$GlobalPath = '/etc/wayk'
-	}
-
-	if (Test-Path Env:WAYK_DATA_PATH) {
-		$LocalPath = $Env:WAYK_DATA_PATH
+		$ConfigPath = '/etc/wayk'
 	}
 
 	if (Test-Path Env:WAYK_SYSTEM_PATH) {
-		$GlobalPath = $Env:WAYK_SYSTEM_PATH
+		$ConfigPath = $Env:WAYK_SYSTEM_PATH
 	}
 
 	switch ($PathType) {
-		'LocalPath' { $LocalPath }
-		'GlobalPath' { $GlobalPath }
+		'ConfigPath' { $ConfigPath }
 		default { throw("Invalid path type: $PathType") }
 	}
 }
-
-function Get-WaykAgentInfo()
-{
-	[CmdletBinding()]
-	param()
-
-	$DataPath = Get-WaykAgentPath 'LocalPath'
-	$GlobalPath = Get-WaykAgentPath 'GlobalPath'
-
-	$info = [WaykAgentInfo]::New()
-	$info.DataPath = $DataPath
-	$info.GlobalPath = $GlobalPath
-	$info.GlobalDataPath = $GlobalPath
-	$info.GlobalConfigFile = Join-Path -Path $GlobalPath -ChildPath 'WaykAgent.cfg'
-	$info.DenGlobalPath = Join-Path -Path $GlobalPath -ChildPath 'den'
-	$info.LogGlobalPath = Join-Path -Path $GlobalPath -ChildPath 'logs'
-	$info.ConfigFile = Join-Path -Path $DataPath -ChildPath 'WaykAgent.cfg'
-	$info.DenPath = Join-Path -Path $DataPath -ChildPath 'den'
-	$info.LogPath = Join-Path -Path $DataPath -ChildPath 'logs'
-	$info.CertificateFile = Join-Path -Path $DataPath -ChildPath 'WaykAgent.crt'
-	$info.PrivateKeyFile = Join-Path -Path $DataPath -ChildPath 'WaykAgent.key'
-	$info.PasswordVault = Join-Path -Path $DataPath -ChildPath 'WaykAgent.vault'
-	$info.KnownHostsFile = Join-Path -Path $DataPath -ChildPath 'known_hosts'
-	$info.BookmarksFile = Join-Path -Path $DataPath -ChildPath 'bookmarks'
-
-	return $info 
-}
-
-Export-ModuleMember -Function Get-WaykAgentVersion, Get-WaykAgentPackage, Install-WaykAgent, Uninstall-WaykAgent, Update-WaykAgent, Get-WaykAgentPath, Get-WaykAgentInfo

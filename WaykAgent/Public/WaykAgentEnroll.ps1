@@ -42,5 +42,3 @@ function Register-WaykAgent
         & $WaykAgentCommand 'enroll' '--token-file' $TokenPath
     }
 }
-
-Export-ModuleMember -Function Register-WaykAgent

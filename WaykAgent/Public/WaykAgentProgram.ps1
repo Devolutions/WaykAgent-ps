@@ -25,7 +25,7 @@ function Get-WaykAgentCommand
             }
         }
     } else { # IsWindows
-        $DisplayName = 'Wayk Now'
+        $DisplayName = 'Wayk Agent'
 
 		$UninstallReg = Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" `
             | ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $DisplayName }
@@ -148,6 +148,3 @@ function Restart-WaykAgent
     Stop-WaykAgent
     Start-WaykAgent
 }
-
-Export-ModuleMember -Function Start-WaykAgent, Stop-WaykAgent, Restart-WaykAgent,
-    Get-WaykAgentCommand, Get-WaykAgentProcess, Get-WaykAgentService, Start-WaykAgentService
