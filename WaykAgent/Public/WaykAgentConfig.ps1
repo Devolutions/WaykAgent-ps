@@ -144,9 +144,9 @@ function Set-WaykAgentConfig
     $ConfigFile = Get-WaykAgentConfigFile
 
     if (Test-Path $ConfigFile) {
-        $json = Get-Content -Path $ConfigFile -Encoding UTF8 | ConvertFrom-Json
+        $ConfigJson = Get-Content -Path $ConfigFile -Encoding UTF8 | ConvertFrom-Json
     } else {
-        $json = '{}' | ConvertFrom-Json
+        $ConfigJson = '{}' | ConvertFrom-Json
     }
 
     $properties = [WaykAgentConfig].GetProperties() | ForEach-Object { $_.Name }
@@ -154,28 +154,28 @@ function Set-WaykAgentConfig
     foreach ($param in $PSBoundParameters.GetEnumerator()) {
         if ($param.Key -NotLike 'AccessControl*') {
             if ($properties -Contains $param.Key) {
-                $json | Add-Member -Type NoteProperty -Name $param.Key -Value $param.Value -Force
+                $ConfigJson | Add-Member -Type NoteProperty -Name $param.Key -Value $param.Value -Force
             }
         }
     }
 
     $AccessControlNames = @('Viewing', 'Interact', 'Clipboard', 'FileTransfer', 'Exec', 'Chat')
 
-    if (-Not $json.AccessControl) {
-        $json | Add-Member -Type NoteProperty -Name "AccessControl" -Value $([PSCustomObject]@{})
+    if (-Not $ConfigJson.AccessControl) {
+        $ConfigJson | Add-Member -Type NoteProperty -Name "AccessControl" -Value $([PSCustomObject]@{})
     }
 
     foreach ($ShortName in $AccessControlNames) {
         $LongName = "AccessControl$ShortName"
         $Value = $PSBoundParameters[$LongName]
         if ($Value) {
-            $json.AccessControl | Add-Member -Type NoteProperty -Name $ShortName -Value $Value -Force
+            $ConfigJson.AccessControl | Add-Member -Type NoteProperty -Name $ShortName -Value $Value -Force
         }
     }
 
     New-Item -Path $(Split-Path $ConfigFile -Parent) -ItemType 'Directory' -Force | Out-Null
 
-    $FileValue = $json | ConvertTo-Json
+    $FileValue = $ConfigJson | ConvertTo-Json
     $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
     [System.IO.File]::WriteAllLines($ConfigFile, $FileValue, $Utf8NoBomEncoding)
 }

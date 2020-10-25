@@ -30,7 +30,7 @@ CompanyName = 'Devolutions'
 Copyright = '(c) 2019-2020 Devolutions Inc. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Devolutions Wayk Now PowerShell Module'
+Description = 'Devolutions Wayk Agent PowerShell Module'
 
 # Minimum version of the PowerShell engine required by this module
 PowerShellVersion = '5.1'
@@ -122,7 +122,7 @@ PrivateData = @{
         # ReleaseNotes = ''
 
         # Prerelease string of this module
-        Prerelease = 'rc1'
+        Prerelease = 'rc3'
 
     } # End of PSData hashtable
 
