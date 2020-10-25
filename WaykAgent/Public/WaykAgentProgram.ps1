@@ -25,15 +25,7 @@ function Get-WaykAgentCommand
             }
         }
     } else { # IsWindows
-        $DisplayName = 'Wayk Agent'
-
-		$UninstallReg = Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" `
-            | ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $DisplayName }
-            
-		if (-Not $UninstallReg) {
-			$UninstallReg = Get-ChildItem "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall" `
-				| ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $DisplayName }
-        }
+        $UninstallReg = Get-UninstallRegistryKey 'Wayk Agent'
         
         if ($UninstallReg) {
             $InstallLocation = $UninstallReg.InstallLocation
@@ -49,15 +41,15 @@ function Get-WaykAgentProcess
     [CmdletBinding()]
     param()
 
-    $wayk_now_process = $null
+    $WaykAgentProcess = $null
 
 	if (Get-IsWindows -Or $IsMacOS) {
-        $wayk_now_process = $(Get-Process | Where-Object -Property ProcessName -Like 'WaykAgent')
+        $WaykAgentProcess = $(Get-Process | Where-Object -Property ProcessName -Like 'WaykAgent')
 	} elseif ($IsLinux) {
-        $wayk_now_process = $(Get-Process | Where-Object -Property ProcessName -Like 'wayk-now')
+        $WaykAgentProcess = $(Get-Process | Where-Object -Property ProcessName -Like 'wayk-agent')
 	}
 
-    return $wayk_now_process
+    return $WaykAgentProcess
 }
 
 function Get-WaykAgentService
@@ -65,13 +57,13 @@ function Get-WaykAgentService
     [CmdletBinding()]
     param()
 
-    $wayk_now_service = $null
+    $WaykAgentService = $null
 
-    if (Get-IsWindows -And $PSEdition -Eq 'Desktop') {
-        $wayk_now_service = $(Get-Service 'WaykAgentService' -ErrorAction SilentlyContinue)
+    if (Get-IsWindows) {
+        $WaykAgentService = $(Get-Service 'WaykNowService' -ErrorAction SilentlyContinue)
 	}
 
-    return $wayk_now_service
+    return $WaykAgentService
 }
 
 function Start-WaykAgentService
@@ -79,9 +71,10 @@ function Start-WaykAgentService
     [CmdletBinding()]
     param()
 
-    $wayk_now_service = Get-WaykAgentService
-    if ($wayk_now_service) {
-        Start-Service $wayk_now_service
+    $WaykAgentService = Get-WaykAgentService
+
+    if ($WaykAgentService) {
+        Start-Service $WaykAgentService
     }
 }
 
@@ -92,26 +85,11 @@ function Start-WaykAgent
 
     Start-WaykAgentService
 
-	if (Get-IsWindows) {
-        $display_name = 'Wayk Now'
-		if ([System.Environment]::Is64BitOperatingSystem) {
-			$uninstall_reg = Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" `
-				| ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $display_name }
-		} else {
-			$uninstall_reg = Get-ChildItem "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall" `
-				| ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_ -Match $display_name }
-        }
-        
-        if ($uninstall_reg) {
-            $install_location = $uninstall_reg.InstallLocation
-            $wayk_now_exe = Join-Path -Path $install_location -ChildPath "WaykAgent.exe"
-            Start-Process $wayk_now_exe
-        }
-	} elseif ($IsMacOS) {
-		Start-Process 'open' -ArgumentList @('-a', 'WaykAgent')
-	} elseif ($IsLinux) {
-        Start-Process 'wayk-now'
-	}
+    $WaykAgentCommand = Get-WaykAgentCommand
+
+    if ($WaykAgentCommand) {
+        Start-Process $WaykAgentCommand
+    }
 }
 
 function Stop-WaykAgent
@@ -119,23 +97,23 @@ function Stop-WaykAgent
     [CmdletBinding()]
     param()
 
-    $wayk_now_process = Get-WaykAgentProcess
+    $WaykAgentProcess = Get-WaykAgentProcess
 
-    if ($wayk_now_process) {
-        Stop-Process $wayk_now_process.Id
+    if ($WaykAgentProcess) {
+        Stop-Process $WaykAgentProcess.Id
     }
 
-    $now_service = Get-WaykAgentService
+    $WaykAgentService = Get-WaykAgentService
 
-    if ($now_service) {
-        Stop-Service $now_service
+    if ($WaykAgentService) {
+        Stop-Service $WaykAgentService
     }
 
 	if (Get-IsWindows) {
-        $now_session_process = $(Get-Process | Where-Object -Property ProcessName -Like 'NowSession')
+        $NowSessionProcess = $(Get-Process | Where-Object -Property ProcessName -Like 'NowSession')
 
-        if ($now_session_process) {
-            Stop-Process $now_session_process.Id
+        if ($NowSessionProcess) {
+            Stop-Process $NowSessionProcess.Id
         }
 	}
 }

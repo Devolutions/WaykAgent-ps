@@ -6,28 +6,28 @@ function Get-WaykAgentVersion
     param()
 
 	if (Get-IsWindows) {
-		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Agent'
-		if ($uninstall_reg) {
-			$version = $uninstall_reg.DisplayVersion
-			if ($version -lt 2000) {
-					$version = "20" + $version
+		$UninstallReg = Get-UninstallRegistryKey 'Wayk Agent'
+		if ($UninstallReg) {
+			$Version = $UninstallReg.DisplayVersion
+			if ($Version -lt 2000) {
+					$Version = "20" + $Version
 			}
-			return $version
+			return $Version
 		}
 	} elseif ($IsMacOS) {
-		$info_plist_path = "/Applications/WaykAgent.app/Contents/Info.plist"
-		$cf_bundle_version_xpath = "//dict/key[. ='CFBundleVersion']/following-sibling::string[1]"
-		if (Test-Path -Path $info_plist_path) {
-			$version = $(Select-Xml -Path $info_plist_path -XPath $cf_bundle_version_xpath `
+		$InfoPlistPath = "/Applications/WaykAgent.app/Contents/Info.plist"
+		$CfBundleVersionXpath = "//dict/key[. ='CFBundleVersion']/following-sibling::string[1]"
+		if (Test-Path -Path $InfoPlistPath) {
+			$Version = $(Select-Xml -Path $InfoPlistPath -XPath $CfBundleVersionXpath `
 				| Foreach-Object {$_.Node.InnerXML }).Trim()
-			return $version
+			return $Version
 		}
 	} elseif ($IsLinux) {
-		$dpkg_status = $(dpkg -s wayk-agent)
-		$DpkgMatches = $($dpkg_status | Select-String -AllMatches -Pattern 'version: (\S+)').Matches
+		$DpkgStatus = $(dpkg -s wayk-agent)
+		$DpkgMatches = $($DpkgStatus | Select-String -AllMatches -Pattern 'Version: (\S+)').Matches
 		if ($DpkgMatches) {
-			$version = $DpkgMatches.Groups[1].Value
-			return $version
+			$Version = $DpkgMatches.Groups[1].Value
+			return $Version
 		}
 	}
 
@@ -133,7 +133,7 @@ function Get-WaykAgentPackage
 	}
 
 	if ($RequiredVersion) {
-		# both variables are in quadruple version format
+		# both variables are in quadruple Version format
 		$DownloadUrl = $DownloadUrl -Replace $LatestVersion, $RequiredVersion
 	}
  
@@ -155,83 +155,83 @@ function Install-WaykAgent
 		[switch] $NoStartMenuShortcut
 	)
 
-	$tempDirectory = New-TemporaryDirectory
-	$package = Get-WaykAgentPackage $Version
-	$latest_version = $package.Version
-	$current_version = Get-WaykAgentVersion
+	$TempDirectory = New-TemporaryDirectory
+	$Package = Get-WaykAgentPackage $Version
+	$LatestVersion = $Package.Version
+	$CurrentVersion = Get-WaykAgentVersion
 
-	if (([version]$latest_version -gt [version]$current_version) -Or $Force) {
-		Write-Host "Installing Wayk Agent ${latest_version}"
+	if (([Version]$LatestVersion -gt [Version]$CurrentVersion) -Or $Force) {
+		Write-Host "Installing Wayk Agent ${LatestVersion}"
 	} else {
 		Write-Host "Wayk Agent is already up to date"
 		return
 	}
 
-	$download_url = $package.url
-	$download_file = Split-Path -Path $download_url -Leaf
-	$download_file_path = "$tempDirectory/$download_file"
-	Write-Host "Downloading $download_url"
+	$DownloadUrl = $Package.url
+	$DownloadFile = Split-Path -Path $DownloadUrl -Leaf
+	$DownloadFilePath = Join-Path $TempDirectory $DownloadFile
+	Write-Host "Downloading $DownloadUrl"
 
-	$web_client = [System.Net.WebClient]::new()
-	$web_client.DownloadFile($download_url, $download_file_path)
-	$web_client.Dispose()
+	$WebClient = [System.Net.WebClient]::new()
+	$WebClient.DownloadFile($DownloadUrl, $DownloadFilePath)
+	$WebClient.Dispose()
 	
-	$download_file_path = Resolve-Path $download_file_path
+	$DownloadFilePath = Resolve-Path $DownloadFilePath
 
-	if (([version]$current_version -gt [version]$latest_version) -And $Force)
+	if (([Version]$CurrentVersion -gt [Version]$LatestVersion) -And $Force)
 	{
 		Uninstall-WaykAgent -Quiet:$Quiet
 	}
 
 	if (Get-IsWindows) {
-		$display = '/passive'
+		$Display = '/passive'
 		if ($Quiet){
-			$display = '/quiet'
+			$Display = '/quiet'
 		}
-		$install_log_file = "$tempDirectory/WaykAgent_Install.log"
-		$msi_args = @(
-			'/i', "`"$download_file_path`"",
-			$display,
+		$InstallLogFile = "$TempDirectory/WaykAgent_Install.log"
+		$MsiArgs = @(
+			'/i', "`"$DownloadFilePath`"",
+			$Display,
 			'/norestart',
-			'/log', "`"$install_log_file`""
+			'/log', "`"$InstallLogFile`""
 		)
 		if ($NoDesktopShortcut){
-			$msi_args += "INSTALLDESKTOPSHORTCUT=`"`""
+			$MsiArgs += "INSTALLDESKTOPSHORTCUT=`"`""
 		}
 		if ($NoStartMenuShortcut){
-			$msi_args += "INSTALLSTARTMENUSHORTCUT=`"`""
+			$MsiArgs += "INSTALLSTARTMENUSHORTCUT=`"`""
 		}
 
-		Start-Process "msiexec.exe" -ArgumentList $msi_args -Wait -NoNewWindow
+		Start-Process "msiexec.exe" -ArgumentList $MsiArgs -Wait -NoNewWindow
 
-		Remove-Item -Path $install_log_file -Force -ErrorAction SilentlyContinue
+		Remove-Item -Path $InstallLogFile -Force -ErrorAction SilentlyContinue
 	} elseif ($IsMacOS) {
-		$volumes_wayk_now = "/Volumes/WaykAgent"
-		if (Test-Path -Path $volumes_wayk_now -PathType 'Container') {
-			Start-Process 'hdiutil' -ArgumentList @('unmount', $volumes_wayk_now) -Wait
+		$VolumesWaykAgent = "/Volumes/WaykAgent"
+		if (Test-Path -Path $VolumesWaykAgent -PathType 'Container') {
+			Start-Process 'hdiutil' -ArgumentList @('unmount', $VolumesWaykAgent) -Wait
 		}
-		Start-Process 'hdiutil' -ArgumentList @('mount', "$download_file_path") `
+		Start-Process 'hdiutil' -ArgumentList @('mount', "$DownloadFilePath") `
 			-Wait -RedirectStandardOutput '/dev/null'
 		Wait-Process $(Start-Process 'sudo' -ArgumentList @('cp', '-R', `
-			"${volumes_wayk_now}/WaykAgent.app", "/Applications") -PassThru).Id
-		Start-Process 'hdiutil' -ArgumentList @('unmount', $volumes_wayk_now) `
+			"${VolumesWaykAgent}/WaykAgent.app", "/Applications") -PassThru).Id
+		Start-Process 'hdiutil' -ArgumentList @('unmount', $VolumesWaykAgent) `
 			-Wait -RedirectStandardOutput '/dev/null'
 		Wait-Process $(Start-Process 'sudo' -ArgumentList @('ln', '-sfn', `
 			"/Applications/WaykAgent.app/Contents/MacOS/WaykAgent",
 			"/usr/local/bin/wayk-now") -PassThru).Id
 	} elseif ($IsLinux) {
-		$dpkg_args = @(
-			'-i', $download_file_path
+		$DpkgArgs = @(
+			'-i', $DownloadFilePath
 		)
 		if ((id -u) -eq 0) {
-			Start-Process 'dpkg' -ArgumentList $dpkg_args -Wait
+			Start-Process 'dpkg' -ArgumentList $DpkgArgs -Wait
 		} else {
-			$dpkg_args = @('dpkg') + $dpkg_args
-			Start-Process 'sudo' -ArgumentList $dpkg_args -Wait
+			$DpkgArgs = @('dpkg') + $DpkgArgs
+			Start-Process 'sudo' -ArgumentList $DpkgArgs -Wait
 		}
 	}
 
-	Remove-Item -Path $tempDirectory -Force -Recurse
+	Remove-Item -Path $TempDirectory -Force -Recurse
 }
 
 function Uninstall-WaykAgent
@@ -245,38 +245,38 @@ function Uninstall-WaykAgent
 	
 	if (Get-IsWindows) {
 		# https://stackoverflow.com/a/25546511
-		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Agent'
-		if ($uninstall_reg) {
-			$uninstall_string = $($uninstall_reg.UninstallString `
+		$UninstallReg = Get-UninstallRegistryKey 'Wayk Agent'
+		if ($UninstallReg) {
+			$UninstallString = $($UninstallReg.UninstallString `
 				-Replace "msiexec.exe", "" -Replace "/I", "" -Replace "/X", "").Trim()
-			$display = '/passive'
+			$Display = '/passive'
 			if ($Quiet){
-				$display = '/quiet'
+				$Display = '/quiet'
 			}
-			$msi_args = @(
-				'/X', $uninstall_string, $display
+			$MsiArgs = @(
+				'/X', $UninstallString, $Display
 			)
-			Start-Process "msiexec.exe" -ArgumentList $msi_args -Wait
+			Start-Process "msiexec.exe" -ArgumentList $MsiArgs -Wait
 		}
 	} elseif ($IsMacOS) {
-		$wayk_now_app = "/Applications/WaykAgent.app"
-		if (Test-Path -Path $wayk_now_app -PathType 'Container') {
-			Start-Process 'sudo' -ArgumentList @('rm', '-rf', $wayk_now_app) -Wait
+		$WaykAgentApp = "/Applications/WaykAgent.app"
+		if (Test-Path -Path $WaykAgentApp -PathType 'Container') {
+			Start-Process 'sudo' -ArgumentList @('rm', '-rf', $WaykAgentApp) -Wait
 		}
-		$wayk_now_symlink = "/usr/local/bin/wayk-now"
-		if (Test-Path -Path $wayk_now_symlink) {
-			Start-Process 'sudo' -ArgumentList @('rm', $wayk_now_symlink) -Wait
+		$WaykNowSymlink = "/usr/local/bin/wayk-now"
+		if (Test-Path -Path $WaykNowSymlink) {
+			Start-Process 'sudo' -ArgumentList @('rm', $WaykNowSymlink) -Wait
 		}
 	} elseif ($IsLinux) {
 		if (Get-WaykAgentVersion) {
-			$apt_args = @(
+			$AptArgs = @(
 				'-y', 'remove', 'wayk-agent', '--purge'
 			)
 			if ((id -u) -eq 0) {
-				Start-Process 'apt-get' -ArgumentList $apt_args -Wait
+				Start-Process 'apt-get' -ArgumentList $AptArgs -Wait
 			} else {
-				$apt_args = @('apt-get') + $apt_args
-				Start-Process 'sudo' -ArgumentList $apt_args -Wait
+				$AptArgs = @('apt-get') + $AptArgs
+				Start-Process 'sudo' -ArgumentList $AptArgs -Wait
 			}
 		}
 	}
@@ -290,8 +290,8 @@ function Update-WaykAgent
 		[switch] $Quiet
 	)
 
-	$wayk_now_process_was_running = Get-WaykAgentProcess
-	$wayk_now_service_was_running = (Get-WaykAgentService).Status -Eq 'Running'
+	$ProcessWasRunning = Get-WaykAgentProcess
+	$ServiceWasRunning = (Get-WaykAgentService).Status -Eq 'Running'
 
 	try {
 		Install-WaykAgent -Force:$Force -Quiet:$Quiet
@@ -300,9 +300,9 @@ function Update-WaykAgent
 		throw $_
 	}
 
-	if ($wayk_now_process_was_running) {
+	if ($ProcessWasRunning) {
 		Start-WaykAgent
-	} elseif ($wayk_now_service_was_running) {
+	} elseif ($ServiceWasRunning) {
 		Start-WaykAgentService
 	}
 }
