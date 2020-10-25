@@ -1,5 +1,5 @@
 
-function Register-WaykNow
+function Register-WaykAgent
 {
     [CmdletBinding()]
     param(
@@ -17,7 +17,7 @@ function Register-WaykNow
         [string] $TokenPath
     )
 
-    $WaykNowCommand = Get-WaykNowCommand
+    $WaykAgentCommand = Get-WaykAgentCommand
 
     if ($PSCmdlet.ParameterSetName -eq 'TokenId') {
 
@@ -29,18 +29,16 @@ function Register-WaykNow
             Write-Warning "DenUrl appears to be missing an 'https://' or 'http://' prefix: $DenUrl"
         }
 
-        & $WaykNowCommand 'enroll' '--token-id' $TokenId '--den-url' $DenUrl
+        & $WaykAgentCommand 'enroll' '--token-id' $TokenId '--den-url' $DenUrl
     }
     elseif ($PSCmdlet.ParameterSetName -eq 'TokenData') {
-        & $WaykNowCommand 'enroll' '--token' $TokenData
+        & $WaykAgentCommand 'enroll' '--token' $TokenData
     }
     elseif ($PSCmdlet.ParameterSetName -eq 'TokenPath') {
         if (-Not (Test-Path -Path $TokenPath -PathType Leaf)) {
             Write-Warning "TokenPath cannot be found: $TokenPath"
         }
 
-        & $WaykNowCommand 'enroll' '--token-file' $TokenPath
+        & $WaykAgentCommand 'enroll' '--token-file' $TokenPath
     }
 }
-
-Export-ModuleMember -Function Register-WaykNow

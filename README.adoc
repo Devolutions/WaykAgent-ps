@@ -1,8 +1,8 @@
 :toc:
 :toclevels: 4
 
-= Wayk Now PowerShell Cmdlet
-WaykNow-ps is a PowerShell cmdlet for https://wayk.devolutions.net[Devolutions Wayk Now]. For assistance or feature requests, please use the https://forum.devolutions.net/#WaykNow[Wayk Now forums] or open a ticket on this github project.
+= Wayk Agent PowerShell Cmdlet
+WaykAgent-ps is a PowerShell cmdlet for https://wayk.devolutions.net[Devolutions Wayk Agent]. For assistance or feature requests, please use the https://forum.devolutions.net[Wayk forums] or open a ticket on this github project.
 
 == Installation
 
@@ -13,88 +13,88 @@ To launch a PowerShell 7 terminal, use the `pwsh` command.
 
 === Installation from PSGallery
 
-The Wayk Den PowerShell module is https://www.powershellgallery.com/packages/WaykNow[available on PSGallery].
+The Wayk Den PowerShell module is https://www.powershellgallery.com/packages/WaykAgent[available on PSGallery].
 
 [source,sh]
 ----
-Install-Module -Name WaykNow
-Import-Module WaykNow
+Install-Module -Name WaykAgent
+Import-Module WaykAgent
 ----
 
 If you encounter issues with the `Install-Module` command, you may have to https://docs.microsoft.com/en-ca/powershell/gallery/installing-psget[install or update PowerShellGet].
 
-You can then list all commands exported from the `WaykNow` module:
+You can then list all commands exported from the `WaykAgent` module:
 
 [source,sh]
 ----
-Get-Command -Module WaykNow
+Get-Command -Module WaykAgent
 ----
 
 === Installation from Source
 
-From PowerShell, clone the https://github.com/Devolutions/WaykNow-ps[WaykNow-ps] git repository, then import the module from the "WaykNow" directory.
+From PowerShell, clone the https://github.com/Devolutions/WaykAgent-ps[WaykAgent-ps] git repository, then import the module from the "WaykAgent" directory.
 
 [source,sh]
 ----
-git clone https://github.com/Devolutions/WaykNow-ps
-Import-Module "./WaykNow-ps/WaykNow" -Force
+git clone https://github.com/Devolutions/WaykAgent-ps
+Import-Module "./WaykAgent-ps/WaykAgent" -Force
 ----
 
 == Usage
 
 === Install/Uninstall
 
-The `Install-WaykNow` and `Uninstall-WaykNow` commands can be used to install, update and uninstall Wayk Now on all platforms. On Windows, the PowerShell console must have elevated rights to perform the installation. On macOS and Linux, sudo will be called to elevate permissions when necessary.
+The `Install-WaykAgent` and `Uninstall-WaykAgent` commands can be used to install, update and uninstall Wayk Agent on all platforms. On Windows, the PowerShell console must have elevated rights to perform the installation. On macOS and Linux, sudo will be called to elevate permissions when necessary.
 
 Here is a sample installation, update check and uninstall for macOS:
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Install-WaykNow
-Installing Wayk Now 3.3.2
+PS ~/WaykAgent-ps> Install-WaykAgent
+Installing Wayk Agent 3.3.2
 Downloading https://cdn.devolutions.net/download/Mac/Wayk/3.3.2.0/Wayk.Mac.3.3.2.0.dmg
 Password:
-PS ~/WaykNow-ps> Install-WaykNow
-Wayk Now is already up to date
-PS ~/WaykNow-ps> Uninstall-WaykNow
+PS ~/WaykAgent-ps> Install-WaykAgent
+Wayk Agent is already up to date
+PS ~/WaykAgent-ps> Uninstall-WaykAgent
 ----
 
-By default, the `Install-WaykNow` skips the installation if the local Wayk Now version is the same as the latest one available, unless the `-Force` parameter is used.
+By default, the `Install-WaykAgent` skips the installation if the local Wayk Agent version is the same as the latest one available, unless the `-Force` parameter is used.
 
-The `-Version` optional parameter can be used to force using a specific version of Wayk Now instead of the latest one.
+The `-Version` optional parameter can be used to force using a specific version of Wayk Agent instead of the latest one.
 
-The `-NoDesktopShortcut` optional parameter can be used to NOT create a Desktop Shortcut for Wayk Now
+The `-NoDesktopShortcut` optional parameter can be used to NOT create a Desktop Shortcut for Wayk Agent
 
-The `-NoStartMenuShortcut` optional parameter can be used to NOT create a Start Menu Shortcut for Wayk Now
+The `-NoStartMenuShortcut` optional parameter can be used to NOT create a Start Menu Shortcut for Wayk Agent
 
 === wayk-now Command
 
-The Wayk Now executable path (referred to as 'wayk-now' in CLI commands) can be detected by the `Get-WaykNowCommand`:
+The Wayk Agent executable path (referred to as 'wayk-now' in CLI commands) can be detected by the `Get-WaykAgentCommand`:
 
 ----
-Get-WaykNowCommand
-C:\Program Files (x86)\Devolutions\Wayk Now\WaykNow.exe
+Get-WaykAgentCommand
+C:\Program Files (x86)\Devolutions\Wayk Agent\WaykAgent.exe
 ----
 
 This detection correctly handles non-standard installation paths.
 
 === Version/Package
 
-The `Get-WaykNowVersion` command detects the current Wayk Now installation version number.
+The `Get-WaykAgentVersion` command detects the current Wayk Agent installation version number.
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Get-WaykNowVersion
+PS ~/WaykAgent-ps> Get-WaykAgentVersion
 3.3.2
 ----
 
-The `Get-WaykNowPackage` command discovers the latest Wayk Now version available and the corresponding download URL.
+The `Get-WaykAgentPackage` command discovers the latest Wayk Agent version available and the corresponding download URL.
 
-An optional parameter `-Version` is available if you want to see an older version of Wayk Now. The `-Platform` parameter can be used to force a specific platform (Windows, macOS, Linux), along with `-Architecture` (x86, x64).
+An optional parameter `-Version` is available if you want to see an older version of Wayk Agent. The `-Platform` parameter can be used to force a specific platform (Windows, macOS, Linux), along with `-Architecture` (x86, x64).
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Get-WaykNowPackage
+PS ~/WaykAgent-ps> Get-WaykAgentPackage
 
 Url                                                                        Version
 ---                                                                        -------
@@ -103,42 +103,42 @@ https://cdn.devolutions.net/download/Mac/Wayk/3.3.2.0/Wayk.Mac.3.3.2.0.dmg 3.3.2
 
 === Start/Stop/Restart
 
-The `Start-WaykNow`, `Stop-WaykNow` and `Restart-WaykNow` commands can be used to start, stop and restart all Wayk Now executables and services correctly. This can be particularly useful with the Windows system service.
+The `Start-WaykAgent`, `Stop-WaykAgent` and `Restart-WaykAgent` commands can be used to start, stop and restart all Wayk Agent executables and services correctly. This can be particularly useful with the Windows system service.
 
 === Reboot in Safe Mode
 
-This is an experimental feature for Windows that has been prototyped as part of this PowerShell cmdlet. It will likely be rewritten and integrated directly in the main Wayk Now software at some point in the future.
+This is an experimental feature for Windows that has been prototyped as part of this PowerShell cmdlet. It will likely be rewritten and integrated directly in the main Wayk Agent software at some point in the future.
 
-Starting from a regular Windows boot environment (not safe mode), open an administrative PowerShell console and use the `Set-WaykNowSafeMode` command. This will create a copy of the current boot entry, rename it to "Wayk Now Safe Mode", and set it as the default. A copy of the original boot entry name is saved in the registry to allow reverting to the original state.
+Starting from a regular Windows boot environment (not safe mode), open an administrative PowerShell console and use the `Set-WaykAgentSafeMode` command. This will create a copy of the current boot entry, rename it to "Wayk Agent Safe Mode", and set it as the default. A copy of the original boot entry name is saved in the registry to allow reverting to the original state.
 
-You can not reboot the system (`Restart-Computer` or `shutdown /r`), and it will automatically select the "Wayk Now Safe Mode" boot entry. Once the system is booted, you should be able to connect to it with Wayk Now.
+You can not reboot the system (`Restart-Computer` or `shutdown /r`), and it will automatically select the "Wayk Agent Safe Mode" boot entry. Once the system is booted, you should be able to connect to it with Wayk Agent.
 
-To revert to the original state, open a PowerShell console again, but use the `Reset-WaykNowSafeMode` command. This will set the original boot entry as the default, and delete the special "Wayk Now Safe Mode". You can now restart the computer again and it will boot in its regular state.
+To revert to the original state, open a PowerShell console again, but use the `Reset-WaykAgentSafeMode` command. This will set the original boot entry as the default, and delete the special "Wayk Agent Safe Mode". You can now restart the computer again and it will boot in its regular state.
 
-=== Wayk Now Information
+=== Wayk Agent Information
 
-The `Get-WaykNowInfo` command returns information about the different WaykNow paths
+The `Get-WaykAgentInfo` command returns information about the different WaykAgent paths
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Get-WaykNowInfo
+PS ~/WaykAgent-ps> Get-WaykAgentInfo
 ----
 
 [source,sh]
 ----
 DataPath        : C:/Users/User/AppData/Roaming/Wayk
-GlobalDataPath  : C:/ProgramData/Wayk/WaykNow.cfg
-ConfigFile      : C:/Users/User/AppData/Roaming/Wayk/WaykNow.cfg
+GlobalDataPath  : C:/ProgramData/Wayk/WaykAgent.cfg
+ConfigFile      : C:/Users/User/AppData/Roaming/Wayk/WaykAgent.cfg
 LogPath         : C:/Users/User/AppData/Roaming/Wayk/logs
-CertificateFile : C:/Users/User/AppData/Roaming/Wayk/WaykNow.crt
-PrivateKeyFile  : C:/Users/User/AppData/Roaming/Wayk/WaykNow.key
-PasswordVault   : C:/Users/User/AppData/Roaming/Wayk/WaykNow.vault
+CertificateFile : C:/Users/User/AppData/Roaming/Wayk/WaykAgent.crt
+PrivateKeyFile  : C:/Users/User/AppData/Roaming/Wayk/WaykAgent.key
+PasswordVault   : C:/Users/User/AppData/Roaming/Wayk/WaykAgent.vault
 KnownHostsFile  : C:/Users/User/AppData/Roaming/Wayk/known_hosts
 BookmarksFile   : C:/Users/User/AppData/Roaming/Wayk/bookmarks
 ----
 
 == Configuration
-The `Set-WaykNowConfig` command, is used to modify multiple settings from WaykNow.
+The `Set-WaykAgentConfig` command, is used to modify multiple settings from WaykAgent.
 
 Here is a list of properties that you can modify:
 
@@ -146,15 +146,15 @@ With Windows you can set the global settings or the local settings, by default t
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -Global
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -Global
 ----
 
 === Get Configuration
-The `Get-WaykNowConfig` command returns the list of configurations from WaykNow
+The `Get-WaykAgentConfig` command returns the list of configurations from WaykAgent
 
 [source,sh]
 ----
-PS ~/WaykNow-ps>  Get-WaykNowConfig
+PS ~/WaykAgent-ps>  Get-WaykAgentConfig
 ----
 
 [source,sh]
@@ -196,7 +196,7 @@ The Friendly Name is used for Prompt For Permission (PFP) authentication. It sho
 *Example:*
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -FriendlyName david
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -FriendlyName david
 ----
 
 ==== Language
@@ -208,11 +208,11 @@ Specifies the language of the application, "en" for English, "fr" for French, "d
 *Example:*
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -Language en
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -Language en
 ----
 
 ==== ControlMode
-Specifies the Remote Control Mode of WaykNow, Both: Both sides are displayed, Client: Only the client side is displayed and Server: Only the server side is displayed.
+Specifies the Remote Control Mode of WaykAgent, Both: Both sides are displayed, Client: Only the client side is displayed and Server: Only the server side is displayed.
 
 *Type:* ControlMode +
 *DefaultValue:* Both +
@@ -220,11 +220,11 @@ Specifies the Remote Control Mode of WaykNow, Both: Both sides are displayed, Cl
 *Example:*
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -ControlMode Both
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -ControlMode Both
 ----
 
 ==== AutoLaunchOnUserLogon
-Select this option if you wish to launch Wayk Now when you log on.
+Select this option if you wish to launch Wayk Agent when you log on.
 
 *Type:* boolean +
 *DefaultValue:* false +
@@ -232,11 +232,11 @@ Select this option if you wish to launch Wayk Now when you log on.
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -AutoLaunchOnUserLogon $false
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -AutoLaunchOnUserLogon $false
 ----
 
 ==== ShowMainWindowOnLaunch
-this option is to prevent the main application window from showing when Wayk Now starts. It can be quite useful when the application is automatically launched.
+this option is to prevent the main application window from showing when Wayk Agent starts. It can be quite useful when the application is automatically launched.
 
 *Type:* boolean +
 *DefaultValue:* true +
@@ -244,11 +244,11 @@ this option is to prevent the main application window from showing when Wayk Now
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -ShowMainWindowOnLaunch $true
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -ShowMainWindowOnLaunch $true
 ----
 
 ==== MinimizeToNotificationArea
-This option is to hide Wayk Now from the taskbar when minimized.
+This option is to hide Wayk Agent from the taskbar when minimized.
 
 *Type:* boolean +
 *DefaultValue:* false +
@@ -256,11 +256,11 @@ This option is to hide Wayk Now from the taskbar when minimized.
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -MinimizeToNotificationArea $false
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -MinimizeToNotificationArea $false
 ----
 
 ==== ElevationPrompt
-This option is to disable the prompt to elevate program permissions, and run Wayk Now without elevated program permissions.
+This option is to disable the prompt to elevate program permissions, and run Wayk Agent without elevated program permissions.
 
 *Type:* boolean +
 *DefaultValue:* false +
@@ -268,7 +268,7 @@ This option is to disable the prompt to elevate program permissions, and run Way
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -ElevationPrompt $false
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -ElevationPrompt $false
 ----
 
 === Security Properties
@@ -281,7 +281,7 @@ Setting to enabled/disabled SRP: When Secure Remote Password is disabled, the pa
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -AllowPersonalPassword $true
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -AllowPersonalPassword $true
 ----
 
 ==== AllowSystemAuth
@@ -293,7 +293,7 @@ Setting to enabled/disabled SRD: Secure Remote Delegation is the method used for
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -AllowSystemAuth $true
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -AllowSystemAuth $true
 ----
 
 ==== AllowNoPassword
@@ -305,7 +305,7 @@ Setting to enabled/disabled PFP: Prompt for Permission authentication requests e
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -AllowNoPassword $true
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -AllowNoPassword $true
 ----
 
 ==== PersonalPasswordType
@@ -323,7 +323,7 @@ Create a custom password of your own choosing.
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -PersonalPasswordType Generated
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -PersonalPasswordType Generated
 ----
 
 ==== PersonalPassword
@@ -333,7 +333,7 @@ Create a custom password of your own choosing.
 *Example:*
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -PersonalPassword password
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -PersonalPassword password
 ----
 
 ==== GeneratedPasswordLength
@@ -345,7 +345,7 @@ The generated password length
 *Example:*
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -GeneratedPasswordLength 6
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -GeneratedPasswordLength 6
 ----
 
 ==== GeneratedPasswordCharSet
@@ -358,7 +358,7 @@ The alphanumeric character set contains numbers and letters, excluding 0, O, 1, 
 *Example:*
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -GeneratedPasswordCharSet Alphanumeric
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -GeneratedPasswordCharSet Alphanumeric
 ----
 
 === Connectivity Properties
@@ -371,7 +371,7 @@ Connect to Wayk Den to enable simplified peer-to-peer connectivity with a 6-digi
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -DenEnabled $true
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -DenEnabled $true
 ----
 
 ==== DenUrl
@@ -383,7 +383,7 @@ Connect to the Wayk Den server with the URL
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -DenUrl https://den.wayk.net
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -DenUrl https://den.wayk.net
 ----
 
 === Advanced Properties
@@ -397,7 +397,7 @@ The quality mode allow to adjust the quality of the render to optimize performan
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -QualityMode Medium
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -QualityMode Medium
 ----
 
 ==== LoggingLevel
@@ -410,7 +410,7 @@ This Logging level option affects the verbosity of the logging messages.
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -LoggingLevel Off
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -LoggingLevel Off
 ----
 
 ==== LoggingFilter
@@ -422,11 +422,11 @@ Do not use unless instructed.
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -LoggingFilter filter
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -LoggingFilter filter
 ----
 
 ==== VersionCheck
-Check for updates when Wayk Now is launched
+Check for updates when Wayk Agent is launched
 
 *Type:* boolean +
 *DefaultValue:* true +
@@ -434,7 +434,7 @@ Check for updates when Wayk Now is launched
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -VersionCheck $true
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -VersionCheck $true
 ----
 
 === Access Control Properties
@@ -456,7 +456,7 @@ The viewing access control
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -AccessControlViewing Allow
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -AccessControlViewing Allow
 ----
 
 ==== AccessControlInteract
@@ -469,7 +469,7 @@ The interaction access control
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -AccessControlInteract Allow
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -AccessControlInteract Allow
 ----
 
 ==== AccessControlClipboard
@@ -482,7 +482,7 @@ The clipboard access control
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -AccessControlClipboard Allow
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -AccessControlClipboard Allow
 ----
 
 ==== AccessControlFileTransfer
@@ -495,7 +495,7 @@ The file transfer access control
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -AccessControlFileTransfer Allow
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -AccessControlFileTransfer Allow
 ----
 
 ==== AccessControlExec
@@ -508,7 +508,7 @@ The execution access control
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -AccessControlExec Allow
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -AccessControlExec Allow
 ----
 
 ==== AccessControlChat
@@ -521,7 +521,7 @@ The chat access control
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowConfig -AccessControlChat Allow
+PS ~/WaykAgent-ps> Set-WaykAgentConfig -AccessControlChat Allow
 ----
 
 == White Labeling
@@ -530,127 +530,96 @@ https://helpwayk.devolutions.net/index.html?advanced_whitelabelbranding.htm
 
 === Branding Management
 
-==== Test Wayk Now Branding
+==== Test Wayk Agent Branding
 
-The `Test-WaykNowBranding` command with the parameter `BrandingPath` will inform you if the `branding.7z` is in a correct format, if the json file is correct, and if the encoding of the json file is correct.
-
-[source,sh]
-----
-PS ~/WaykNow-ps> Test-WaykNowBranding -BrandingPath https://github.com/Devolutions/WaykNow-ps/blob/master/samples/branding.7z?raw=true
-----
+The `Test-WaykAgentBranding` command with the parameter `BrandingPath` will inform you if the `branding.7z` is in a correct format, if the json file is correct, and if the encoding of the json file is correct.
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Test-WaykNowBranding -BrandingPath C:\Devolutions\BrandingFolder\branding.7z
+PS ~/WaykAgent-ps> Test-WaykAgentBranding -BrandingPath https://github.com/Devolutions/WaykAgent-ps/blob/master/samples/branding.7z?raw=true
 ----
-
-==== Set Wayk Now Branding
-
-The `Set-WaykNowBranding` command with the parameter `BrandingPath` will copy your archive `branding.zip` to the correct path of WaykNow. You can find a https://github.com/Devolutions/WaykNow-ps/blob/master/samples/branding.zip?raw=true[sample branding.zip file here].
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowBranding -BrandingPath C:\branding.zip
+PS ~/WaykAgent-ps> Test-WaykAgentBranding -BrandingPath C:\Devolutions\BrandingFolder\branding.7z
 ----
 
-==== Reset Wayk Now Branding
+==== Set Wayk Agent Branding
 
-The `Reset-WaykNowBranding` command remove the `branding.7z` from the `%APPDATA%\Wayk` and the `%PROGRAMDATA%\Wayk` paths.
-
-== Wayk Now License
-
-==== Set Wayk Now License
-
-The `Set-WaykNowLicense` command with the parameter `License`, sets your Wayk Now license.
+The `Set-WaykAgentBranding` command with the parameter `BrandingPath` will copy your archive `branding.zip` to the correct path of WaykAgent. You can find a https://github.com/Devolutions/WaykAgent-ps/blob/master/samples/branding.zip?raw=true[sample branding.zip file here].
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Set-WaykNowLicense -License XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
+PS ~/WaykAgent-ps> Set-WaykAgentBranding -BrandingPath C:\branding.zip
 ----
 
-==== Get Wayk Now License
+==== Reset Wayk Agent Branding
 
-The `Get-WaykNowLicense` command returns your license from Wayk Now.
+The `Reset-WaykAgentBranding` command remove the `branding.7z` from the `%APPDATA%\Wayk` and the `%PROGRAMDATA%\Wayk` paths.
+
+== Wayk Agent Unique ID
+
+==== Get Wayk Agent Unique ID
+
+The `Get-WaykAgentUniqueID` command returns the unique ID of Wayk Agent
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Get-WaykNowLicense 
-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
-----
-
-==== Reset Wayk Now license
-
-The `Reset-WaykNowLicense` command removes your license from Wayk Now.
-
-[source,sh]
-----
-PS ~/WaykNow-ps> Reset-WaykNowLicense 
-
-----
-
-== Wayk Now Unique ID
-
-==== Get Wayk Now Unique ID
-
-The `Get-WaykNowUniqueID` command returns the unique ID of Wayk Now
-
-[source,sh]
-----
-PS ~/WaykNow-ps> Get-WaykNowUniqueID
+PS ~/WaykAgent-ps> Get-WaykAgentUniqueID
 xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ----
 
 == Machine Registration
 
-The `Register-WaykNow` command can be used to automatically connect and register to a https://github.com/Devolutions/WaykDen-ps/blob/master/docs/deployment-automation.adoc#enrollment[Wayk Den using an enrollment token]. It is the PowerShell equivalent of the "wayk-now enroll" command. The most common usage is with the -TokenId and -DenUrl parameters:
+The `Register-WaykAgent` command can be used to automatically connect and register to a https://github.com/Devolutions/WaykDen-ps/blob/master/docs/deployment-automation.adoc#enrollment[Wayk Den using an enrollment token]. It is the PowerShell equivalent of the "wayk-now enroll" command. The most common usage is with the -TokenId and -DenUrl parameters:
 
 ----
-Register-WaykNow -TokenId 'f762156f-9470-4dcc-9ba3-157437e465ce' -DenUrl 'https://den.contoso.com'
+Register-WaykAgent -TokenId 'f762156f-9470-4dcc-9ba3-157437e465ce' -DenUrl 'https://den.contoso.com'
 ----
 
 The `-TokenData` can also be used to pass the full token data (no separate `-DenUrl` parameter is necessary):
 
 ----
-Register-WaykNow -TokenData 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Rlbi5idXp6d29yZC5tYXJrZXRpbmciLCJqdGkiOiJmNzYyMTU2Zi05NDcwLTRkY2MtOWJhMy0xNTc0MzdlNDY1Y2UiLCJpYXQiOjE1OTcwODI3NjMsImV4cCI6MTU5OTY3NDc2M30.hWaKDCHXuCHd6dXNwkvdCVKSY3eZXN7qWKKPkeSFdT4NkhT8H-p_GNXxpXuE-OTfOFislg9F1eacV5p86ef3qukgWp_qw_LJ6O8kBcq1AQccSFM7nkyB5yvXnAFbvuOJyUnGxmGG0eO9b3ihA3RVZdQFaQrn7uDyQSAnPssq1M0tli9ywcXki__IzAFI7ZXDPZPKwEw_xedADNSNfL7Gb_pnFnTsyuSOLynq7T8TPdR0G5YSG6palnRjWKPlZeEfYhYq6qu_zDSDLDLgfLFxjSxVHUGd62cSC3r1ne5Viu7GZKZIQJR2T1ljWPBfttqYjrHZMTe6JiU3-E7VUVYLVQ'
+Register-WaykAgent -TokenData 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Rlbi5idXp6d29yZC5tYXJrZXRpbmciLCJqdGkiOiJmNzYyMTU2Zi05NDcwLTRkY2MtOWJhMy0xNTc0MzdlNDY1Y2UiLCJpYXQiOjE1OTcwODI3NjMsImV4cCI6MTU5OTY3NDc2M30.hWaKDCHXuCHd6dXNwkvdCVKSY3eZXN7qWKKPkeSFdT4NkhT8H-p_GNXxpXuE-OTfOFislg9F1eacV5p86ef3qukgWp_qw_LJ6O8kBcq1AQccSFM7nkyB5yvXnAFbvuOJyUnGxmGG0eO9b3ihA3RVZdQFaQrn7uDyQSAnPssq1M0tli9ywcXki__IzAFI7ZXDPZPKwEw_xedADNSNfL7Gb_pnFnTsyuSOLynq7T8TPdR0G5YSG6palnRjWKPlZeEfYhYq6qu_zDSDLDLgfLFxjSxVHUGd62cSC3r1ne5Viu7GZKZIQJR2T1ljWPBfttqYjrHZMTe6JiU3-E7VUVYLVQ'
 ----
 
 For the sake of convenience, the token can also be saved to a file and passed using the `-TokenPath` parameter:
 
 ----
-Register-WaykNow -TokenPath 'C:\token.txt'
+Register-WaykAgent -TokenPath 'C:\token.txt'
 ----
 
 == Log Management
 
-==== Enable WaykNow Logs
+==== Enable WaykAgent Logs
 
-The command `Enable-WaykNowLogs` will enable the logs on WaykNow with the Logging Level `Debug` by default, you can choose this one with the parameter `LoggingLevel` and you can choose to restart WaykNow with the command `-Restart`, because the changes will only be applied after an application restart.
+The command `Enable-WaykAgentLogs` will enable the logs on WaykAgent with the Logging Level `Debug` by default, you can choose this one with the parameter `LoggingLevel` and you can choose to restart WaykAgent with the command `-Restart`, because the changes will only be applied after an application restart.
 
 [source,sh]
 ----
-PS ~/WaykNow-ps> Enable-WaykNowLogs -Restart -LoggingLevel Info
+PS ~/WaykAgent-ps> Enable-WaykAgentLogs -Restart -LoggingLevel Info
 ----
 
-==== Disable WaykNow Logs
+==== Disable WaykAgent Logs
 
-The command `Disable-WaykNowLogs` will disable the logs on WaykNow, you can choose to restart WaykNow with the command `-Restart`, because the changes will only be applied after an application restart.
+The command `Disable-WaykAgentLogs` will disable the logs on WaykAgent, you can choose to restart WaykAgent with the command `-Restart`, because the changes will only be applied after an application restart.
 [source,sh]
 ----
-PS ~/WaykNow-ps> Disable-WaykNowLogs -Restart
+PS ~/WaykAgent-ps> Disable-WaykAgentLogs -Restart
 ----
 
-==== Export WaykNow Logs
+==== Export WaykAgent Logs
 
-The command `Export-WaykNowLogs` will export the logs from WaykNow, you need to set the parameter `-ExportPath` to choose the destination of the logs
+The command `Export-WaykAgentLogs` will export the logs from WaykAgent, you need to set the parameter `-ExportPath` to choose the destination of the logs
 [source,sh]
 ----
-PS ~/WaykNow-ps> Export-WaykNowLogs -ExportPath C:\Users\user\Desktop
+PS ~/WaykAgent-ps> Export-WaykAgentLogs -ExportPath C:\Users\user\Desktop
 ----
 
-==== Clear WaykNow Logs
+==== Clear WaykAgent Logs
 
-The command `Clear-WaykNowLogs` will clear the logs from WaykNow
+The command `Clear-WaykAgentLogs` will clear the logs from WaykAgent
 [source,sh]
 ----
-PS ~/WaykNow-ps> Clear-WaykNowLogs
+PS ~/WaykAgent-ps> Clear-WaykAgentLogs
 ----

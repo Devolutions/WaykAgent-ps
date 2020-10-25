@@ -1,17 +1,16 @@
-Import-Module "$PSScriptRoot/../WaykNow"
+Import-Module "$PSScriptRoot/../WaykAgent"
 
-Describe 'Wayk Now branding' {
-	InModuleScope WaykNow {
-		Mock Get-WaykNowPath { Join-Path $TestDrive "Global" } -ParameterFilter { $PathType -eq "GlobalPath" }
-		Mock Get-WaykNowPath { Join-Path $TestDrive "Local" } -ParameterFilter { $PathType -eq "LocalPath" }
+Describe 'Wayk Agent branding' {
+	InModuleScope WaykAgent {
+		Mock Get-WaykAgentPath { Join-Path $TestDrive "config" }
 
 		Context 'Empty configuration files' {
 			It 'Sets a sample branding.zip file' {
 				$BrandingZip = Join-Path $PSScriptRoot "../samples/branding.zip" -Resolve
-				Set-WaykNowBranding -BrandingPath $BrandingZip
-				Assert-MockCalled 'Get-WaykNowPath'
-				$GlobalPath = Get-WaykNowPath 'GlobalPath'
-				$BrandingPath = Join-Path $GlobalPath "branding.zip"
+				Set-WaykAgentBranding -BrandingPath $BrandingZip
+				Assert-MockCalled 'Get-WaykAgentPath'
+				$ConfigPath = Get-WaykAgentPath 'GlobalPath'
+				$BrandingPath = Join-Path $ConfigPath "branding.zip"
 				Test-Path -Path $BrandingPath | Should -BeTrue
 			}
 		}

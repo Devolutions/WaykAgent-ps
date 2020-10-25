@@ -1,5 +1,3 @@
-. "$PSScriptRoot/../Private/Invoke-Process.ps1"
-. "$PSScriptRoot/../Private/Exceptions.ps1"
 
 enum ControlMode 
 {
@@ -45,7 +43,7 @@ enum AccessControl
     Disable = 4
 }
 
-class WaykNowConfig
+class WaykAgentConfig
 {
 	# General
     [string] $FriendlyName
@@ -90,29 +88,20 @@ class WaykNowConfig
     [bool] $AutoUpdateEnabled = $true
 }
 
-function Get-WaykNowConfigFile
+function Get-WaykAgentConfigFile
 {
     param(
-        [switch] $Global
     )
 
-    [WaykNowInfo]$WaykInfo = Get-WaykNowInfo
-
-    if ($Global) {
-        $ConfigFile = $WaykInfo.GlobalConfigFile
-    } else {
-        $ConfigFile = $WaykInfo.ConfigFile
-    }
-
+    $ConfigPath = Get-WaykAgentPath
+    $ConfigFile = Join-Path $ConfigPath "WaykNow.cfg"
     return $ConfigFile
 }
 
-function Set-WaykNowConfig
+function Set-WaykAgentConfig
 {
     [CmdletBinding()]
     param(
-        [switch] $Global,
-
         [string] $FriendlyName,
         [ValidateSet("en", "fr", "de", "it", "pl", "zh-CN", "zh-TW")]
         [string] $Language,
@@ -152,7 +141,7 @@ function Set-WaykNowConfig
         [bool] $AutoUpdateEnabled
     )
 
-    $ConfigFile = Get-WaykNowConfigFile -Global:$Global
+    $ConfigFile = Get-WaykAgentConfigFile
 
     if (Test-Path $ConfigFile) {
         $json = Get-Content -Path $ConfigFile -Encoding UTF8 | ConvertFrom-Json
@@ -160,7 +149,7 @@ function Set-WaykNowConfig
         $json = '{}' | ConvertFrom-Json
     }
 
-    $properties = [WaykNowConfig].GetProperties() | ForEach-Object { $_.Name }
+    $properties = [WaykAgentConfig].GetProperties() | ForEach-Object { $_.Name }
 
     foreach ($param in $PSBoundParameters.GetEnumerator()) {
         if ($param.Key -NotLike 'AccessControl*') {
@@ -191,41 +180,27 @@ function Set-WaykNowConfig
     [System.IO.File]::WriteAllLines($ConfigFile, $FileValue, $Utf8NoBomEncoding)
 }
 
-function Get-WaykNowConfig
+function Get-WaykAgentConfig
 {
     [CmdletBinding()]
-    [OutputType('WaykNowConfig')]
     param(
-        [switch] $Global = $false
     )
 
-    if (-Not $Global) {
-        $LocalConfigFile = Get-WaykNowConfigFile
+    $ConfigFile = Get-WaykAgentConfigFile
 
-        if (Test-Path $LocalConfigFile) {
-            $LocalJson = Get-Content -Path $LocalConfigFile -Encoding UTF8 | ConvertFrom-Json
-        }
+    if (Test-Path $ConfigFile) {
+        $ConfigJson = Get-Content -Path $ConfigFile -Encoding UTF8 | ConvertFrom-Json
     }
 
-    $GlobalConfigFile = Get-WaykNowConfigFile -Global
+    $config = [WaykAgentConfig]::new()
 
-    if (Test-Path $GlobalConfigFile) {
-        $GlobalJson = Get-Content -Path $GlobalConfigFile -Encoding UTF8 | ConvertFrom-Json
-    }
-
-    $config = [WaykNowConfig]::new()
-
-    [WaykNowConfig].GetProperties() | ForEach-Object {
+    [WaykAgentConfig].GetProperties() | ForEach-Object {
         if ($_.Name -NotLike 'AccessControl*') {
             $Name = $_.Name
             $Property = $null
 
-            if ($LocalJson -And $LocalJson.PSObject.Properties[$Name]) {
-                $Property = $LocalJson.PSObject.Properties[$Name]
-            }
-
-            if ($GlobalJson -And $GlobalJson.PSObject.Properties[$Name]) {
-                $Property = $GlobalJson.PSObject.Properties[$Name]
+            if ($ConfigJson -And $ConfigJson.PSObject.Properties[$Name]) {
+                $Property = $ConfigJson.PSObject.Properties[$Name]
             }
 
             if ($Property) {
@@ -243,13 +218,8 @@ function Get-WaykNowConfig
         $AccessControl = $null
         $Property = $null
 
-        if ($LocalJson -And $LocalJson.PSObject.Properties['AccessControl']) {
-            $AccessControl = $LocalJson.PSObject.Properties['AccessControl'].Value
-            $Property = $AccessControl.PSObject.Properties[$ShortName]
-        }
-
-        if ($GlobalJson -And $GlobalJson.PSObject.Properties['AccessControl']) {
-            $AccessControl = $GlobalJson.PSObject.Properties['AccessControl'].Value
+        if ($ConfigJson -And $ConfigJson.PSObject.Properties['AccessControl']) {
+            $AccessControl = $ConfigJson.PSObject.Properties['AccessControl'].Value
             $Property = $AccessControl.PSObject.Properties[$ShortName]
         }
 
@@ -261,5 +231,3 @@ function Get-WaykNowConfig
 
     return $config
 }
-
-Export-ModuleMember -Function Set-WaykNowConfig, Get-WaykNowConfig

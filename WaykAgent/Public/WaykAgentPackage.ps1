@@ -1,15 +1,12 @@
-
-. "$PSScriptRoot/../Private/Invoke-Process.ps1"
 . "$PSScriptRoot/../Private/PlatformHelpers.ps1"
-. "$PSScriptRoot/../Private/Exceptions.ps1"
 
-function Get-WaykNowVersion
+function Get-WaykAgentVersion
 {
     [CmdletBinding()]
     param()
 
 	if (Get-IsWindows) {
-		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Now'
+		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Agent'
 		if ($uninstall_reg) {
 			$version = $uninstall_reg.DisplayVersion
 			if ($version -lt 2000) {
@@ -18,7 +15,7 @@ function Get-WaykNowVersion
 			return $version
 		}
 	} elseif ($IsMacOS) {
-		$info_plist_path = "/Applications/WaykNow.app/Contents/Info.plist"
+		$info_plist_path = "/Applications/WaykAgent.app/Contents/Info.plist"
 		$cf_bundle_version_xpath = "//dict/key[. ='CFBundleVersion']/following-sibling::string[1]"
 		if (Test-Path -Path $info_plist_path) {
 			$version = $(Select-Xml -Path $info_plist_path -XPath $cf_bundle_version_xpath `
@@ -26,51 +23,76 @@ function Get-WaykNowVersion
 			return $version
 		}
 	} elseif ($IsLinux) {
-		$dpkg_status = $(Invoke-Process -FilePath 'dpkg' -ArgumentList "-s wayk-now" -IgnoreExitCode)
-		$matches = $($dpkg_status | Select-String -AllMatches -Pattern 'version: (\S+)').Matches
-		if ($matches) {
-			$version = $matches.Groups[1].Value
+		$dpkg_status = $(dpkg -s wayk-agent)
+		$DpkgMatches = $($dpkg_status | Select-String -AllMatches -Pattern 'version: (\S+)').Matches
+		if ($DpkgMatches) {
+			$version = $DpkgMatches.Groups[1].Value
 			return $version
 		}
 	}
 
 	return $null
 }
-function Get-WaykNowPackage
+function Get-WaykAgentPackage
 {
     [CmdletBinding()]
     param(
-		[string] $Version,
+		[string] $RequiredVersion,
 		[ValidateSet("Windows","macOS","Linux")]
 		[string] $Platform,
 		[ValidateSet("x86","x64")]
 		[string] $Architecture
 	)
 
-	$version_quad = '';
-	$products_url = "https://devolutions.net/products.htm"
-	$products_htm = Invoke-RestMethod -Uri $products_url -Method 'GET' -ContentType 'text/plain'
-	$version_matches = $($products_htm | Select-String -AllMatches -Pattern "Wayk.Version=(\S+)").Matches
+	$VersionQuad = '';
+	$ProductsUrl = "https://devolutions.net/products.htm"
 
-	if ($version) {
-		$version_quad = $version
+	if ($Env:WAYK_PRODUCT_INFO_URL) {
+		$ProductsUrl = $Env:WAYK_PRODUCT_INFO_URL
+	}
+
+	$ProductsHtm = Invoke-RestMethod -Uri $ProductsUrl -Method 'GET' -ContentType 'text/plain'
+	$VersionMatches = $($ProductsHtm | Select-String -AllMatches -Pattern "Wayk.Version=(\S+)").Matches
+	$LatestVersion = $VersionMatches.Groups[1].Value
+
+	if ($RequiredVersion) {
+		if ($RequiredVersion -Match "^\d+`.\d+`.\d+$") {
+			$RequiredVersion = $RequiredVersion + ".0"
+		}
+		$VersionQuad = $RequiredVersion
 	} else {
-		$version_quad = $version_matches.Groups[1].Value
+		$VersionQuad = $LatestVersion
+	}
+
+	$VersionMatches = $($VersionQuad | Select-String -AllMatches -Pattern "(\d+)`.(\d+)`.(\d+)`.(\d+)").Matches
+	$VersionMajor = $VersionMatches.Groups[1].Value
+	$VersionMinor = $VersionMatches.Groups[2].Value
+	$VersionPatch = $VersionMatches.Groups[3].Value
+	$VersionTriple = "${VersionMajor}.${VersionMinor}.${VersionPatch}"
+
+	$WaykMatches = $($ProductsHtm | Select-String -AllMatches -Pattern "(Wayk\S+).Url=(\S+)").Matches
+	$WaykAgentMsi64 = $WaykMatches | Where-Object { $_.Groups[1].Value -eq 'WaykAgentmsi64' }
+	$WaykAgentMsi86 = $WaykMatches | Where-Object { $_.Groups[1].Value -eq 'WaykAgentmsi86' }
+	$WaykAgentMac = $WaykMatches | Where-Object { $_.Groups[1].Value -eq 'WaykAgentMac' }
+	$WaykAgentLinux = $WaykMatches | Where-Object { $_.Groups[1].Value -eq 'WaykAgentLinuxbin' }
+
+	if ($WaykAgentMsi86) {
+		$DownloadUrlX86 = $WaykAgentMsi86.Groups[2].Value
 	}
 	
-	$download_base = "https://cdn.devolutions.net/download"
-	$download_url_x64 = "$download_base/Wayk/$version_quad/WaykNow-x64-$version_quad.msi"
-	$download_url_x86 = "$download_base/Wayk/$version_quad/WaykNow-x86-$version_quad.msi"
-	$download_url_mac = "$download_base/Mac/Wayk/$version_quad/Wayk.Mac.$version_quad.dmg"
-	$download_url_deb = "$download_base/Linux/Wayk/$version_quad/wayk-now_${version_quad}_amd64.deb"
+	if ($WaykAgentMsi64) {
+		$DownloadUrlX64 = $WaykAgentMsi64.Groups[2].Value
+	}
 
-	$version_matches = $($version_quad | Select-String -AllMatches -Pattern "(\d+)`.(\d+)`.(\d+)`.(\d+)").Matches
-	$version_major = $version_matches.Groups[1].Value
-	$version_minor = $version_matches.Groups[2].Value
-	$version_patch = $version_matches.Groups[3].Value
-	$version_triple = "${version_major}.${version_minor}.${version_patch}"
+	if ($WaykAgentMac) {
+		$DownloadUrlMac = $WaykAgentMac.Groups[2].Value
+	}
+	
+	if ($WaykAgentLinux) {
+		$DownloadUrlLinux = $WaykAgentLinux.Groups[2].Value
+	}
 
-	$download_url = $null
+	$DownloadUrl = $null
 
 	if (-Not $Platform) {
 		if ($IsLinux) {
@@ -100,24 +122,29 @@ function Get-WaykNowPackage
 
 	if ($Platform -eq 'Windows') {
 		if ($Architecture -eq 'x64') {
-			$download_url = $download_url_x64
+			$DownloadUrl = $DownloadUrlX64
 		} elseif ($Architecture -eq 'x86') {
-			$download_url = $download_url_x86
+			$DownloadUrl = $DownloadUrlX86
 		}
 	} elseif ($Platform -eq 'macOS') {
-		$download_url = $download_url_mac
+		$DownloadUrl = $DownloadUrlMac
 	} elseif ($Platform -eq 'Linux') {
-		$download_url = $download_url_deb
+		$DownloadUrl = $DownloadUrlLinux
+	}
+
+	if ($RequiredVersion) {
+		# both variables are in quadruple version format
+		$DownloadUrl = $DownloadUrl -Replace $LatestVersion, $RequiredVersion
 	}
  
     $result = [PSCustomObject]@{
-        Url = $download_url
-        Version = $version_triple
+        Url = $DownloadUrl
+        Version = $VersionTriple
     }
 
 	return $result
 }
-function Install-WaykNow
+function Install-WaykAgent
 {
     [CmdletBinding()]
     param(
@@ -129,14 +156,14 @@ function Install-WaykNow
 	)
 
 	$tempDirectory = New-TemporaryDirectory
-	$package = Get-WaykNowPackage $Version
+	$package = Get-WaykAgentPackage $Version
 	$latest_version = $package.Version
-	$current_version = Get-WaykNowVersion
+	$current_version = Get-WaykAgentVersion
 
 	if (([version]$latest_version -gt [version]$current_version) -Or $Force) {
-		Write-Host "Installing Wayk Now ${latest_version}"
+		Write-Host "Installing Wayk Agent ${latest_version}"
 	} else {
-		Write-Host "Wayk Now is already up to date"
+		Write-Host "Wayk Agent is already up to date"
 		return
 	}
 
@@ -153,7 +180,7 @@ function Install-WaykNow
 
 	if (([version]$current_version -gt [version]$latest_version) -And $Force)
 	{
-		Uninstall-WaykNow -Quiet:$Quiet
+		Uninstall-WaykAgent -Quiet:$Quiet
 	}
 
 	if (Get-IsWindows) {
@@ -161,7 +188,7 @@ function Install-WaykNow
 		if ($Quiet){
 			$display = '/quiet'
 		}
-		$install_log_file = "$tempDirectory/WaykNow_Install.log"
+		$install_log_file = "$tempDirectory/WaykAgent_Install.log"
 		$msi_args = @(
 			'/i', "`"$download_file_path`"",
 			$display,
@@ -179,18 +206,18 @@ function Install-WaykNow
 
 		Remove-Item -Path $install_log_file -Force -ErrorAction SilentlyContinue
 	} elseif ($IsMacOS) {
-		$volumes_wayk_now = "/Volumes/WaykNow"
+		$volumes_wayk_now = "/Volumes/WaykAgent"
 		if (Test-Path -Path $volumes_wayk_now -PathType 'Container') {
 			Start-Process 'hdiutil' -ArgumentList @('unmount', $volumes_wayk_now) -Wait
 		}
 		Start-Process 'hdiutil' -ArgumentList @('mount', "$download_file_path") `
 			-Wait -RedirectStandardOutput '/dev/null'
 		Wait-Process $(Start-Process 'sudo' -ArgumentList @('cp', '-R', `
-			"${volumes_wayk_now}/WaykNow.app", "/Applications") -PassThru).Id
+			"${volumes_wayk_now}/WaykAgent.app", "/Applications") -PassThru).Id
 		Start-Process 'hdiutil' -ArgumentList @('unmount', $volumes_wayk_now) `
 			-Wait -RedirectStandardOutput '/dev/null'
 		Wait-Process $(Start-Process 'sudo' -ArgumentList @('ln', '-sfn', `
-			"/Applications/WaykNow.app/Contents/MacOS/WaykNow",
+			"/Applications/WaykAgent.app/Contents/MacOS/WaykAgent",
 			"/usr/local/bin/wayk-now") -PassThru).Id
 	} elseif ($IsLinux) {
 		$dpkg_args = @(
@@ -207,18 +234,18 @@ function Install-WaykNow
 	Remove-Item -Path $tempDirectory -Force -Recurse
 }
 
-function Uninstall-WaykNow
+function Uninstall-WaykAgent
 {
     [CmdletBinding()]
     param(
 		[switch] $Quiet
 	)
 	
-	Stop-WaykNow
+	Stop-WaykAgent
 	
 	if (Get-IsWindows) {
 		# https://stackoverflow.com/a/25546511
-		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Now'
+		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Agent'
 		if ($uninstall_reg) {
 			$uninstall_string = $($uninstall_reg.UninstallString `
 				-Replace "msiexec.exe", "" -Replace "/I", "" -Replace "/X", "").Trim()
@@ -232,7 +259,7 @@ function Uninstall-WaykNow
 			Start-Process "msiexec.exe" -ArgumentList $msi_args -Wait
 		}
 	} elseif ($IsMacOS) {
-		$wayk_now_app = "/Applications/WaykNow.app"
+		$wayk_now_app = "/Applications/WaykAgent.app"
 		if (Test-Path -Path $wayk_now_app -PathType 'Container') {
 			Start-Process 'sudo' -ArgumentList @('rm', '-rf', $wayk_now_app) -Wait
 		}
@@ -241,9 +268,9 @@ function Uninstall-WaykNow
 			Start-Process 'sudo' -ArgumentList @('rm', $wayk_now_symlink) -Wait
 		}
 	} elseif ($IsLinux) {
-		if (Get-WaykNowVersion) {
+		if (Get-WaykAgentVersion) {
 			$apt_args = @(
-				'-y', 'remove', 'wayk-now', '--purge'
+				'-y', 'remove', 'wayk-agent', '--purge'
 			)
 			if ((id -u) -eq 0) {
 				Start-Process 'apt-get' -ArgumentList $apt_args -Wait
@@ -255,7 +282,7 @@ function Uninstall-WaykNow
 	}
 }
 
-function Update-WaykNow
+function Update-WaykAgent
 {
     [CmdletBinding()]
     param(
@@ -263,102 +290,45 @@ function Update-WaykNow
 		[switch] $Quiet
 	)
 
-	$wayk_now_process_was_running = Get-WaykNowProcess
-	$wayk_now_service_was_running = (Get-WaykNowService).Status -Eq 'Running'
+	$wayk_now_process_was_running = Get-WaykAgentProcess
+	$wayk_now_service_was_running = (Get-WaykAgentService).Status -Eq 'Running'
 
 	try {
-		Install-WaykNow -Force:$Force -Quiet:$Quiet
+		Install-WaykAgent -Force:$Force -Quiet:$Quiet
 	}
 	catch {
 		throw $_
 	}
 
 	if ($wayk_now_process_was_running) {
-		Start-WaykNow
+		Start-WaykAgent
 	} elseif ($wayk_now_service_was_running) {
-		Start-WaykNowService
+		Start-WaykAgentService
 	}
 }
 
-class WaykNowInfo
-{
-	[string] $DataPath
-	[string] $GlobalPath
-	[string] $GlobalDataPath
-	[string] $GlobalConfigFile
-	[string] $ConfigFile
-	[string] $DenPath
-	[string] $DenGlobalPath
-	[string] $LogPath
-	[string] $LogGlobalPath
-	[string] $CertificateFile
-	[string] $PrivateKeyFile
-	[string] $PasswordVault
-	[string] $KnownHostsFile
-	[string] $BookmarksFile
-}
-
-function Get-WaykNowPath()
+function Get-WaykAgentPath()
 {
 	[CmdletBinding()]
 	param(
-		[Parameter(Mandatory,Position=0)]
-		[string] $PathType
+		[Parameter(Position=0)]
+		[string] $PathType = "ConfigPath"
 	)
 
-	$HomePath = Resolve-Path '~'
-
 	if (Get-IsWindows)	{
-		$LocalPath = $Env:APPDATA + '\Wayk';
-		$GlobalPath = $Env:ALLUSERSPROFILE + '\Wayk'
+		$ConfigPath = $Env:ALLUSERSPROFILE + '\Wayk'
 	} elseif ($IsMacOS) {
-		$LocalPath = "$HomePath/Library/Application Support/Wayk"
-		$GlobalPath = "/Library/Application Support/Wayk"
+		$ConfigPath = "/Library/Application Support/Wayk"
 	} elseif ($IsLinux) {
-		$LocalPath = "$HomePath/.config/Wayk"
-		$GlobalPath = '/etc/wayk'
-	}
-
-	if (Test-Path Env:WAYK_DATA_PATH) {
-		$LocalPath = $Env:WAYK_DATA_PATH
+		$ConfigPath = '/etc/wayk'
 	}
 
 	if (Test-Path Env:WAYK_SYSTEM_PATH) {
-		$GlobalPath = $Env:WAYK_SYSTEM_PATH
+		$ConfigPath = $Env:WAYK_SYSTEM_PATH
 	}
 
 	switch ($PathType) {
-		'LocalPath' { $LocalPath }
-		'GlobalPath' { $GlobalPath }
+		'ConfigPath' { $ConfigPath }
 		default { throw("Invalid path type: $PathType") }
 	}
 }
-
-function Get-WaykNowInfo()
-{
-	[CmdletBinding()]
-	param()
-
-	$DataPath = Get-WaykNowPath 'LocalPath'
-	$GlobalPath = Get-WaykNowPath 'GlobalPath'
-
-	$info = [WaykNowInfo]::New()
-	$info.DataPath = $DataPath
-	$info.GlobalPath = $GlobalPath
-	$info.GlobalDataPath = $GlobalPath
-	$info.GlobalConfigFile = Join-Path -Path $GlobalPath -ChildPath 'WaykNow.cfg'
-	$info.DenGlobalPath = Join-Path -Path $GlobalPath -ChildPath 'den'
-	$info.LogGlobalPath = Join-Path -Path $GlobalPath -ChildPath 'logs'
-	$info.ConfigFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.cfg'
-	$info.DenPath = Join-Path -Path $DataPath -ChildPath 'den'
-	$info.LogPath = Join-Path -Path $DataPath -ChildPath 'logs'
-	$info.CertificateFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.crt'
-	$info.PrivateKeyFile = Join-Path -Path $DataPath -ChildPath 'WaykNow.key'
-	$info.PasswordVault = Join-Path -Path $DataPath -ChildPath 'WaykNow.vault'
-	$info.KnownHostsFile = Join-Path -Path $DataPath -ChildPath 'known_hosts'
-	$info.BookmarksFile = Join-Path -Path $DataPath -ChildPath 'bookmarks'
-
-	return $info 
-}
-
-Export-ModuleMember -Function Get-WaykNowVersion, Get-WaykNowPackage, Install-WaykNow, Uninstall-WaykNow, Update-WaykNow, Get-WaykNowPath, Get-WaykNowInfo
