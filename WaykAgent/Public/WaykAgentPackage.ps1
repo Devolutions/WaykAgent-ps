@@ -6,7 +6,7 @@ function Get-WaykAgentVersion
     param()
 
 	if (Get-IsWindows) {
-		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Now'
+		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Agent'
 		if ($uninstall_reg) {
 			$version = $uninstall_reg.DisplayVersion
 			if ($version -lt 2000) {
@@ -37,37 +37,62 @@ function Get-WaykAgentPackage
 {
     [CmdletBinding()]
     param(
-		[string] $Version,
+		[string] $RequiredVersion,
 		[ValidateSet("Windows","macOS","Linux")]
 		[string] $Platform,
 		[ValidateSet("x86","x64")]
 		[string] $Architecture
 	)
 
-	$version_quad = '';
-	$products_url = "https://devolutions.net/products.htm"
-	$products_htm = Invoke-RestMethod -Uri $products_url -Method 'GET' -ContentType 'text/plain'
-	$version_matches = $($products_htm | Select-String -AllMatches -Pattern "Wayk.Version=(\S+)").Matches
+	$VersionQuad = '';
+	$ProductsUrl = "https://devolutions.net/products.htm"
 
-	if ($version) {
-		$version_quad = $version
+	if ($Env:WAYK_PRODUCT_INFO_URL) {
+		$ProductsUrl = $Env:WAYK_PRODUCT_INFO_URL
+	}
+
+	$ProductsHtm = Invoke-RestMethod -Uri $ProductsUrl -Method 'GET' -ContentType 'text/plain'
+	$VersionMatches = $($ProductsHtm | Select-String -AllMatches -Pattern "Wayk.Version=(\S+)").Matches
+	$LatestVersion = $VersionMatches.Groups[1].Value
+
+	if ($RequiredVersion) {
+		if ($RequiredVersion -Match "^\d+`.\d+`.\d+$") {
+			$RequiredVersion = $RequiredVersion + ".0"
+		}
+		$VersionQuad = $RequiredVersion
 	} else {
-		$version_quad = $version_matches.Groups[1].Value
+		$VersionQuad = $LatestVersion
+	}
+
+	$VersionMatches = $($VersionQuad | Select-String -AllMatches -Pattern "(\d+)`.(\d+)`.(\d+)`.(\d+)").Matches
+	$VersionMajor = $VersionMatches.Groups[1].Value
+	$VersionMinor = $VersionMatches.Groups[2].Value
+	$VersionPatch = $VersionMatches.Groups[3].Value
+	$VersionTriple = "${VersionMajor}.${VersionMinor}.${VersionPatch}"
+
+	$WaykMatches = $($ProductsHtm | Select-String -AllMatches -Pattern "(Wayk\S+).Url=(\S+)").Matches
+	$WaykAgentMsi64 = $WaykMatches | Where-Object { $_.Groups[1].Value -eq 'WaykAgentmsi64' }
+	$WaykAgentMsi86 = $WaykMatches | Where-Object { $_.Groups[1].Value -eq 'WaykAgentmsi86' }
+	$WaykAgentMac = $WaykMatches | Where-Object { $_.Groups[1].Value -eq 'WaykAgentMac' }
+	$WaykAgentLinux = $WaykMatches | Where-Object { $_.Groups[1].Value -eq 'WaykAgentLinuxbin' }
+
+	if ($WaykAgentMsi86) {
+		$DownloadUrlX86 = $WaykAgentMsi86.Groups[2].Value
 	}
 	
-	$download_base = "https://cdn.devolutions.net/download"
-	$download_url_x64 = "$download_base/Wayk/$version_quad/WaykAgent-x64-$version_quad.msi"
-	$download_url_x86 = "$download_base/Wayk/$version_quad/WaykAgent-x86-$version_quad.msi"
-	$download_url_mac = "$download_base/Mac/Wayk/$version_quad/Wayk.Mac.$version_quad.dmg"
-	$download_url_deb = "$download_base/Linux/Wayk/$version_quad/wayk-now_${version_quad}_amd64.deb"
+	if ($WaykAgentMsi64) {
+		$DownloadUrlX64 = $WaykAgentMsi64.Groups[2].Value
+	}
 
-	$version_matches = $($version_quad | Select-String -AllMatches -Pattern "(\d+)`.(\d+)`.(\d+)`.(\d+)").Matches
-	$version_major = $version_matches.Groups[1].Value
-	$version_minor = $version_matches.Groups[2].Value
-	$version_patch = $version_matches.Groups[3].Value
-	$version_triple = "${version_major}.${version_minor}.${version_patch}"
+	if ($WaykAgentMac) {
+		$DownloadUrlMac = $WaykAgentMac.Groups[2].Value
+	}
+	
+	if ($WaykAgentLinux) {
+		$DownloadUrlLinux = $WaykAgentLinux.Groups[2].Value
+	}
 
-	$download_url = $null
+	$DownloadUrl = $null
 
 	if (-Not $Platform) {
 		if ($IsLinux) {
@@ -97,19 +122,24 @@ function Get-WaykAgentPackage
 
 	if ($Platform -eq 'Windows') {
 		if ($Architecture -eq 'x64') {
-			$download_url = $download_url_x64
+			$DownloadUrl = $DownloadUrlX64
 		} elseif ($Architecture -eq 'x86') {
-			$download_url = $download_url_x86
+			$DownloadUrl = $DownloadUrlX86
 		}
 	} elseif ($Platform -eq 'macOS') {
-		$download_url = $download_url_mac
+		$DownloadUrl = $DownloadUrlMac
 	} elseif ($Platform -eq 'Linux') {
-		$download_url = $download_url_deb
+		$DownloadUrl = $DownloadUrlLinux
+	}
+
+	if ($RequiredVersion) {
+		# both variables are in quadruple version format
+		$DownloadUrl = $DownloadUrl -Replace $LatestVersion, $RequiredVersion
 	}
  
     $result = [PSCustomObject]@{
-        Url = $download_url
-        Version = $version_triple
+        Url = $DownloadUrl
+        Version = $VersionTriple
     }
 
 	return $result
@@ -131,9 +161,9 @@ function Install-WaykAgent
 	$current_version = Get-WaykAgentVersion
 
 	if (([version]$latest_version -gt [version]$current_version) -Or $Force) {
-		Write-Host "Installing Wayk Now ${latest_version}"
+		Write-Host "Installing Wayk Agent ${latest_version}"
 	} else {
-		Write-Host "Wayk Now is already up to date"
+		Write-Host "Wayk Agent is already up to date"
 		return
 	}
 
@@ -215,7 +245,7 @@ function Uninstall-WaykAgent
 	
 	if (Get-IsWindows) {
 		# https://stackoverflow.com/a/25546511
-		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Now'
+		$uninstall_reg = Get-UninstallRegistryKey 'Wayk Agent'
 		if ($uninstall_reg) {
 			$uninstall_string = $($uninstall_reg.UninstallString `
 				-Replace "msiexec.exe", "" -Replace "/I", "" -Replace "/X", "").Trim()

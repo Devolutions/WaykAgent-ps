@@ -21,7 +21,7 @@ function Get-WindowsHostArch
 }
 
 function Get-UninstallRegistryKey(
-	[string] $display_name = 'Wayk Now'
+	[string] $display_name = 'Wayk Agent'
 ){
     if ([System.Environment]::Is64BitOperatingSystem) {
         $uninstall_base_reg = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
