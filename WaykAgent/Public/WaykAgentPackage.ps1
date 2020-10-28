@@ -206,19 +206,8 @@ function Install-WaykAgent
 
 		Remove-Item -Path $InstallLogFile -Force -ErrorAction SilentlyContinue
 	} elseif ($IsMacOS) {
-		$VolumesWaykAgent = "/Volumes/WaykAgent"
-		if (Test-Path -Path $VolumesWaykAgent -PathType 'Container') {
-			Start-Process 'hdiutil' -ArgumentList @('unmount', $VolumesWaykAgent) -Wait
-		}
-		Start-Process 'hdiutil' -ArgumentList @('mount', "$DownloadFilePath") `
-			-Wait -RedirectStandardOutput '/dev/null'
-		Wait-Process $(Start-Process 'sudo' -ArgumentList @('cp', '-R', `
-			"${VolumesWaykAgent}/WaykAgent.app", "/Applications") -PassThru).Id
-		Start-Process 'hdiutil' -ArgumentList @('unmount', $VolumesWaykAgent) `
-			-Wait -RedirectStandardOutput '/dev/null'
-		Wait-Process $(Start-Process 'sudo' -ArgumentList @('ln', '-sfn', `
-			"/Applications/WaykAgent.app/Contents/MacOS/WaykAgent",
-			"/usr/local/bin/wayk-now") -PassThru).Id
+		Wait-Process $(Start-Process 'sudo' -ArgumentList `
+			@('installer', '-pkg', $DownloadFilePath, '-target', '/') -PassThru).Id
 	} elseif ($IsLinux) {
 		$DpkgArgs = @(
 			'-i', $DownloadFilePath
@@ -259,14 +248,37 @@ function Uninstall-WaykAgent
 			Start-Process "msiexec.exe" -ArgumentList $MsiArgs -Wait
 		}
 	} elseif ($IsMacOS) {
-		$WaykAgentApp = "/Applications/WaykAgent.app"
-		if (Test-Path -Path $WaykAgentApp -PathType 'Container') {
-			Start-Process 'sudo' -ArgumentList @('rm', '-rf', $WaykAgentApp) -Wait
+		$InstallerUser = $(stat -f '%Su' $HOME)
+		$WaykAgentAppPath = "/Applications/WaykAgent.app"
+		$NowPrivacyHelper = "${WaykAgentAppPath}/Contents/MacOS/NowPrivacyHelper"
+		$NowSessionLauncher = "${WaykAgentAppPath}/Contents/MacOS/NowSessionLauncher"
+		$NowService = "${WaykAgentAppPath}/Contents/MacOS/NowService"
+
+		foreach ($UnloadProgram in @($NowPrivacyHelper, $NowSessionLauncher)) {
+			if (Test-Path -Path $UnloadProgram -PathType 'Leaf') {
+				Wait-Process $(Start-Process 'sudo' -ArgumentList `
+					@('-u', $InstallerUser, '-s', $UnloadProgram, '--cmd', 'unload') -PassThru).Id
+			}
 		}
-		$WaykNowSymlink = "/usr/local/bin/wayk-now"
-		if (Test-Path -Path $WaykNowSymlink) {
-			Start-Process 'sudo' -ArgumentList @('rm', $WaykNowSymlink) -Wait
+
+		foreach ($DeleteProgram in @($NowPrivacyHelper, $NowSessionLauncher, $NowService)) {
+			if (Test-Path -Path $DeleteProgram -PathType 'Leaf') {
+				Wait-Process $(Start-Process 'sudo' -ArgumentList `
+					@($DeleteProgram, '--cmd', 'delete') -PassThru).Id
+			}
 		}
+
+		Wait-Process $(Start-Process 'sudo' -ArgumentList `
+			@('rm', '-rf', '/var/run/wayk') -PassThru).Id
+
+		Wait-Process $(Start-Process 'sudo' -ArgumentList `
+			@('rm', '-f', '/usr/local/bin/wayk-now') -PassThru).Id
+
+		Stop-Process -Name 'WaykAgent' -ErrorAction 'SilentlyContinue'
+
+		Wait-Process $(Start-Process 'sudo' -ArgumentList `
+			@('rm', '-rf', $WaykAgentAppPath) -PassThru).Id
+
 	} elseif ($IsLinux) {
 		if (Get-WaykAgentVersion) {
 			$AptArgs = @(
