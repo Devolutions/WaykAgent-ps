@@ -6,12 +6,6 @@ enum ControlMode
     Server = 2
 }
 
-enum PersonalPasswordType 
-{
-    Generated = 0
-    Custom = 1
-}
-
 enum GeneratedPasswordCharSet 
 {
     Numeric = 0
@@ -58,8 +52,6 @@ class WaykAgentConfig
     [bool] $AllowPersonalPassword = $true
     [bool] $AllowSystemAuth = $true
     [bool] $AllowNoPassword = $true
-    [PersonalPasswordType] $PersonalPasswordType
-    [string] $PersonalPassword
     [int32] $GeneratedPasswordLength = 6
     [bool] $GeneratedPasswordAutoReset = $true
     [GeneratedPasswordCharSet] $GeneratedPasswordCharSet = [GeneratedPasswordCharSet]::Alphanumeric
@@ -114,8 +106,6 @@ function Set-WaykAgentConfig
         [bool] $AllowPersonalPassword,
         [bool] $AllowSystemAuth,
         [bool] $AllowNoPassword,
-        [PersonalPasswordType]  $PersonalPasswordType,
-        [string] $PersonalPassword,
         [ValidateRange(3,9)]
         [int32] $GeneratedPasswordLength,
         [GeneratedPasswordCharSet] $GeneratedPasswordCharSet,

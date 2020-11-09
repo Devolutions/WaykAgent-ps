@@ -5,11 +5,6 @@ Describe 'Wayk Agent config' {
 		Mock Get-WaykAgentPath { Join-Path $TestDrive "config" }
 
 		Context 'Empty configuration files' {
-			It 'Disables Prompt for Permission (PFP)' {
-				Set-WaykAgentConfig -AllowPersonalPassword $false
-				$(Get-WaykAgentConfig).AllowPersonalPassword | Should -Be $false
-				Assert-MockCalled 'Get-WaykAgentPath'
-			}
 			It 'Disables the version check' {
 				Set-WaykAgentConfig -VersionCheck $false
 				$(Get-WaykAgentConfig).VersionCheck | Should -Be $false
