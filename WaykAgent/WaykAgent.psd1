@@ -27,7 +27,7 @@ Author = 'Devolutions'
 CompanyName = 'Devolutions'
 
 # Copyright statement for this module
-Copyright = '(c) 2019-2020 Devolutions Inc. All rights reserved.'
+Copyright = '(c) 2019-2021 Devolutions Inc. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Devolutions Wayk Agent PowerShell Module'
